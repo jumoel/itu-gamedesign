@@ -85,21 +85,11 @@ public class Player {
 	}
 	
 	public void moveRight(){
-		if (isInAir){
-			x+= xSpeed * AIRFACTOR;
-		}
-		else{
-			currentXSpeed = xSpeed;
-		}
+		currentXSpeed = xSpeed;
 	}
 
 	public void moveLeft(){
-		if (isInAir){
-			x-= xSpeed * AIRFACTOR;
-		}
-		else{
-			currentXSpeed = -xSpeed;
-		}
+		currentXSpeed = -xSpeed;
 	}
 	
 	
