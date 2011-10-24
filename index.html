@@ -22,6 +22,8 @@
 	</header>
 	<div id="main" role="main">
 
+		<h1>bunnyhat!</h1>
+
 	</div>
 	<footer>
 
@@ -30,6 +32,18 @@
 
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script>window.jQuery || document.write('<script src="js/libs/jquery-1.6.2.min.js"><\/script>')</script>
+<script src="js/libs/jquery.jrumble.1.2.min.js"></script>
+
+<script>
+
+$('#main h1').jrumble({
+	x: 0,
+	y: 0,
+	rotation: 5
+}).trigger('startRumble');
+
+</script>
+
 <script>
 	var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']]; // Change UA-XXXXX-X to be your site's ID
 	(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];g.async=1;

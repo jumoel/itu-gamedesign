@@ -246,6 +246,8 @@ table { border-collapse: collapse; border-spacing: 0; }
 
 @media only screen and (min-width: 480px) {
   /* Style adjustments for viewports 480px and over go here */
+  div#main { text-align: center; padding-top: 100px; }
+  h1 { font-size: 5em; }
 
 }
 
