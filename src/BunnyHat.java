@@ -1,62 +1,52 @@
+import game.State;
+import gui.PlayerView;
+import gui.RaceIndicator;
+
 import java.util.LinkedList;
 
 import processing.core.*;
 
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.tiled.*;
-
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet
 {
+	private static int WINDOWHEIGHT = 768;
+	private static int WINDOWWIDTH = 1024;
+	private static int RACEINDICATORHEIGHT = 24;
+	private static int PLAYERVIEWHEIGHT = (WINDOWHEIGHT - RACEINDICATORHEIGHT) / 2;
 
-	public Player player2;
+	private static int VIEW1Y = 0;
+	private static int RACEINDICATORY = PLAYERVIEWHEIGHT;
+	private static int VIEW2Y = RACEINDICATORY + RACEINDICATORHEIGHT;
+	
+	private static int LEFT = 0;
+	
+	private gui.PlayerView view1;
+	private gui.PlayerView view2;
+	private gui.RaceIndicator indicator;
+	
+	// TODO: REMOVE
 	public LinkedList<Obstacle> obstacleList;
 
+	private State inputState;
+	
 	public void setup()
 	{
+		inputState = new State();
+		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this);
+		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this);
+		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
+		
 		size(1024, 768);
 		background(0);
-		
-		/* Example: Read map data
-	
-		BHTiledMap tm;
-		try
-		{
-			tm = new BHTiledMap("/Users/jmoeller/Desktop/untitled.tmx");
-			
-			System.out.println("Layers: " + tm.getLayerCount());
-			System.out.println("Width:" + tm.getWidth() + " Height: " + tm.getHeight());
-			
-			Layer l = tm.getLayer(0);
-			System.out.println(l.name);
-		}
-		catch (SlickException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
-
-		player2 = new Player(this);
-
-		obstacleList = new LinkedList<Obstacle>();
-		obstacleList.add(new Obstacle(this, 0, 500, 600, 50));
-		obstacleList.add(new Obstacle(this, 0, 700, 1024, 68));
 	}
 
 	public void draw()
 	{
 		background(0);
 
-		this.update();
-		player2.update();
-
-		for (Obstacle o : obstacleList)
-		{
-			o.draw();
-		}
-
-		player2.draw();
+		view1.update(inputState, LEFT, VIEW1Y);
+		view2.update(inputState, LEFT, VIEW2Y);
+		indicator.update(inputState, LEFT, RACEINDICATORY);
 	}
 
 	public static void main(String args[])
@@ -65,42 +55,21 @@ public class BunnyHat extends PApplet
 		{ "--present", "BunnyHat" });
 	}
 
-	public void update()
-	{
-		if (wIsDown)
-		{
-			player2.jump();
-		}
-		if (aIsDown)
-		{
-			player2.moveLeft();
-		}
-		if (dIsDown)
-		{
-			player2.moveRight();
-		}
-	}
-
-	private boolean wIsDown = false;
-	private boolean aIsDown = false;
-	// private boolean sIsDown = false;
-	private boolean dIsDown = false;
-
 	public void keyPressed()
 	{
 		if (key == 'd')
 		{
-			dIsDown = true;
-			aIsDown = false;
+			inputState.put("d", true);
+			inputState.put("a", false);
 		}
 		if (key == 'a')
 		{
-			aIsDown = true;
-			dIsDown = false;
+			inputState.put("a", true);
+			inputState.put("d", false);
 		}
 		if (key == 'w')
 		{
-			wIsDown = true;
+			inputState.put("w", true);
 		}
 	}
 
@@ -108,15 +77,15 @@ public class BunnyHat extends PApplet
 	{
 		if (key == 'd')
 		{
-			dIsDown = false;
+			inputState.put("d", false);
 		}
 		if (key == 'a')
 		{
-			aIsDown = false;
+			inputState.put("a", false);
 		}
 		if (key == 'w')
 		{
-			wIsDown = false;
+			inputState.put("w", false);
 		}
 	}
 }
