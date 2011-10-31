@@ -37,6 +37,7 @@ public class Player
 
 	public void update()
 	{
+		/*
 		boolean hasCollided = false;
 		x += currentXSpeed;
 		float sign = Math.signum(currentXSpeed);
@@ -73,6 +74,7 @@ public class Player
 			ySpeed = 0;
 		}
 		y += ySpeed;
+		*/
 	}
 
 	void jump()

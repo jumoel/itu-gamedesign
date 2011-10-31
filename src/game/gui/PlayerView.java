@@ -22,6 +22,7 @@ public class PlayerView extends Updateable
 	
 	public void update(State state, int xpos, int ypos)
 	{
+		processing.noStroke();
 		processing.fill(255);
 		processing.rect(xpos, ypos, width, height);
 	}

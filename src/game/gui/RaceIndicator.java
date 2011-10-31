@@ -18,6 +18,7 @@ public class RaceIndicator extends Updateable
 	
 	public void update(State state, int xpos, int ypos)
 	{
+		processing.noStroke();
 		processing.fill(processing.color(255, 0, 0, 255));
 		processing.rect(xpos, ypos, width, height);
 	}
