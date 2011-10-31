@@ -1,6 +1,6 @@
-import game.State;
-import gui.PlayerView;
-import gui.RaceIndicator;
+package game;
+import game.gui.PlayerView;
+import game.gui.RaceIndicator;
 
 import java.util.LinkedList;
 
@@ -20,9 +20,9 @@ public class BunnyHat extends PApplet
 	
 	private static int LEFT = 0;
 	
-	private gui.PlayerView view1;
-	private gui.PlayerView view2;
-	private gui.RaceIndicator indicator;
+	private game.gui.PlayerView view1;
+	private game.gui.PlayerView view2;
+	private game.gui.RaceIndicator indicator;
 	
 	// TODO: REMOVE
 	public LinkedList<Obstacle> obstacleList;

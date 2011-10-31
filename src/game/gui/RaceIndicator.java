@@ -1,4 +1,4 @@
-package gui;
+package game.gui;
 
 import game.State;
 import processing.core.*;
