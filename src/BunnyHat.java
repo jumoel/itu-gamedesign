@@ -1,7 +1,9 @@
 import java.util.LinkedList;
-import java.util.List;
 
 import processing.core.*;
+
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.tiled.*;
 
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet
@@ -14,6 +16,26 @@ public class BunnyHat extends PApplet
 	{
 		size(1024, 768);
 		background(0);
+		
+		/* Example: Read map data
+	
+		BHTiledMap tm;
+		try
+		{
+			tm = new BHTiledMap("/Users/jmoeller/Desktop/untitled.tmx");
+			
+			System.out.println("Layers: " + tm.getLayerCount());
+			System.out.println("Width:" + tm.getWidth() + " Height: " + tm.getHeight());
+			
+			Layer l = tm.getLayer(0);
+			System.out.println(l.name);
+		}
+		catch (SlickException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		*/
 
 		player2 = new Player(this);
 
