@@ -14,7 +14,7 @@ public class PlayerView extends Updateable
 	private Player otherPlayer;
 	
 	public PlayerView(int width, int height, PApplet applet)
-	{
+	{	
 		this.width = width;
 		this.height = height;
 		this.processing = applet;

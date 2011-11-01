@@ -10,7 +10,8 @@ public class BunnyHat extends PApplet
 	private static int TILEDIMENSION = 16;
 	
 	private static int RACEINDICATORHEIGHT = 2 * TILEDIMENSION;
-	private static int PLAYERVIEWHEIGHT = 25 * TILEDIMENSION;
+	private static int PLAYERVIEWTILES = 25;
+	private static int PLAYERVIEWHEIGHT = PLAYERVIEWTILES * TILEDIMENSION;
 
 	private static int VIEW1Y = 0;
 	private static int RACEINDICATORY = PLAYERVIEWHEIGHT;
