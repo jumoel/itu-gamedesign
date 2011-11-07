@@ -6,6 +6,9 @@ import processing.core.*;
 
 public class PlayerView extends Updateable
 {
+	private enum Horizontal { LEFT, RIGHT, MIDDLE }
+	private enum Vertical { TOP, BOTTOM, CENTER }
+	
 	private int width;
 	private int height;
 	private PApplet processing;
@@ -40,18 +43,64 @@ public class PlayerView extends Updateable
 	}
 	
 	public void update(State state, int xpos, int ypos, int deltaT)
-	{
+	{	
+		// Just a shortcut :)
 		PGraphics cb = buffers[currentBuffer];
+		
+		// Update the players physics, etc.
+		ownPlayer.update(deltaT);
+		
+		// Draw a white background
 		cb.beginDraw();
 		cb.background(255);
-		
-		ownPlayer.update(cb);
-		
 		cb.endDraw();
 		
+		// Draw the player
+		drawImage(ownPlayer.getCurrentTexture(), cb, 100, 150, Horizontal.MIDDLE, Vertical.BOTTOM);
+		
+		// Draw the image to the surface
 		processing.image(cb, xpos, ypos);
 		
-		
+		// Swap the buffers
 		currentBuffer = (currentBuffer + 1) % NUMBER_OF_BUFFERS;
+	}
+	
+	private void drawImage(PImage image, PGraphics graphics, int xpos, int ypos, Horizontal horizontal, Vertical vertical)
+	{
+		graphics.beginDraw();
+		
+		int tx = xpos, ty = ypos;
+		
+		switch (horizontal)
+		{
+			case LEFT:
+				tx = xpos;
+				break;
+			case RIGHT:
+				tx = xpos - image.width;
+				break;
+			case MIDDLE:
+				tx = xpos - image.width / 2;
+				break;
+		}
+		
+		switch (vertical)
+		{
+			case TOP:
+				ty = ypos;
+				break;
+			case BOTTOM:
+				ty = ypos - image.height;
+				break;
+			case CENTER:
+				ty = ypos - image.height / 2;
+				break;
+		}
+		
+		graphics.image(image, tx, ty);
+		graphics.fill(processing.color(255, 0, 0, 255));
+		graphics.ellipse(xpos, ypos, 4, 4);
+		
+		graphics.endDraw();
 	}
 }

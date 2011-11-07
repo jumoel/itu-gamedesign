@@ -5,7 +5,7 @@ public class Player
 {
 	private PApplet processing;
 	private PImage texture;
-	private int xpos, ypos;
+	public int xpos, ypos;
 
 	public Player(PApplet applet)
 	{
@@ -16,16 +16,15 @@ public class Player
 		xpos = 50;
 		ypos = 50;
 	}
-
-	public void update(PGraphics g)
+	
+	// Return the current texture (ie. specific animation sprite)
+	public PImage getCurrentTexture()
 	{
-		int texX, texY;
+		return texture;
+	}
+
+	public void update(int deltaT)
+	{
 		
-		texX = xpos - texture.width / 2;
-		texY = ypos - texture.height;
-		g.image(texture, texX, texY);
-		
-		g.fill(processing.color(255, 0, 0, 255));
-		g.ellipse(xpos, ypos, 4, 4);
 	}
 }

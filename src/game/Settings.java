@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 
 import org.yaml.snakeyaml.Yaml;
 
+@SuppressWarnings("unchecked")
 public class Settings
 {
 	private LinkedHashMap<String, Object> values;
@@ -19,7 +20,6 @@ public class Settings
 	
 	public <T> T getValue(String name)
 	{
-		Object val;
 		LinkedHashMap<String, Object> inner = values;
 		
 		String[] tokens = name.split("/");
