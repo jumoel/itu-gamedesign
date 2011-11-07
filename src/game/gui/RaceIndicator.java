@@ -16,7 +16,7 @@ public class RaceIndicator extends Updateable
 		this.processing = applet;
 	}
 	
-	public void update(State state, int xpos, int ypos)
+	public void update(State state, int xpos, int ypos, int deltaT)
 	{
 		processing.noStroke();
 		processing.fill(processing.color(255, 0, 0, 255));

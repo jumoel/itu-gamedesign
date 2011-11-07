@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="res"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/jmoeller/Dropbox/itu/semester-1/game-design/bunnyhat/external/processing.core.jar"/>
-	<classpathentry kind="lib" path="/Users/jmoeller/Dropbox/itu/semester-1/game-design/bunnyhat/external/slick.jar"/>
+	<classpathentry kind="lib" path="external/snakeyaml-1.9.jar"/>
+	<classpathentry kind="lib" path="external/processing.core.jar"/>
+	<classpathentry kind="lib" path="external/slick.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

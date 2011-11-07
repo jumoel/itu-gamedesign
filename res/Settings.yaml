@@ -1,0 +1,7 @@
+game:
+  title: Lucid Twins
+gameplay:
+  gravity: 9.82
+gui:
+  tiledimension: 16
+  playerviewtiles: 25

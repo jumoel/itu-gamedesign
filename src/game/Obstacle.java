@@ -30,6 +30,6 @@ public class Obstacle
 
 	public boolean collidesWith(Player p)
 	{
-		return (p.y >= yPos && p.y <= (yPos + height) && p.x >= xPos && p.x <= (xPos + width));
+		return false; //(p.y >= yPos && p.y <= (yPos + height) && p.x >= xPos && p.x <= (xPos + width));
 	}
 }

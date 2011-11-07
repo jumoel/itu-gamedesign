@@ -7,10 +7,13 @@ import processing.core.*;
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet
 {
-	private static int TILEDIMENSION = 16;
+	public static Settings settings = new Settings();
+	
+	
+	private static int TILEDIMENSION = settings.getValue("gui/tiledimension");
 	
 	private static int RACEINDICATORHEIGHT = 2 * TILEDIMENSION;
-	private static int PLAYERVIEWTILES = 25;
+	private static int PLAYERVIEWTILES = settings.getValue("gui/playerviewtiles");;
 	private static int PLAYERVIEWHEIGHT = PLAYERVIEWTILES * TILEDIMENSION;
 
 	private static int VIEW1Y = 0;
@@ -28,24 +31,39 @@ public class BunnyHat extends PApplet
 
 	private State inputState;
 	
+	private int lastTimestamp;
+	private int currentTimestamp;
+	private int deltaT;
+	
 	public void setup()
-	{
+	{	
 		inputState = new State();
-		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this);
-		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this);
+		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 1);
+		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2);
 		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
 		
 		size(WINDOWWIDTH, WINDOWHEIGHT);
 		background(0);
+		
+		frameRate(60);
+		
+		lastTimestamp = currentTimestamp = millis();
+		deltaT = 0;
 	}
 
 	public void draw()
 	{
+		lastTimestamp = currentTimestamp;
+		currentTimestamp = millis();
+		
+		deltaT = currentTimestamp - lastTimestamp;
+		
+		
 		background(0);
 
-		view1.update(inputState, LEFT, VIEW1Y);
-		view2.update(inputState, LEFT, VIEW2Y);
-		indicator.update(inputState, LEFT, RACEINDICATORY);
+		view1.update(inputState, LEFT, VIEW1Y, deltaT);
+		view2.update(inputState, LEFT, VIEW2Y, deltaT);
+		indicator.update(inputState, LEFT, RACEINDICATORY, deltaT);
 	}
 
 	public static void main(String args[])
