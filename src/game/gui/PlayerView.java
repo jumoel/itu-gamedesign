@@ -34,7 +34,7 @@ public class PlayerView extends Updateable
 		
 		for (int i = 0; i < NUMBER_OF_BUFFERS; i++)
 		{
-			buffers[i] = processing.createGraphics(width, height, PConstants.P2D);
+			buffers[i] = processing.createGraphics(width, height, PConstants.JAVA2D);
 		}
 		
 		this.viewNumber = viewNumber;

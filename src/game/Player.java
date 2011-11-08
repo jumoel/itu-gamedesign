@@ -29,6 +29,8 @@ public class Player
 	private static double MAXSPEED = BunnyHat.SETTINGS.getValue("gameplay/maxspeed");
 	
 	private static double CLAMPTOZERO = BunnyHat.SETTINGS.getValue("gameplay/clamptozero");
+	
+	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
 
 	public Player(PApplet applet)
 	{
@@ -103,7 +105,7 @@ public class Player
 			xSpeed = 0;
 		}
 		
-		xpos = xpos + xSpeed * 1/deltaT;
+		xpos = xpos + xSpeed * deltaT / DELTAT_DIVIDENT;
 		
 		
 		// Y

@@ -1,6 +1,7 @@
 game:
   title: Lucid Twins
 gameplay:
+  deltatdivident: 100
   clamptozero: 0.001
   gravity: -0.0005
   jumpforce: 0.1
