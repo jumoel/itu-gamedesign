@@ -1,7 +1,16 @@
 game:
   title: Lucid Twins
 gameplay:
-  gravity: 9.82
+  clamptozero: 0.001
+  gravity: -0.0005
+  jumpforce: 0.1
+  moveacceleration:
+    ground: 0.5
+    air: 0.2
+  breakacceleration:
+    ground: 0.05
+    air: 0.05
+  maxspeed: 2.0
 gui:
   tiledimension: 16
   playerviewtiles: 25

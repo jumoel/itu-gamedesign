@@ -7,14 +7,14 @@ import processing.core.*;
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet
 {
-	public static Settings settings = new Settings();
+	public static Settings SETTINGS = new Settings();
 	
 	
-	private static int TILEDIMENSION = settings.getValue("gui/tiledimension");
+	public static int TILEDIMENSION = SETTINGS.getValue("gui/tiledimension");
 	
 	private static int RACEINDICATORHEIGHT = 2 * TILEDIMENSION;
-	private static int PLAYERVIEWTILES = settings.getValue("gui/playerviewtiles");;
-	private static int PLAYERVIEWHEIGHT = PLAYERVIEWTILES * TILEDIMENSION;
+	private static int PLAYERVIEWTILES = SETTINGS.getValue("gui/playerviewtiles");;
+	public static int PLAYERVIEWHEIGHT = PLAYERVIEWTILES * TILEDIMENSION;
 
 	private static int VIEW1Y = 0;
 	private static int RACEINDICATORY = PLAYERVIEWHEIGHT;
@@ -25,15 +25,18 @@ public class BunnyHat extends PApplet
 	private static int WINDOWHEIGHT = RACEINDICATORHEIGHT + 2 * PLAYERVIEWHEIGHT;
 	private static int WINDOWWIDTH = 64 * TILEDIMENSION;
 	
-	private game.gui.PlayerView view1;
-	private game.gui.PlayerView view2;
-	private game.gui.RaceIndicator indicator;
+	private PlayerView view1;
+	private PlayerView view2;
+	private RaceIndicator indicator;
 
 	private State inputState;
 	
 	private int lastTimestamp;
 	private int currentTimestamp;
 	private int deltaT;
+	
+	private int lastFpsTime;
+	private int fps;
 	
 	public void setup()
 	{	
@@ -45,25 +48,39 @@ public class BunnyHat extends PApplet
 		size(WINDOWWIDTH, WINDOWHEIGHT);
 		background(0);
 		
-		frameRate(60);
+		frameRate(2000);
 		
 		lastTimestamp = currentTimestamp = millis();
 		deltaT = 0;
+		lastFpsTime = 0;
+		fps = 0;
 	}
 
 	public void draw()
 	{
+		
 		lastTimestamp = currentTimestamp;
 		currentTimestamp = millis();
 		
 		deltaT = currentTimestamp - lastTimestamp;
-		
 		
 		background(0);
 
 		view1.update(inputState, LEFT, VIEW1Y, deltaT);
 		view2.update(inputState, LEFT, VIEW2Y, deltaT);
 		indicator.update(inputState, LEFT, RACEINDICATORY, deltaT);
+		
+		// Print the fps
+		if ((currentTimestamp - lastFpsTime) > 1000)
+		{
+			System.out.println("FPS: " + fps);
+			lastFpsTime = currentTimestamp;
+			fps = 0;
+		}
+		else
+		{
+			fps++;
+		}
 	}
 
 	public static void main(String args[])
@@ -74,35 +91,29 @@ public class BunnyHat extends PApplet
 
 	public void keyPressed()
 	{
+		inputState.put(key, true);
+		
 		if (key == 'd')
 		{
-			inputState.put("d", true);
-			inputState.put("a", false);
+			inputState.put('a', false);
 		}
 		if (key == 'a')
 		{
-			inputState.put("a", true);
-			inputState.put("d", false);
+			inputState.put('d', false);
 		}
-		if (key == 'w')
+		
+		if (key == 'j')
 		{
-			inputState.put("w", true);
+			inputState.put('l', false);
+		}
+		if (key == 'l')
+		{
+			inputState.put('j', false);
 		}
 	}
 
 	public void keyReleased()
 	{
-		if (key == 'd')
-		{
-			inputState.put("d", false);
-		}
-		if (key == 'a')
-		{
-			inputState.put("a", false);
-		}
-		if (key == 'w')
-		{
-			inputState.put("w", false);
-		}
+		inputState.put(key, false);
 	}
 }

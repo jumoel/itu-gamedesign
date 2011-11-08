@@ -1,5 +1,6 @@
 package game.gui;
 
+import game.BunnyHat;
 import game.Player;
 import game.State;
 import processing.core.*;
@@ -15,7 +16,7 @@ public class PlayerView extends Updateable
 	
 	private PGraphics buffers[];
 	private int currentBuffer;
-	private static int NUMBER_OF_BUFFERS = 2;
+	private static int NUMBER_OF_BUFFERS = 1;
 	
 	private int viewNumber;
 
@@ -42,10 +43,56 @@ public class PlayerView extends Updateable
 		this.otherPlayer = null;
 	}
 	
+	private void handleInput(State state)
+	{
+		boolean jumpbutton = (viewNumber == 1) ?
+				(state.containsKey('w') && state.get('w')) :
+				(state.containsKey('i') && state.get('i'));
+		
+		boolean leftbutton = (viewNumber == 1) ?
+				(state.containsKey('a') && state.get('a')) :
+				(state.containsKey('j') && state.get('j'));
+				
+		boolean rightbutton = (viewNumber == 1) ?
+				(state.containsKey('d') && state.get('d')) :
+				(state.containsKey('l') && state.get('l'));
+				
+		boolean downbutton = (viewNumber == 1) ?
+				(state.containsKey('s') && state.get('s')) :
+				(state.containsKey('k') && state.get('k'));
+
+		
+		if (jumpbutton && ownPlayer != null)
+		{
+			ownPlayer.jump();
+		}
+		
+		if (leftbutton && ownPlayer != null)
+		{
+			ownPlayer.isMovingSideways = true;
+			ownPlayer.moveLeft();
+		}
+		else if (rightbutton && ownPlayer != null)
+		{
+			ownPlayer.isMovingSideways = true;
+			ownPlayer.moveRight();
+			
+		}
+		
+		if (downbutton && ownPlayer != null)
+		{
+			// Use stuff
+		}
+	}
+	
 	public void update(State state, int xpos, int ypos, int deltaT)
 	{	
 		// Just a shortcut :)
 		PGraphics cb = buffers[currentBuffer];
+		
+		ownPlayer.isMovingSideways = false;
+		
+		handleInput(state);
 		
 		// Update the players physics, etc.
 		ownPlayer.update(deltaT);
@@ -56,7 +103,10 @@ public class PlayerView extends Updateable
 		cb.endDraw();
 		
 		// Draw the player
-		drawImage(ownPlayer.getCurrentTexture(), cb, 100, 150, Horizontal.MIDDLE, Vertical.BOTTOM);
+		int pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);
+		int pypos = BunnyHat.PLAYERVIEWHEIGHT - (int) (ownPlayer.ypos * BunnyHat.TILEDIMENSION);
+		
+		drawImage(ownPlayer.getCurrentTexture(), cb, pxpos, pypos, Horizontal.MIDDLE, Vertical.BOTTOM);
 		
 		// Draw the image to the surface
 		processing.image(cb, xpos, ypos);
