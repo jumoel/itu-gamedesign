@@ -1,7 +1,5 @@
 package game.gui;
 
-import java.text.DecimalFormat;
-
 import game.BunnyHat;
 import game.State;
 import processing.core.*;
