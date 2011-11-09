@@ -13,5 +13,6 @@ gameplay:
     air: 0.05
   maxspeed: 2.0
 gui:
-  tiledimension: 16
-  playerviewtiles: 25
+  tiledimension: 24
+  playerviewtileheight: 12
+  playerviewtilewidth: 30

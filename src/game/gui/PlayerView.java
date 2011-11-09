@@ -149,7 +149,7 @@ public class PlayerView extends Updateable
 			ownPlayer.cannotMoveLeft = true;
 		}
 		
-		drawGrid(cb, 16, -(xCoordCamera % 16));
+		drawGrid(cb, BunnyHat.TILEDIMENSION, -(xCoordCamera % BunnyHat.TILEDIMENSION));
 		
 		drawImage(ownPlayer.getCurrentTexture(), cb, pxpos, pypos, Horizontal.MIDDLE, Vertical.BOTTOM);
 		
