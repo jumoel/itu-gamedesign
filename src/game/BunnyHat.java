@@ -57,7 +57,7 @@ public class BunnyHat extends PApplet
 		fps = 0;
 		
 		//testing Level
-		//Level level = new Level(this, "levels/test.tmx");
+		Level level = new Level(this, "levels/test.tmx");
 	}
 
 	public void draw()

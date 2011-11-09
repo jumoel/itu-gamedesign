@@ -2,43 +2,42 @@ package level;
 
 import game.BunnyHat;
 import processing.core.*;
+import util.BImage;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.xpath.*;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.w3c.dom.Node;
-import org.w3c.dom.Element;
-import java.io.File;
-import org.w3c.dom.NamedNodeMap;
-
-
-
 
 public class Level
-{
-	public static int TILEDIMENSION = BunnyHat.SETTINGS.getValue("gui/tiledimension");
-	PImage level;
-	private PImage tiles[];
+{	
 	private PApplet processing;
+	
+	private PImage tiles[];
+	private int metaTiles[];
+	
 	public String levelName;
-	private String imgFile;
-	private int imgWidth;
-	private int imgHeight;
+	
+	private String imageFile;
+	private int imageWidth;
+	private int imageHeight;
 	private int levelWidth;
 	private int levelHeight;
 	
-	public Level (PApplet p, String levelName){
+	public Level (PApplet p, String levelName)
+	{
 		this.processing = p;
 		this.levelName = levelName;
+		
 		loadXML();
+		tiles = BImage.cutImageSprite(processing, processing.loadImage("levels/" + imageFile), BunnyHat.TILEDIMENSION, BunnyHat.TILEDIMENSION);
 	}
-	public void loadXML(){
-		try {
-			 
-			File fXmlFile = new File(levelName);
-			
+	
+	private void loadXML()
+	{
+		try
+		{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(true); // never forget this!
 			DocumentBuilder builder = factory.newDocumentBuilder();
@@ -51,40 +50,35 @@ public class Level
 			XPathExpression imgFileXPath = xpath.compile("/map[1]//tileset[@name='Graphics']/image/@source");
 			XPathExpression imgWidthXPath = xpath.compile("/map[1]//tileset[@name='Graphics']/image/@width");
 			XPathExpression imgHeightXPath = xpath.compile("/map[1]//tileset[@name='Graphics']/image/@height");
-			XPathExpression levelWidthXPath = xpath.compile("/map[1]//layer[@name='Graphics']/image/@width");
-			XPathExpression levelHeightXPath = xpath.compile("/map[1]//layer[@name='Graphics']/image/@height");
-			
-			//THIS DOES NOT WORK YET ->
+			XPathExpression levelWidthXPath = xpath.compile("/map[1]//layer[@name='Graphics']/@width");
+			XPathExpression levelHeightXPath = xpath.compile("/map[1]//layer[@name='Graphics']/@height");
 			
 			
-			NodeList tileWidth  = (NodeList) tileWidthXPath.evaluate(doc, XPathConstants.NODESET);
+			int tileWidth  = ((Double) tileWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			int tileHeight  = ((Double) tileHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			
-			System.out.println("tileWidth: " + tileWidth.getLength());
+			// The tile dimensions should match up.
+			if (tileWidth != tileHeight || tileWidth != BunnyHat.TILEDIMENSION)
+			{
+				System.err.println(
+						"The tile dimensions in the level '" + levelName + "' aren't square, " +
+						"or doesn't match with the tile dimension in the settings file," +
+						"or the level doesn't conform to the quality control guidelines.");
+				
+				System.exit(-1);
+			}
 
-			imgFile = ((String) imgFileXPath.evaluate(doc, XPathConstants.STRING));
-			imgWidth = ((Double) imgWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
-			imgHeight = ((Double) imgHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
+			imageFile = ((String) imgFileXPath.evaluate(doc, XPathConstants.STRING));
+			imageWidth = ((Double) imgWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
+			imageHeight = ((Double) imgHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			levelWidth = ((Double) levelWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			levelHeight = ((Double) levelHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			
-			
-		  } catch (Exception e) {
-			e.printStackTrace();
-		  }
-	}
-	
-	
-	
-	public void cropImage(){
-		level = processing.loadImage(levelName);
-		
-		for (int y = 0; y < level.height/TILEDIMENSION; y = y + TILEDIMENSION){
-			
-			for (int x = 0; x < level.width/TILEDIMENSION; x = x + TILEDIMENSION){
-				tiles[y*x+x+1] = level.get(x, y, TILEDIMENSION, TILEDIMENSION);
-			}
-		
+			System.out.println(imageFile + ", " + imageWidth + ", " + imageHeight + ", " + levelWidth + ", " + levelHeight);
 		}
-	}	
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
 }
