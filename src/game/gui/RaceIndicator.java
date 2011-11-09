@@ -12,9 +12,6 @@ public class RaceIndicator extends Updateable
 	private int height;
 	private PApplet processing;
 	private BunnyHat bunnyhat;
-	private PFont font;
-    private DecimalFormat df;
-
     private int triangleWidth;
     private int triangleHeight;
 	
@@ -25,8 +22,6 @@ public class RaceIndicator extends Updateable
 		this.processing = applet;
 		this.bunnyhat = applet;
 		
-		this.font = processing.loadFont("Monospaced-20.vlw");
-		this.df = new DecimalFormat("###.##");
 		this.triangleWidth = 10;
 		this.triangleHeight = 10;
 	}
