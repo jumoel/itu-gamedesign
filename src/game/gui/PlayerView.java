@@ -11,6 +11,7 @@ public class PlayerView extends Updateable
 	private enum Vertical { TOP, BOTTOM, CENTER }
 	
 	private int width;
+	private int halfwidth;
 	private int height;
 	private PApplet processing;
 	
@@ -19,6 +20,10 @@ public class PlayerView extends Updateable
 	private static int NUMBER_OF_BUFFERS = 1;
 	
 	private int viewNumber;
+	private int xCoordCamera;
+	private int xCoordCameraMiddle;
+	
+	private int maxDistance;
 
 	private Player ownPlayer;
 	private Player otherPlayer;
@@ -26,6 +31,7 @@ public class PlayerView extends Updateable
 	public PlayerView(int width, int height, PApplet applet, int viewNumber)
 	{	
 		this.width = width;
+		this.halfwidth = this.width / 2;
 		this.height = height;
 		this.processing = applet;
 		
@@ -34,13 +40,18 @@ public class PlayerView extends Updateable
 		
 		for (int i = 0; i < NUMBER_OF_BUFFERS; i++)
 		{
-			buffers[i] = processing.createGraphics(width, height, PConstants.JAVA2D);
+			buffers[i] = processing.createGraphics(this.width, this.height, PConstants.JAVA2D);
 		}
 		
 		this.viewNumber = viewNumber;
 		
 		this.ownPlayer = new Player(processing);
 		this.otherPlayer = null;
+		
+		this.maxDistance = 0;
+		
+		this.xCoordCamera = 0;
+		this.xCoordCameraMiddle = xCoordCamera + halfwidth;
 	}
 	
 	private void handleInput(State state)
@@ -106,6 +117,38 @@ public class PlayerView extends Updateable
 		int pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);
 		int pypos = BunnyHat.PLAYERVIEWHEIGHT - (int) (ownPlayer.ypos * BunnyHat.TILEDIMENSION);
 		
+		if (pxpos > maxDistance)
+		{
+			maxDistance = pxpos;
+		}
+		
+		/* If the player is about to travel across the middle of the screen,
+		 * make him stick in the middle and move the background instead;
+		 */
+		if (maxDistance > xCoordCameraMiddle)
+		{
+			xCoordCameraMiddle = maxDistance;
+			xCoordCamera = xCoordCameraMiddle - halfwidth;
+			pxpos = halfwidth;
+		}
+		/* Like in Super Mario Bros, the player can move backwards, but the
+		 * camera won't pan with him.
+		 */
+		else
+		{
+			pxpos = halfwidth - (xCoordCameraMiddle - pxpos);
+		}
+		
+		/* And the player cannot move behind the cameras view
+		 */
+		if (pxpos < 0)
+		{
+			pxpos = 0;
+			ownPlayer.cannotMoveLeft = true;
+		}
+		
+		drawGrid(cb, 16, -(xCoordCamera % 16));
+		
 		drawImage(ownPlayer.getCurrentTexture(), cb, pxpos, pypos, Horizontal.MIDDLE, Vertical.BOTTOM);
 		
 		// Draw the image to the surface
@@ -113,6 +156,27 @@ public class PlayerView extends Updateable
 		
 		// Swap the buffers
 		currentBuffer = (currentBuffer + 1) % NUMBER_OF_BUFFERS;
+	}
+	
+	private void drawGrid(PGraphics graphics, int distance, int xbegin)
+	{
+		graphics.beginDraw();
+		graphics.stroke(200);
+		
+		int ymax = graphics.height - 1;
+		int xmax = graphics.width - 1;
+		
+		for (int x = xbegin; x < graphics.width; x = x + distance)
+		{
+			graphics.line(x, 0, x, ymax);
+		}
+		
+		for (int y = 0; y < graphics.height; y = y + distance)
+		{
+			graphics.line(0, y, xmax, y);
+		}
+		
+		graphics.endDraw();
 	}
 	
 	private void drawImage(PImage image, PGraphics graphics, int xpos, int ypos, Horizontal horizontal, Vertical vertical)
