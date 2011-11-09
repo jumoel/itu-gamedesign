@@ -13,6 +13,8 @@ public class Player
 	
 	public boolean isMovingSideways;
 	
+	public boolean cannotMoveLeft;
+	
 	private double yAcceleration;
 	private double ySpeed;
 	private double xSpeed;
@@ -46,6 +48,7 @@ public class Player
 		isInAir = true;
 		isJumping = true;
 		isMovingSideways = false;
+		cannotMoveLeft = false;
 	}
 	
 	// Return the current texture (ie. specific animation sprite)
@@ -66,6 +69,12 @@ public class Player
 	
 	public void moveLeft()
 	{
+		if (cannotMoveLeft)
+		{
+			xSpeed = 0;
+			return;
+		}
+		
 		if (isInAir)
 		{
 			xSpeed -= MOVEACCEL_AIR;
@@ -78,6 +87,8 @@ public class Player
 	
 	public void moveRight()
 	{
+		cannotMoveLeft = false;
+		
 		if (isInAir)
 		{
 			xSpeed += MOVEACCEL_AIR;

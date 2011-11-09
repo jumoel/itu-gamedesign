@@ -9,7 +9,6 @@ public class BunnyHat extends PApplet
 {
 	public static Settings SETTINGS = new Settings();
 	
-	
 	public static int TILEDIMENSION = SETTINGS.getValue("gui/tiledimension");
 	
 	private static int RACEINDICATORHEIGHT = 2 * TILEDIMENSION;
@@ -25,9 +24,9 @@ public class BunnyHat extends PApplet
 	private static int WINDOWHEIGHT = RACEINDICATORHEIGHT + 2 * PLAYERVIEWHEIGHT;
 	private static int WINDOWWIDTH = 64 * TILEDIMENSION;
 	
-	private PlayerView view1;
-	private PlayerView view2;
-	private RaceIndicator indicator;
+	public PlayerView view1;
+	public PlayerView view2;
+	public RaceIndicator indicator;
 
 	private State inputState;
 	

@@ -69,7 +69,6 @@ public class Level
 			levelHeight = ((Double) levelHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			
 			
-			
 		  } catch (Exception e) {
 			e.printStackTrace();
 		  }
