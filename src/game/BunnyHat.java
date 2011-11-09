@@ -3,6 +3,7 @@ import game.gui.PlayerView;
 import game.gui.RaceIndicator;
 
 import processing.core.*;
+import util.BImage;
 
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet
@@ -12,8 +13,9 @@ public class BunnyHat extends PApplet
 	public static int TILEDIMENSION = SETTINGS.getValue("gui/tiledimension");
 	
 	private static int RACEINDICATORHEIGHT = 2 * TILEDIMENSION;
-	private static int PLAYERVIEWTILES = SETTINGS.getValue("gui/playerviewtiles");;
-	public static int PLAYERVIEWHEIGHT = PLAYERVIEWTILES * TILEDIMENSION;
+	private static int PLAYERVIEWTILEHEIGHT = SETTINGS.getValue("gui/playerviewtileheight");
+	private static int PLAYERVIEWTILEWIDTH = SETTINGS.getValue("gui/playerviewtilewidth");
+	public static int PLAYERVIEWHEIGHT = PLAYERVIEWTILEHEIGHT * TILEDIMENSION;
 
 	private static int VIEW1Y = 0;
 	private static int RACEINDICATORY = PLAYERVIEWHEIGHT;
@@ -22,7 +24,7 @@ public class BunnyHat extends PApplet
 	private static int LEFT = 0;
 	
 	private static int WINDOWHEIGHT = RACEINDICATORHEIGHT + 2 * PLAYERVIEWHEIGHT;
-	private static int WINDOWWIDTH = 64 * TILEDIMENSION;
+	private static int WINDOWWIDTH = PLAYERVIEWTILEWIDTH * TILEDIMENSION;
 	
 	public PlayerView view1;
 	public PlayerView view2;
