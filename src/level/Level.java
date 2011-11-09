@@ -30,25 +30,8 @@ public class Level
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 			Document doc = dBuilder.parse(fXmlFile);
-			doc.getDocumentElement().normalize();
-	 
-			NodeList nList = doc.getElementsByTagName("staff");
-			System.out.println("-----------------------");
-	 
-			for (int temp = 0; temp < nList.getLength(); temp++) {
-	 
-			   Node nNode = nList.item(temp);
-			   if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-	 
-			      Element eElement = (Element) nNode;
-	 
-			      System.out.println("First Name : " + getTagValue("firstname", eElement));
-			      System.out.println("Last Name : " + getTagValue("lastname", eElement));
-		          System.out.println("Nick Name : " + getTagValue("nickname", eElement));
-			      System.out.println("Salary : " + getTagValue("salary", eElement));
-	 
-			   }
-			}
+			
+			
 		  } catch (Exception e) {
 			e.printStackTrace();
 		  }

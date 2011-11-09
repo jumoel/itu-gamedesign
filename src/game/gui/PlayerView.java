@@ -28,6 +28,8 @@ public class PlayerView extends Updateable
 	private Player ownPlayer;
 	private Player otherPlayer;
 	
+	private int levelLength = 500 * BunnyHat.TILEDIMENSION;
+	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber)
 	{	
 		this.width = width;
@@ -156,6 +158,16 @@ public class PlayerView extends Updateable
 		
 		// Swap the buffers
 		currentBuffer = (currentBuffer + 1) % NUMBER_OF_BUFFERS;
+	}
+	
+	public int getPlayerPosition()
+	{
+		return maxDistance;
+	}
+	
+	public int getLevelLength()
+	{
+		return levelLength;
 	}
 	
 	private void drawGrid(PGraphics graphics, int distance, int xbegin)
