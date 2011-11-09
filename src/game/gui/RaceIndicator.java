@@ -14,6 +14,9 @@ public class RaceIndicator extends Updateable
 	private BunnyHat bunnyhat;
 	private PFont font;
     private DecimalFormat df;
+
+    private int triangleWidth;
+    private int triangleHeight;
 	
 	public RaceIndicator(int width, int height, BunnyHat applet)
 	{
@@ -24,6 +27,8 @@ public class RaceIndicator extends Updateable
 		
 		this.font = processing.loadFont("Monospaced-20.vlw");
 		this.df = new DecimalFormat("###.##");
+		this.triangleWidth = 10;
+		this.triangleHeight = 10;
 	}
 	
 	public void update(State state, int xpos, int ypos, int deltaT)
@@ -32,16 +37,23 @@ public class RaceIndicator extends Updateable
 		processing.fill(processing.color(255, 0, 0, 255));
 		processing.rect(xpos, ypos, width, height);
 
-		int levelOneLength = bunnyhat.view1.getLevelLength();
-		int levelTwoLength = bunnyhat.view2.getLevelLength();
-
-		int playerOneProgress = bunnyhat.view1.getPlayerPosition();
-		int playerTwoProgress = bunnyhat.view2.getPlayerPosition();
-
-		double percentageOne = (double)playerOneProgress / (double)levelOneLength * 100.0;
-		double percentageTwo = (double)playerTwoProgress / (double)levelTwoLength * 100.0;
+		processing.fill(255);
 		
-		processing.fill(0);
-		processing.text("Player 1: " + df.format(percentageOne) + "% -- Player 2: " + df.format(percentageTwo) + "%", xpos, ypos + height / 2);
+		int levelOneLength = bunnyhat.view1.getLevelLength();
+		int playerOneProgress = bunnyhat.view1.getPlayerPosition();
+		double percentageOne = (double)playerOneProgress / (double)levelOneLength;
+		
+		int xOne = (int)(width * percentageOne);
+		
+		processing.triangle(xOne, ypos, xOne - triangleWidth / 2, ypos + triangleHeight, xOne + triangleWidth / 2, ypos + triangleHeight);
+		
+
+		int levelTwoLength = bunnyhat.view2.getLevelLength();
+		int playerTwoProgress = bunnyhat.view2.getPlayerPosition();
+		double percentageTwo = (double)playerTwoProgress / (double)levelTwoLength;
+		
+		int xTwo = (int)(width * percentageTwo);
+		
+		processing.triangle(xTwo, ypos + height, xTwo - triangleWidth / 2, ypos + height - triangleHeight, xTwo + triangleWidth / 2, ypos + height - triangleHeight);
 	}
 }
