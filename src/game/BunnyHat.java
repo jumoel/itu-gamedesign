@@ -1,7 +1,7 @@
 package game;
 import game.gui.PlayerView;
 import game.gui.RaceIndicator;
-
+import level.Level;
 import processing.core.*;
 
 @SuppressWarnings("serial")
@@ -54,6 +54,9 @@ public class BunnyHat extends PApplet
 		deltaT = 0;
 		lastFpsTime = 0;
 		fps = 0;
+		
+		//testing Level
+		//Level level = new Level(this, "levels/test.tmx");
 	}
 
 	public void draw()
