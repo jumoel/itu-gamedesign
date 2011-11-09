@@ -6,19 +6,25 @@ import processing.core.PImage;
 
 public class BImage
 {
+	/***
+	 * Cuts an image into multiple sprites.
+	 * The function will not save 'half empty' tiles, so preferably,
+	 * the dimensions of the original image should be divisible by the
+	 * tileWidth and the tileHeight.
+	 * 
+	 * @param processing The processing instance doing the hard lifting
+	 * @param original The original image
+	 * @param tileWidth The width of the tiles
+	 * @param tileHeight The height of the tiles
+	 * @return
+	 */
 	public static PImage[] cutImageSprite(PApplet processing, PImage original, int tileWidth, int tileHeight)
 	{
 		int imageHeight = original.height;
 		int imageWidth = original.width;
 
-		System.out.println("imageHeight: " + imageHeight);
-		System.out.println("imageWidth: " + imageWidth);
-		
 		int xTiles = imageWidth / tileWidth;
 		int yTiles = imageHeight / tileHeight;
-
-		System.out.println("xTiles: " + xTiles);
-		System.out.println("yTiles: " + yTiles);
 		
 		PImage retval[] = new PImage[xTiles * yTiles];
 		

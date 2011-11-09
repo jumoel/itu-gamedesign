@@ -3,6 +3,7 @@ package level;
 import game.BunnyHat;
 import processing.core.*;
 import util.BImage;
+import util.BString;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
@@ -15,7 +16,8 @@ public class Level
 	private PApplet processing;
 	
 	private PImage tiles[];
-	private int metaTiles[];
+	private int metaData[];
+	private int levelData[];
 	
 	public String levelName;
 	
@@ -34,12 +36,39 @@ public class Level
 		tiles = BImage.cutImageSprite(processing, processing.loadImage("levels/" + imageFile), BunnyHat.TILEDIMENSION, BunnyHat.TILEDIMENSION);
 	}
 	
+	public int getLevelDataAt(int x, int y)
+	{
+		return levelData[x*y + x];
+	}
+	
+	public int getMetaDataAt(int x, int y)
+	{
+		return metaData[x*y + x];
+	}
+	
+	public PImage getLevelImageAt(int x, int y)
+	{
+		int leveldata = getLevelDataAt(x, y);
+		
+		if (leveldata == 0)
+		{
+			return processing.createImage(BunnyHat.TILEDIMENSION, BunnyHat.TILEDIMENSION, PConstants.ARGB);
+		}
+		else
+		{
+			return tiles[leveldata - 1];
+		}
+	}
+	
+	
 	private void loadXML()
 	{
 		try
 		{
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			factory.setNamespaceAware(true); // never forget this!
+											 // Ok!
+
 			DocumentBuilder builder = factory.newDocumentBuilder();
 			Document doc = builder.parse(levelName);
 			
@@ -52,12 +81,14 @@ public class Level
 			XPathExpression imgHeightXPath = xpath.compile("/map[1]//tileset[@name='Graphics']/image/@height");
 			XPathExpression levelWidthXPath = xpath.compile("/map[1]//layer[@name='Graphics']/@width");
 			XPathExpression levelHeightXPath = xpath.compile("/map[1]//layer[@name='Graphics']/@height");
+			XPathExpression levelDataXpath = xpath.compile("/map[1]//layer[@name='Graphics']/data/text()");
+			XPathExpression metaDataXpath = xpath.compile("/map[1]//layer[@name='Meta']/data/text()");
 			
 			
 			int tileWidth  = ((Double) tileWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			int tileHeight  = ((Double) tileHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			
-			// The tile dimensions should match up.
+			// The tile dimensions should match up, otherwise something is wrong.
 			if (tileWidth != tileHeight || tileWidth != BunnyHat.TILEDIMENSION)
 			{
 				System.err.println(
@@ -67,14 +98,32 @@ public class Level
 				
 				System.exit(-1);
 			}
-
+			
 			imageFile = ((String) imgFileXPath.evaluate(doc, XPathConstants.STRING));
 			imageWidth = ((Double) imgWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			imageHeight = ((Double) imgHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			levelWidth = ((Double) levelWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			levelHeight = ((Double) levelHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			
-			System.out.println(imageFile + ", " + imageWidth + ", " + imageHeight + ", " + levelWidth + ", " + levelHeight);
+			String levelDataRaw = (String) levelDataXpath.evaluate(doc, XPathConstants.STRING);
+			String metaDataRaw = (String) metaDataXpath.evaluate(doc, XPathConstants.STRING);
+			
+			// Convert the loaded strings to a int arrays
+			String metaDataStrings[] = BString.join(metaDataRaw.split("\n"), "").split(",");
+			metaData = new int[metaDataStrings.length];
+			
+			for (int i = 0; i < metaDataStrings.length; i++)
+			{
+				metaData[i] = Integer.parseInt(metaDataStrings[i]);
+			}
+			
+			String levelDataStrings[] = BString.join(levelDataRaw.split("\n"), "").split(",");
+			levelData = new int[metaDataStrings.length];
+			
+			for (int i = 0; i < levelDataStrings.length; i++)
+			{
+				levelData[i] = Integer.parseInt(levelDataStrings[i]);
+			}
 		}
 		catch (Exception e)
 		{

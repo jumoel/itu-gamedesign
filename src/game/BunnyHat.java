@@ -3,7 +3,6 @@ import game.gui.PlayerView;
 import game.gui.RaceIndicator;
 import level.Level;
 import processing.core.*;
-import util.BImage;
 
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet
