@@ -1,5 +1,6 @@
 package game.gui;
 
+import level.Level;
 import game.BunnyHat;
 import game.Player;
 import game.State;
@@ -30,6 +31,10 @@ public class PlayerView extends Updateable
 	
 	private int levelLength = 500 * BunnyHat.TILEDIMENSION;
 	
+	private Level level;
+	
+	private PFont font;
+	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber)
 	{	
 		this.width = width;
@@ -54,6 +59,10 @@ public class PlayerView extends Updateable
 		
 		this.xCoordCamera = 0;
 		this.xCoordCameraMiddle = xCoordCamera + halfwidth;
+		
+		level = new Level(processing, "levels/test.tmx");
+		
+		font = processing.loadFont("Monospaced-10.vlw");
 	}
 	
 	private void handleInput(State state)
@@ -133,6 +142,7 @@ public class PlayerView extends Updateable
 			xCoordCamera = xCoordCameraMiddle - halfwidth;
 			pxpos = halfwidth;
 		}
+		
 		/* Like in Super Mario Bros, the player can move backwards, but the
 		 * camera won't pan with him.
 		 */
@@ -149,7 +159,7 @@ public class PlayerView extends Updateable
 			ownPlayer.cannotMoveLeft = true;
 		}
 		
-		drawGrid(cb, BunnyHat.TILEDIMENSION, -(xCoordCamera % BunnyHat.TILEDIMENSION));
+		
 		
 		drawImage(ownPlayer.getCurrentTexture(), cb, pxpos, pypos, Horizontal.MIDDLE, Vertical.BOTTOM);
 		
@@ -168,27 +178,6 @@ public class PlayerView extends Updateable
 	public int getLevelLength()
 	{
 		return levelLength;
-	}
-	
-	private void drawGrid(PGraphics graphics, int distance, int xbegin)
-	{
-		graphics.beginDraw();
-		graphics.stroke(200);
-		
-		int ymax = graphics.height - 1;
-		int xmax = graphics.width - 1;
-		
-		for (int x = xbegin; x < graphics.width; x = x + distance)
-		{
-			graphics.line(x, 0, x, ymax);
-		}
-		
-		for (int y = 0; y < graphics.height; y = y + distance)
-		{
-			graphics.line(0, y, xmax, y);
-		}
-		
-		graphics.endDraw();
 	}
 	
 	private void drawImage(PImage image, PGraphics graphics, int xpos, int ypos, Horizontal horizontal, Vertical vertical)

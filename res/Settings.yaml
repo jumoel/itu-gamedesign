@@ -11,7 +11,7 @@ gameplay:
   breakacceleration:
     ground: 0.05
     air: 0.05
-  maxspeed: 2.0
+  maxspeed: 0.5
 gui:
   tiledimension: 16
   playerviewtileheight: 12

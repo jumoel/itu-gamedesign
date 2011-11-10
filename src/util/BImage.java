@@ -28,12 +28,14 @@ public class BImage
 		
 		PImage retval[] = new PImage[xTiles * yTiles];
 		
-		for (int x = 0; x < xTiles; x++)
+		int index;
+		for (int y = 0; y < yTiles; y++)
 		{
-			for (int y = 0; y < yTiles; y++)
+			for (int x = 0; x < xTiles; x++)
 			{
-				retval[x*y + x] = processing.createImage(tileWidth, tileHeight, PConstants.RGB);
-				retval[x*y + x].copy(original, x * tileWidth, y * tileHeight, tileWidth, tileHeight, 0, 0, tileWidth, tileHeight);
+				index = xTiles*y + x;
+				retval[index] = processing.createImage(tileWidth, tileHeight, PConstants.RGB);
+				retval[index].copy(original, x * tileWidth, y * tileHeight, tileWidth, tileHeight, 0, 0, tileWidth, tileHeight);
 			}
 		}
 		

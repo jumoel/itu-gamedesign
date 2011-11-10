@@ -24,8 +24,9 @@ public class Level
 	private String imageFile;
 	private int imageWidth;
 	private int imageHeight;
-	private int levelWidth;
-	private int levelHeight;
+	
+	public int levelWidth;
+	public int levelHeight;
 	
 	public Level (PApplet p, String levelName)
 	{
@@ -38,12 +39,30 @@ public class Level
 	
 	public int getLevelDataAt(int x, int y)
 	{
-		return levelData[x*y + x];
+		int index = levelWidth*y + x;
+		
+		if (index >= 0 && index < levelData.length)
+		{
+			return levelData[index];
+		}
+		else
+		{
+			return 0;
+		}
 	}
 	
 	public int getMetaDataAt(int x, int y)
 	{
-		return metaData[x*y + x];
+		int index = levelWidth*y + x;
+		
+		if (index >= 0 && index < levelData.length)
+		{
+			return metaData[index];
+		}
+		else
+		{
+			return 0;
+		}
 	}
 	
 	public PImage getLevelImageAt(int x, int y)
@@ -52,7 +71,7 @@ public class Level
 		
 		if (leveldata == 0)
 		{
-			return processing.createImage(BunnyHat.TILEDIMENSION, BunnyHat.TILEDIMENSION, PConstants.ARGB);
+			return null;
 		}
 		else
 		{
