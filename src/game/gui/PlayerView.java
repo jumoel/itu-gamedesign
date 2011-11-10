@@ -159,15 +159,64 @@ public class PlayerView extends Updateable
 			ownPlayer.cannotMoveLeft = true;
 		}
 		
-		
-		
-		drawImage(ownPlayer.getCurrentTexture(), cb, pxpos, pypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+		drawLevelGraphics(cb);
 		
 		// Draw the image to the surface
 		processing.image(cb, xpos, ypos);
 		
 		// Swap the buffers
 		currentBuffer = (currentBuffer + 1) % NUMBER_OF_BUFFERS;
+	}
+	
+	private void drawLevelGraphics(PGraphics graphics)
+	{
+		graphics.beginDraw();
+		
+		
+		int minimumTile = xCoordCamera / BunnyHat.TILEDIMENSION;
+		int minimumTileCoord = minimumTile * BunnyHat.TILEDIMENSION - xCoordCamera;
+		
+		int maximumTile = (xCoordCamera + graphics.width) / BunnyHat.TILEDIMENSION;
+		int maximumTileCoord = maximumTile * BunnyHat.TILEDIMENSION - xCoordCamera;
+		
+		// Counting y from down towards the sky
+		for (int reversey = 0; reversey < BunnyHat.PLAYERVIEWTILEHEIGHT; reversey++)
+		{
+			// Counting x from left towards right
+			for (int x = minimumTile; x <= maximumTile; x++)
+			{
+				int y = level.levelHeight - reversey;
+				PImage tile = level.getLevelImageAt(x, y);
+				
+				int xcoord = x * BunnyHat.TILEDIMENSION - xCoordCamera;
+				int ycoord = (BunnyHat.PLAYERVIEWTILEHEIGHT - reversey) * BunnyHat.TILEDIMENSION;
+				
+				if (tile != null)
+				{
+					graphics.image(tile, xcoord, ycoord);
+				}
+			}
+		}
+		
+		// Debug below
+		graphics.line(minimumTileCoord, 0, minimumTileCoord, graphics.height);
+		graphics.line(maximumTileCoord, 0, maximumTileCoord, graphics.height);
+		
+		// Even more debug below
+		int nextTile = minimumTile + 1;
+		int nextTileCoord = nextTile * BunnyHat.TILEDIMENSION;
+		int cameraNextTileCoord = nextTileCoord - xCoordCamera;
+		
+		int cameraSecondTileCoord = cameraNextTileCoord + BunnyHat.TILEDIMENSION;
+		
+		graphics.textFont(font);
+		graphics.fill(0);
+		graphics.text(minimumTile, 0, 20);
+
+		graphics.line(cameraNextTileCoord, 0, cameraNextTileCoord, graphics.height);
+		graphics.line(cameraSecondTileCoord, 0, cameraSecondTileCoord, graphics.height);
+		
+		graphics.endDraw();
 	}
 	
 	public int getPlayerPosition()
