@@ -29,7 +29,7 @@ public class PlayerView extends Updateable
 	private Player ownPlayer;
 	private Player otherPlayer;
 	
-	private int levelLength = 500 * BunnyHat.TILEDIMENSION;
+	private int levelLength;
 	
 	private Level level;
 	
@@ -60,9 +60,11 @@ public class PlayerView extends Updateable
 		this.xCoordCamera = 0;
 		this.xCoordCameraMiddle = xCoordCamera + halfwidth;
 		
-		level = new Level(processing, "levels/test.tmx");
+		this.level = new Level(processing, "levels/test.tmx");
 		
-		font = processing.loadFont("Monospaced-10.vlw");
+		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
+		
+		this.font = processing.loadFont("Monospaced-10.vlw");
 	}
 	
 	private void handleInput(State state)
@@ -128,6 +130,13 @@ public class PlayerView extends Updateable
 		int pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);
 		int pypos = BunnyHat.PLAYERVIEWHEIGHT - (int) (ownPlayer.ypos * BunnyHat.TILEDIMENSION);
 		
+		// Prevent the player from traveling further out than the level is
+		if (pxpos > levelLength)
+		{
+			pxpos = levelLength;
+			ownPlayer.cannotMoveRight = true;
+		}
+		
 		if (pxpos > maxDistance)
 		{
 			maxDistance = pxpos;
@@ -139,8 +148,17 @@ public class PlayerView extends Updateable
 		if (maxDistance > xCoordCameraMiddle)
 		{
 			xCoordCameraMiddle = maxDistance;
+			
+			if (xCoordCameraMiddle > (levelLength - halfwidth))
+			{
+				xCoordCameraMiddle = levelLength - halfwidth;
+				pxpos = width - (levelLength - pxpos);
+			}
+			else
+			{	
+				pxpos = halfwidth;
+			}
 			xCoordCamera = xCoordCameraMiddle - halfwidth;
-			pxpos = halfwidth;
 		}
 		
 		/* Like in Super Mario Bros, the player can move backwards, but the
@@ -161,6 +179,8 @@ public class PlayerView extends Updateable
 		
 		drawLevelGraphics(cb);
 		
+		drawImage(ownPlayer.getCurrentTexture(), cb, pxpos, pypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+		
 		// Draw the image to the surface
 		processing.image(cb, xpos, ypos);
 		
@@ -174,9 +194,17 @@ public class PlayerView extends Updateable
 		
 		
 		int minimumTile = xCoordCamera / BunnyHat.TILEDIMENSION;
+		if (minimumTile < 0)
+		{
+			minimumTile = 0;
+		}
 		int minimumTileCoord = minimumTile * BunnyHat.TILEDIMENSION - xCoordCamera;
 		
 		int maximumTile = (xCoordCamera + graphics.width) / BunnyHat.TILEDIMENSION;
+		if (maximumTile > level.levelWidth)
+		{
+			maximumTile = level.levelWidth;
+		}
 		int maximumTileCoord = maximumTile * BunnyHat.TILEDIMENSION - xCoordCamera;
 		
 		// Counting y from down towards the sky

@@ -12,8 +12,9 @@ public class Player
 	private boolean isJumping;
 	
 	public boolean isMovingSideways;
-	
+
 	public boolean cannotMoveLeft;
+	public boolean cannotMoveRight;
 	
 	private double yAcceleration;
 	private double ySpeed;
@@ -69,6 +70,8 @@ public class Player
 	
 	public void moveLeft()
 	{
+		cannotMoveRight = false;
+		
 		if (cannotMoveLeft)
 		{
 			xSpeed = 0;
@@ -88,6 +91,12 @@ public class Player
 	public void moveRight()
 	{
 		cannotMoveLeft = false;
+		
+		if (cannotMoveRight)
+		{
+			xSpeed = 0;
+			return;
+		}
 		
 		if (isInAir)
 		{
