@@ -1,6 +1,7 @@
 package game;
 import game.graphics.Animation;
 import processing.core.*;
+import util.BImage;
 import util.BMath;
 
 public class Player
@@ -75,7 +76,7 @@ public class Player
 		
 		if (xSpeed < -CLAMPTOZERO)
 		{
-			// TODO: Mirror image?
+			ret = BImage.mirrorAroundY(processing, ret);
 		}
 		
 		return ret;
@@ -134,15 +135,11 @@ public class Player
 	public void update(int deltaT)
 	{
 		// X
-		if (Math.abs(xSpeed) > CLAMPTOZERO)
+		
+		boolean hasXSpeed = Math.abs(xSpeed) > CLAMPTOZERO;
+		
+		if (isMovingSideways)
 		{
-			if (!isMovingSideways)
-			{
-				xSpeed = BMath.addTowardsZero(xSpeed, BREAKACCEL_GROUND);
-			}
-			
-			xSpeed = BMath.clamp(xSpeed, 0, Math.signum(xSpeed) * MAXSPEED);
-			
 			if (walkAnimation.isStopped())
 			{
 				walkAnimation.start();
@@ -150,8 +147,23 @@ public class Player
 		}
 		else
 		{
-			walkAnimation.stop();
+			if (!hasXSpeed)
+			{
+				walkAnimation.stop();
+			}
+		}
+		
+		if (hasXSpeed)
+		{
+			if (!isMovingSideways)
+			{
+				xSpeed = BMath.addTowardsZero(xSpeed, BREAKACCEL_GROUND);
+			}
 			
+			xSpeed = BMath.clamp(xSpeed, 0, Math.signum(xSpeed) * MAXSPEED);
+		}
+		else
+		{	
 			xSpeed = 0;
 		}
 		

@@ -34,11 +34,31 @@ public class BImage
 			for (int x = 0; x < xTiles; x++)
 			{
 				index = xTiles*y + x;
-				retval[index] = processing.createImage(tileWidth, tileHeight, PConstants.RGB);
+				retval[index] = processing.createImage(tileWidth, tileHeight, PConstants.ARGB);
 				retval[index].copy(original, x * tileWidth, y * tileHeight, tileWidth, tileHeight, 0, 0, tileWidth, tileHeight);
 			}
 		}
 		
 		return retval;
+	}
+	
+	public static PImage mirrorAroundY(PApplet processing, PImage original)
+	{
+		PImage ret = processing.createImage(original.width, original.height, PConstants.ARGB);
+		
+		int width = original.width;
+		int height = original.height;
+		
+		for (int x = 0; x < (width / 2) + 1; x++)
+		{
+			for (int y = 0; y < height; y++)
+			{
+				int xreverse = (width - x - 1);
+				ret.pixels[y * width + x] = original.pixels[y * width + xreverse];
+				ret.pixels[y * width + xreverse] = original.pixels[y * width + x];
+			}
+		}
+		
+		return ret;
 	}
 }
