@@ -6,6 +6,8 @@ import util.BMath;
 
 public class Player
 {
+	private enum Facing { LEFT, RIGHT };
+	
 	private PApplet processing;
 	private PImage texture;
 	public double xpos, ypos;
@@ -21,6 +23,8 @@ public class Player
 	private double yAcceleration;
 	private double ySpeed;
 	private double xSpeed;
+	
+	private Facing facing;
 	
 	private Animation walkAnimation;
 
@@ -57,6 +61,8 @@ public class Player
 		
 		String animationfile = BunnyHat.SETTINGS.getValue("graphics/animations/player");
 		this.walkAnimation = new Animation(processing, animationfile, 69, 99, 27);
+		
+		this.facing = Facing.RIGHT;
 	}
 	
 	// Return the current texture (ie. specific animation sprite)
@@ -74,7 +80,7 @@ public class Player
 			}
 		}
 		
-		if (xSpeed < -CLAMPTOZERO)
+		if (facing == Facing.LEFT)
 		{
 			ret = BImage.mirrorAroundY(processing, ret);
 		}
@@ -96,6 +102,8 @@ public class Player
 	{
 		cannotMoveRight = false;
 		
+		facing = Facing.LEFT;
+		
 		if (cannotMoveLeft)
 		{
 			xSpeed = 0;
@@ -115,6 +123,8 @@ public class Player
 	public void moveRight()
 	{
 		cannotMoveLeft = false;
+		
+		facing = Facing.RIGHT;
 		
 		if (cannotMoveRight)
 		{
