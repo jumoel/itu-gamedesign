@@ -1,4 +1,5 @@
 package game;
+import game.graphics.Animation;
 import processing.core.*;
 import util.BMath;
 
@@ -19,6 +20,8 @@ public class Player
 	private double yAcceleration;
 	private double ySpeed;
 	private double xSpeed;
+	
+	private Animation walkAnimation;
 
 	private static double GRAVITY = BunnyHat.SETTINGS.getValue("gameplay/gravity");
 	private static double JUMPFORCE = BunnyHat.SETTINGS.getValue("gameplay/jumpforce");
@@ -50,12 +53,32 @@ public class Player
 		isJumping = true;
 		isMovingSideways = false;
 		cannotMoveLeft = false;
+		
+		String animationfile = BunnyHat.SETTINGS.getValue("graphics/animations/player");
+		this.walkAnimation = new Animation(processing, animationfile, 69, 99, 27);
 	}
 	
 	// Return the current texture (ie. specific animation sprite)
 	public PImage getCurrentTexture()
 	{
-		return texture;
+		PImage ret = texture;
+		
+		if (walkAnimation.isRunning())
+		{
+			PImage frame = walkAnimation.getCurrentImage(processing.millis());
+			
+			if (frame != null)
+			{
+				ret = frame;
+			}
+		}
+		
+		if (xSpeed < -CLAMPTOZERO)
+		{
+			// TODO: Mirror image?
+		}
+		
+		return ret;
 	}
 	
 	public void jump()
@@ -119,9 +142,16 @@ public class Player
 			}
 			
 			xSpeed = BMath.clamp(xSpeed, 0, Math.signum(xSpeed) * MAXSPEED);
+			
+			if (walkAnimation.isStopped())
+			{
+				walkAnimation.start();
+			}
 		}
 		else
 		{
+			walkAnimation.stop();
+			
 			xSpeed = 0;
 		}
 		

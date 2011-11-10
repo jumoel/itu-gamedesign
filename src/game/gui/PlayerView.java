@@ -1,9 +1,9 @@
 package game.gui;
 
-import level.Level;
 import game.BunnyHat;
 import game.Player;
 import game.State;
+import game.level.Level;
 import processing.core.*;
 
 public class PlayerView extends Updateable

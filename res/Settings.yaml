@@ -16,3 +16,7 @@ gui:
   tiledimension: 16
   playerviewtileheight: 12
   playerviewtilewidth: 30
+graphics:
+  animations:
+    animationpath: animations/
+    player: dreamrunsmaller70x100.png

@@ -1,7 +1,7 @@
 package game;
 import game.gui.PlayerView;
 import game.gui.RaceIndicator;
-import level.Level;
+import game.level.Level;
 import processing.core.*;
 
 @SuppressWarnings("serial")
