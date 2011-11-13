@@ -226,6 +226,7 @@ public class PlayerView extends Updateable
 			}
 		}
 		
+		/*
 		// Debug below
 		graphics.line(minimumTileCoord, 0, minimumTileCoord, graphics.height);
 		graphics.line(maximumTileCoord, 0, maximumTileCoord, graphics.height);
@@ -243,6 +244,7 @@ public class PlayerView extends Updateable
 
 		graphics.line(cameraNextTileCoord, 0, cameraNextTileCoord, graphics.height);
 		graphics.line(cameraSecondTileCoord, 0, cameraSecondTileCoord, graphics.height);
+		*/
 		
 		graphics.endDraw();
 	}
