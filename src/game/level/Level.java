@@ -12,7 +12,27 @@ import javax.xml.xpath.*;
 import org.w3c.dom.Document;
 
 public class Level
-{	
+{
+	public enum MetaTiles
+	{
+		Obstacle(1),
+		SpawnPoint(2),
+		FinishLine(3),
+		DoorSpawnPoint(4);
+		
+		private final int index;
+		
+		MetaTiles(int index)
+		{
+			this.index = index;
+		}
+		
+		public int index()
+		{
+			return this.index;
+		}
+	}
+	
 	private PApplet processing;
 	
 	private PImage tiles[];

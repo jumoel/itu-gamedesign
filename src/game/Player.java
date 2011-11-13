@@ -44,14 +44,14 @@ public class Player
 	
 	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
 
-	public Player(PApplet applet, int playerNumber)
+	public Player(PApplet applet, int playerNumber, int xpos, int ypos)
 	{
 		this.processing = applet;
 		
 		xSpeed = ySpeed = yAcceleration = 0.0;
 		
-		xpos = 10;
-		ypos = 10;
+		this.xpos = xpos;
+		this.ypos = ypos;
 		
 		isInAir = true;
 		isJumping = true;
@@ -231,6 +231,9 @@ public class Player
 		ypos = ypos + ySpeed * deltaT + 0.5 * yAcceleration * Math.pow(deltaT, 2);
 		ySpeed = ySpeed + yAcceleration * deltaT;
 		
+		
+		
+		// Old collision detection
 		if (ypos < 0)
 		{
 			ySpeed = 0;

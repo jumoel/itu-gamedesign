@@ -50,6 +50,9 @@ public class PlayerView extends Updateable
 		
 		this.viewNumber = viewNumber;
 		
+		this.level = new Level(processing, "levels/test.tmx");
+		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
+		
 		this.ownPlayer = new Player(processing, viewNumber);
 		this.otherPlayer = null;
 		
@@ -57,10 +60,6 @@ public class PlayerView extends Updateable
 		
 		this.xCoordCamera = 0;
 		this.xCoordCameraMiddle = xCoordCamera + halfwidth;
-		
-		this.level = new Level(processing, "levels/test.tmx");
-		
-		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
 	}
 	
 	private void handleInput(State state)
