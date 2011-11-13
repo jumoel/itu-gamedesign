@@ -18,7 +18,7 @@ public class PlayerView extends Updateable
 	
 	private PGraphics buffers[];
 	private int currentBuffer;
-	private static int NUMBER_OF_BUFFERS = 1;
+	private static int NUMBER_OF_BUFFERS = 2;
 	
 	private int viewNumber;
 	private int xCoordCamera;
@@ -32,8 +32,6 @@ public class PlayerView extends Updateable
 	private int levelLength;
 	
 	private Level level;
-	
-	private PFont font;
 	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber)
 	{	
@@ -63,8 +61,6 @@ public class PlayerView extends Updateable
 		this.level = new Level(processing, "levels/test.tmx");
 		
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
-		
-		this.font = processing.loadFont("Monospaced-10.vlw");
 	}
 	
 	private void handleInput(State state)
