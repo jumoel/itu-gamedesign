@@ -201,7 +201,14 @@ public class Player
 		{
 			if (!isMovingSideways)
 			{
-				xSpeed = BMath.addTowardsZero(xSpeed, BREAKACCEL_GROUND);
+				if (isInAir)
+				{
+					xSpeed = BMath.addTowardsZero(xSpeed, BREAKACCEL_AIR);
+				}
+				else
+				{
+					xSpeed = BMath.addTowardsZero(xSpeed, BREAKACCEL_GROUND);
+				}
 			}
 			
 			xSpeed = BMath.clamp(xSpeed, 0, Math.signum(xSpeed) * MAXSPEED);
