@@ -18,8 +18,13 @@ public class Animation
 	private boolean isRunning;
 	private int startTime;
 	
-	public Animation(PApplet p, String spritesheet, int width, int height, int fps)
+	public Animation(PApplet p, String settingskey)
 	{
+		int fps = BunnyHat.SETTINGS.getValue(settingskey + "/fps");
+		int width = BunnyHat.SETTINGS.getValue(settingskey + "/framewidth");
+		int height = BunnyHat.SETTINGS.getValue(settingskey + "/frameheight");
+		String spritesheet = BunnyHat.SETTINGS.getValue(settingskey + "/path");
+		
 		this.processing = p;
 		this.millisPerFrame = 1000 / fps;
 		
@@ -60,7 +65,8 @@ public class Animation
 		int diff = time - startTime;
 		int timeindex = diff % 1000;
 		
-		int frame = timeindex / millisPerFrame;
+		int frame = (timeindex / millisPerFrame) % numberOfFrames;
+		
 		
 		if (frame < numberOfFrames)
 		{
@@ -68,6 +74,8 @@ public class Animation
 		}
 		else
 		{
+			System.out.println("Frame: " + frame + ". Number of frames: " + numberOfFrames);
+			System.out.println("Diff: " + diff + ". Timeindex: " + timeindex + ". Millis per frame: " + millisPerFrame);
 			return null;
 		}
 	}

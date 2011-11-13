@@ -9,7 +9,6 @@ public class Player
 	private enum Facing { LEFT, RIGHT };
 	
 	private PApplet processing;
-	private PImage texture;
 	public double xpos, ypos;
 	
 	private boolean isInAir;
@@ -25,8 +24,10 @@ public class Player
 	private double xSpeed;
 	
 	private Facing facing;
-	
+
 	private Animation walkAnimation;
+	private Animation jumpAnimation;
+	private Animation idleAnimation;
 
 	private static double GRAVITY = BunnyHat.SETTINGS.getValue("gameplay/gravity");
 	private static double JUMPFORCE = BunnyHat.SETTINGS.getValue("gameplay/jumpforce");
@@ -43,11 +44,9 @@ public class Player
 	
 	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
 
-	public Player(PApplet applet)
+	public Player(PApplet applet, int playerNumber)
 	{
 		this.processing = applet;
-		
-		texture = processing.loadImage("player.png");
 		
 		xSpeed = ySpeed = yAcceleration = 0.0;
 		
@@ -58,9 +57,12 @@ public class Player
 		isJumping = true;
 		isMovingSideways = false;
 		cannotMoveLeft = false;
+
+		this.walkAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "run");
+		this.idleAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "idle");
+		this.jumpAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "jump");
 		
-		String animationfile = BunnyHat.SETTINGS.getValue("graphics/animations/player");
-		this.walkAnimation = new Animation(processing, animationfile, 69, 99, 27);
+		this.idleAnimation.start();
 		
 		this.facing = Facing.RIGHT;
 	}
@@ -68,16 +70,25 @@ public class Player
 	// Return the current texture (ie. specific animation sprite)
 	public PImage getCurrentTexture()
 	{
-		PImage ret = texture;
+		PImage ret;
+		int time = processing.millis();
 		
-		if (walkAnimation.isRunning())
+		if (jumpAnimation.isRunning())
 		{
-			PImage frame = walkAnimation.getCurrentImage(processing.millis());
-			
-			if (frame != null)
-			{
-				ret = frame;
-			}
+			ret = jumpAnimation.getCurrentImage(time);
+		}
+		else if (walkAnimation.isRunning())
+		{
+			ret = walkAnimation.getCurrentImage(time);
+		}
+		else if (idleAnimation.isRunning())
+		{
+			ret = idleAnimation.getCurrentImage(time);
+		}
+		else
+		{
+			idleAnimation.start();
+			ret = idleAnimation.getCurrentImage(time);
 		}
 		
 		if (facing == Facing.LEFT)
@@ -141,15 +152,26 @@ public class Player
 			xSpeed += MOVEACCEL_GROUND;
 		}
 	}
-
-	public void update(int deltaT)
+	
+	private void controlAnimations()
 	{
-		// X
-		
 		boolean hasXSpeed = Math.abs(xSpeed) > CLAMPTOZERO;
 		
-		if (isMovingSideways)
+		if (isInAir)
 		{
+			idleAnimation.stop();
+			walkAnimation.stop();
+			
+			if (jumpAnimation.isStopped())
+			{
+				jumpAnimation.start();
+			}
+		}
+		else if (hasXSpeed || isMovingSideways)
+		{
+			idleAnimation.stop();
+			jumpAnimation.stop();
+			
 			if (walkAnimation.isStopped())
 			{
 				walkAnimation.start();
@@ -157,11 +179,23 @@ public class Player
 		}
 		else
 		{
-			if (!hasXSpeed)
+			jumpAnimation.stop();
+			walkAnimation.stop();
+			
+			if (idleAnimation.isStopped())
 			{
-				walkAnimation.stop();
+				idleAnimation.start();
 			}
 		}
+	}
+
+	public void update(int deltaT)
+	{
+		// X
+		
+		boolean hasXSpeed = Math.abs(xSpeed) > CLAMPTOZERO;
+		
+		controlAnimations();
 		
 		if (hasXSpeed)
 		{

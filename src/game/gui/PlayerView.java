@@ -52,7 +52,7 @@ public class PlayerView extends Updateable
 		
 		this.viewNumber = viewNumber;
 		
-		this.ownPlayer = new Player(processing);
+		this.ownPlayer = new Player(processing, viewNumber);
 		this.otherPlayer = null;
 		
 		this.maxDistance = 0;

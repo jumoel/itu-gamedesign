@@ -19,4 +19,33 @@ gui:
 graphics:
   animations:
     animationpath: animations/
-    player: dreamrunsmaller70x100.png
+    player1run:
+      path: runboy.png
+      framewidth: 69
+      frameheight: 99
+      fps: 27
+    player1idle:
+      path: standboy.png
+      framewidth: 69
+      frameheight: 99
+      fps: 27
+    player1jump:
+      path: jumpboy.png
+      framewidth: 69
+      frameheight: 99
+      fps: 27
+    player2run:
+      path: rungirl.png
+      framewidth: 65
+      frameheight: 97
+      fps: 27
+    player2idle:
+      path: standgirl.png
+      framewidth: 65
+      frameheight: 97
+      fps: 27
+    player2jump:
+      path: jumpgirl.png
+      framewidth: 65
+      frameheight: 97
+      fps: 27
