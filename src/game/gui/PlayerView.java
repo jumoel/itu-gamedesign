@@ -53,7 +53,7 @@ public class PlayerView extends Updateable
 		this.level = new Level(processing, "levels/test.tmx");
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
 		
-		this.ownPlayer = new Player(processing, viewNumber);
+		this.ownPlayer = new Player(processing, viewNumber, level);
 		this.otherPlayer = null;
 		
 		this.maxDistance = 0;
@@ -106,8 +106,15 @@ public class PlayerView extends Updateable
 	
 	public void update(State state, int xpos, int ypos, int deltaT)
 	{	
+
+		if (ownPlayer == null)
+		{
+			return;
+		}
+		
 		// Just a shortcut :)
 		PGraphics cb = buffers[currentBuffer];
+		
 		
 		ownPlayer.isMovingSideways = false;
 		

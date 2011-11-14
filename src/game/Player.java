@@ -1,5 +1,6 @@
 package game;
 import game.graphics.Animation;
+import game.level.Level;
 import processing.core.*;
 import util.BImage;
 import util.BMath;
@@ -28,6 +29,8 @@ public class Player
 	private Animation walkAnimation;
 	private Animation jumpAnimation;
 	private Animation idleAnimation;
+	
+	private Level level;
 
 	private static double GRAVITY = BunnyHat.SETTINGS.getValue("gameplay/gravity");
 	private static double JUMPFORCE = BunnyHat.SETTINGS.getValue("gameplay/jumpforce");
@@ -44,14 +47,16 @@ public class Player
 	
 	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
 
-	public Player(PApplet applet, int playerNumber, int xpos, int ypos)
+	public Player(PApplet applet, int playerNumber, Level level)
 	{
 		this.processing = applet;
 		
 		xSpeed = ySpeed = yAcceleration = 0.0;
 		
-		this.xpos = xpos;
-		this.ypos = ypos;
+		this.level = level;
+		
+		this.xpos = level.spawnX + 0.5;
+		this.ypos = level.spawnY + 0.5;
 		
 		isInAir = true;
 		isJumping = true;
@@ -187,6 +192,11 @@ public class Player
 				idleAnimation.start();
 			}
 		}
+	}
+	
+	public void checkCollisions()
+	{
+		
 	}
 
 	public void update(int deltaT)

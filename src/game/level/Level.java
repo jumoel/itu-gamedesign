@@ -41,6 +41,9 @@ public class Level
 	
 	public String levelName;
 	
+	public int spawnX;
+	public int spawnY;
+	
 	private String imageFile;
 	private int imageWidth;
 	private int imageHeight;
@@ -122,6 +125,7 @@ public class Level
 			XPathExpression levelHeightXPath = xpath.compile("/map[1]//layer[@name='Graphics']/@height");
 			XPathExpression levelDataXpath = xpath.compile("/map[1]//layer[@name='Graphics']/data/text()");
 			XPathExpression metaDataXpath = xpath.compile("/map[1]//layer[@name='Meta']/data/text()");
+			XPathExpression metaDataFirstGid = xpath.compile("/map[1]//tileset[@name='Meta']/@firstgid");
 			
 			
 			int tileWidth  = ((Double) tileWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
@@ -143,6 +147,7 @@ public class Level
 			imageHeight = ((Double) imgHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			levelWidth = ((Double) levelWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			levelHeight = ((Double) levelHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
+			int metaFirstGid = ((Double) metaDataFirstGid.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			
 			String levelDataRaw = (String) levelDataXpath.evaluate(doc, XPathConstants.STRING);
 			String metaDataRaw = (String) metaDataXpath.evaluate(doc, XPathConstants.STRING);
@@ -154,6 +159,18 @@ public class Level
 			for (int i = 0; i < metaDataStrings.length; i++)
 			{
 				metaData[i] = Integer.parseInt(metaDataStrings[i]);
+				
+				if (metaData[i] != 0)
+				{
+					metaData[i] = metaData[i] - metaFirstGid + 1;
+				}
+				
+				if (metaData[i] == MetaTiles.SpawnPoint.index())
+				{
+					System.out.println("Yay");
+					this.spawnX = i / levelWidth;
+					this.spawnY = i % levelWidth;
+				}
 			}
 			
 			String levelDataStrings[] = BString.join(levelDataRaw.split("\n"), "").split(",");
