@@ -5,5 +5,12 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="external/snakeyaml-1.9.jar"/>
 	<classpathentry kind="lib" path="external/processing.core.jar"/>
+	<classpathentry kind="lib" path="external/jl1.0.jar"/>
+	<classpathentry kind="lib" path="external/jsminim.jar"/>
+	<classpathentry kind="lib" path="external/minim-spi.jar"/>
+	<classpathentry kind="lib" path="external/minim.jar"/>
+	<classpathentry kind="lib" path="external/mp3spi1.9.4.jar"/>
+	<classpathentry kind="lib" path="external/tritonus_aos.jar"/>
+	<classpathentry kind="lib" path="external/tritonus_share.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
