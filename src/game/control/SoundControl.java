@@ -1,11 +1,14 @@
 package game.control;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import processing.core.*;
 import ddf.minim.analysis.*;
 import ddf.minim.*;
 
 
-public class SoundControl extends PApplet {
+public class SoundControl extends Observable implements Observer {
 	 
 	/**
 	 * Attention Window
@@ -116,13 +119,9 @@ public class SoundControl extends PApplet {
 		public float getFMax() { return this.cFMax; }
 	}
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	
-	int minGapLength; //  
-	int maxGapLength; // 
+	
+	 
 	
 	
 	public static final int NO_PEAK = 0;
@@ -156,12 +155,10 @@ public class SoundControl extends PApplet {
 	// input Attention Window HF
 	AW iAWHF;
 	float iAWPeakPercentageHF;
-	// input Attention Window Whistling
-	AW iAWW;
-	float iAWPeakPercentageW;
 	
 	
-	int numberOfPeaksForMovingDirectionAverage = 3;
+	
+	
 	
 	// moving freq averages
 	int numberOfPeaksForMovingFreqAverage = 13;
@@ -173,9 +170,9 @@ public class SoundControl extends PApplet {
 	int mainPeakThreshold;
 	int lonelyPeakThreshold;
 	float whistlingPeakNeighbourDistance = 1; //logarithmic distance
-	int lastEventLF, lastEventHF, lastEventW; // last Event
-	int lastPeakPosLF, lastPeakPosHF, lastPeakPosW;
-	PatternDetector pattyLF, pattyHF, pattyW;
+	int lastEventLF, lastEventHF; // last Event
+	int lastPeakPosLF, lastPeakPosHF;
+	PatternDetector pattyLF, pattyHF;
 
 	float[] frequenciesOfInterest =
 			{/*16.35f, //C0
@@ -281,7 +278,7 @@ public class SoundControl extends PApplet {
 			};
 	
 	 
-	public SoundControl()
+	public SoundControl(PApplet papplet)
 	{
 	
 	  
@@ -291,8 +288,6 @@ public class SoundControl extends PApplet {
 	  
 	  
 	  
-	  minGapLength = 2; 
-	  maxGapLength = 7;
 	  
 	  // human voice frequency range: 60 Hz - 7000 Hz
 	  // whistling range: 1300 Hz - 4000 Hz
@@ -304,12 +299,12 @@ public class SoundControl extends PApplet {
 	  
 	  iAWLF = new AW(initStrengthMin, initStrengthMax, 12f, 40f, minHeight, minWidth);
 	  iAWHF = new AW(initStrengthMin, initStrengthMax, 52f, 71f, minHeight, minWidth);
-	  iAWW = new AW(initStrengthMin, initStrengthMax, 0f, 3f, minHeight, minWidth);
+	  
 	  iAWLF.setFA((iAWLF.getFMax()-iAWLF.getFMin())/2); 
 	  iAWHF.setFA((iAWHF.getFMax() - iAWHF.getFMin()) / 2);
-	  iAWW.setFA((iAWW.getFMax() - iAWW.getFMin()) / 2);
+	  
 	 
-	  minim = new Minim(this);
+	  minim = new Minim(papplet);
 	  myinput = minim.getLineIn(Minim.MONO, 2048, 44100.0f);
 	  
 	  fft = new FFT(myinput.bufferSize(), myinput.sampleRate());
@@ -317,18 +312,20 @@ public class SoundControl extends PApplet {
 	  
 	  
 	  
-	  lastEventLF = lastEventHF = lastEventW = PatternDetector.SNDPT_NONE;
-	  lastPeakPosLF = lastPeakPosHF = lastPeakPosW = -1;
+	  lastEventLF = lastEventHF = PatternDetector.SNDPT_NONE;
+	  lastPeakPosLF = lastPeakPosHF = -1;
 	  pattyLF = new PatternDetector("LF");
 	  pattyHF = new PatternDetector("HF");
-	  pattyW = new PatternDetector("W");
+
+	  pattyLF.addObserver(this);
+	  pattyHF.addObserver(this);
 	  
 	  
 	}
 	 
 	
 	
-	@Override
+	
 	public void draw()
 	{
 		
@@ -340,7 +337,7 @@ public class SoundControl extends PApplet {
 	 
 	  int lastFoundEventHF = PatternDetector.SNDPT_NONE;
 	  int lastFoundEventLF = PatternDetector.SNDPT_NONE;
-	  int lastFoundEventW = PatternDetector.SNDPT_NONE;
+	  
 	  
 	 
 	  
@@ -350,21 +347,19 @@ public class SoundControl extends PApplet {
 	  fft.forward(myinput.mix);
 	  
 	  float[] freqArray = new float[frequenciesOfInterest.length];
-	  int[] peakArray = new int[frequenciesOfInterest.length];
-	  int[] peakArrayW = new int[frequenciesOfInterest.length];
+	  
 	  int strongestPitchPositionLF = -1;
 	  int strongestPitchPositionHF = -1;
-	  int strongestPitchPositionW = -1;
+	  
 	  float strongestPitchStrengthLF = -1f;
 	  float strongestPitchStrengthHF = -1f;
-	  float strongestPitchStrengthW = -1f;
+	  
 	  
 	 
 	  for(int i = 0; i < frequenciesOfInterest.length; i++)
 	  {
 		
-		noStroke();
-		fill(100);
+		
 	    // draw a rectangle for each average, multiply the value by 5 so we can see it better
 		float freqStrength = fft.getFreq(frequenciesOfInterest[i]);
 		
@@ -380,30 +375,21 @@ public class SoundControl extends PApplet {
 	    	
 		    if (freqStrength > prevFreqStrength && freqStrength >= nextFreqStrength) {
 		    
-				if (freqStrength > iAWW.getSMin() && freqStrength < iAWW.getSMax()
-						&& i > iAWW.getFMin() && i < iAWW.getFMax()) { // Whistling?
-					if (freqStrength > strongestPitchStrengthW) {
-						strongestPitchStrengthW = freqStrength;
-						strongestPitchPositionW = i;
-					}
-					peakArray[i] = LONELY_PEAK;
-			    }else if (freqStrength > iAWLF.getSMin() && freqStrength < iAWLF.getSMax()
+				if (freqStrength > iAWLF.getSMin() && freqStrength < iAWLF.getSMax()
 						&& i > iAWLF.getFMin() && i < iAWLF.getFMax()) { // LF?
 			    	if (freqStrength > strongestPitchStrengthLF) {
 						strongestPitchStrengthLF = freqStrength;
 						strongestPitchPositionLF = i;
 					}
-			    	peakArray[i] = GENERAL_PEAK;
+			    	//peakArray[i] = GENERAL_PEAK;
 				} else if (freqStrength > iAWHF.getSMin() && freqStrength < iAWHF.getSMax()
 						&& i > iAWHF.getFMin() && i < iAWHF.getFMax()) { //MAYBE HF?
 					if (freqStrength > strongestPitchStrengthHF) {
 						strongestPitchStrengthHF = freqStrength;
 						strongestPitchPositionHF = i;
 					}
-					peakArray[i] = GENERAL_PEAK;
-				} else {
-					peakArray[i] = NO_PEAK;
-				}
+					//peakArray[i] = GENERAL_PEAK;
+				} 
 				
 				
 		    }
@@ -432,7 +418,7 @@ public class SoundControl extends PApplet {
     	  
     	  
     	 
-    			peakArray[strongestPitchPositionLF] = STRONGEST_PEAK;
+    			//peakArray[strongestPitchPositionLF] = STRONGEST_PEAK;
     			if (lastPeakPosLF != -1) {
     				if (lastPeakPosLF < strongestPitchPositionLF) {
     					lastFoundEventLF = PatternDetector.SNDPT_HIGHER;
@@ -461,38 +447,7 @@ public class SoundControl extends PApplet {
 	  
   
 	  
-	  // mark strongest whistling Peak
-	  if (strongestPitchPositionW > -1)
-	  {
-		  iAWW.setSA(calcMovAverage(strongestPitchStrengthW, 1f, iAWW.getSA(), numberOfPeaksForMovingAverage));
-		  iAWW.setFA(calcMovAverage(strongestPitchPositionW, 1f, iAWW.getFA(), numberOfPeaksForMovingFreqAverage));
-		 
-		  iAWPeakPercentageW = calcMovAverage(1f, windowContractionSpeed, iAWPeakPercentageW, peakPercentageSampleSize);
-		  
-    	  
-    			peakArrayW[strongestPitchPositionW] = WHISTLING_PEAK;
-    			if (lastPeakPosW != -1) {
-    				if (lastPeakPosHF < strongestPitchPositionW) {
-    					lastFoundEventW = PatternDetector.SNDPT_HIGHER;
-    				} else if (lastPeakPosW > strongestPitchPositionW) {
-    					lastFoundEventW = PatternDetector.SNDPT_LOWER;
-    				} else {
-    					lastFoundEventW = PatternDetector.SNDPT_SAME;
-    				}
-    			}
-    			lastPeakPosW = strongestPitchPositionW;
-    	  		strongestPitchPositionW = -1;
-    	  		
-    	  
-    	  		
-    	    
-    	  strongestPitchStrengthW = 0;
-	  } else {
-		  
-		  iAWPeakPercentageW = calcMovAverage(0f, windowExpansionSpeed, iAWPeakPercentageW, peakPercentageSampleSize);
-		  
-	  }
-	  iAWW.recalc(iAWPeakPercentageW);
+	 
 	  
 	  
 	  // mark strongest Peak
@@ -505,7 +460,7 @@ public class SoundControl extends PApplet {
 		  
     	 
     	  
-    			peakArray[strongestPitchPositionHF] = STRONGEST_PEAK;
+    			//peakArray[strongestPitchPositionHF] = STRONGEST_PEAK;
     			if (lastPeakPosHF != -1) {
     				if (lastPeakPosHF < strongestPitchPositionHF) {
     					lastFoundEventHF = PatternDetector.SNDPT_HIGHER;
@@ -539,9 +494,9 @@ public class SoundControl extends PApplet {
 	  
 	  pattyLF.pushEvent(lastFoundEventLF);
 	  pattyHF.pushEvent(lastFoundEventHF);
-	  pattyW.pushEvent(lastFoundEventW);
 	  
-	  pattyLF.printCurrentStates();
+	  
+	  
 	  
 	  	
 	    
@@ -552,7 +507,7 @@ public class SoundControl extends PApplet {
 	
 	
 	 
-	@Override
+	
 	public void stop()
 	{
 	  // always close Minim audio classes when you are done with them
@@ -560,7 +515,7 @@ public class SoundControl extends PApplet {
 	  // always stop Minim before exiting
 	  minim.stop();
 	 
-	  super.stop();
+	  
 	}
 	
 	/**
@@ -575,6 +530,15 @@ public class SoundControl extends PApplet {
 		return (average * (windowSize - probeWeight) 
 				+ probe * probeWeight)
 				/ windowSize;
+	}
+
+
+
+	@Override
+	public void update(Observable arg0, Object arg1)
+	{
+		// print current states
+		((PatternDetector)arg0).printCurrentStates();
 	}
 	
 	

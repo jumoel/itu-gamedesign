@@ -2,13 +2,14 @@ package game.control;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Observable;
 
 /**
  * Pattern detector for sound analysis
  * @author Samuel Walz <samuel.walz@gmail.com>
  *
  */
-public class PatternDetector {
+public class PatternDetector extends Observable {
 	public static final boolean DEBUG = false;
 	
 	private class PDS { // Pattern Detector State
@@ -183,6 +184,12 @@ public class PatternDetector {
 			pds.countLower = 0;
 			pds.countNone = 0;
 			pds.countSame = 0;
+		}
+		
+		// inform observers
+		if (newState.pattern != PATTERN_NONE) {
+			this.setChanged();
+			this.notifyObservers(newState.pattern);
 		}
 		
 		return newState;
