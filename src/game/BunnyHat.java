@@ -64,6 +64,12 @@ public class BunnyHat extends PApplet implements Observer
 		
 		//testing Level
 		Level level = new Level(this, "levels/test.tmx");
+		
+		//setup & run sound input
+		sndCtrl = new SoundControl(this);
+		sndCtrl.addObserver(this);
+		sndCtrlThread = new Thread(sndCtrl);
+		sndCtrlThread.start();
 	}
 
 	public void draw()
@@ -80,11 +86,7 @@ public class BunnyHat extends PApplet implements Observer
 		view2.update(inputState, LEFT, VIEW2Y, deltaT);
 		indicator.update(inputState, LEFT, RACEINDICATORY, deltaT);
 		
-		//setup & run sound input
-		sndCtrl = new SoundControl(this);
-		sndCtrl.addObserver(this);
-		sndCtrlThread = new Thread(sndCtrl);
-		sndCtrlThread.start();
+		
 		
 		// Print the fps
 		if ((currentTimestamp - lastFpsTime) > 1000)

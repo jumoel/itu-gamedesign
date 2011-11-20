@@ -139,6 +139,12 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	AudioInput myinput;
 	FFT fft;
 	
+	// for fps statistics
+	private int currentTimeStamp;
+	private int lastFrameTime;
+	private int lastFpsTime;
+	private int fps = 0;
+	
 	//general settings
 	private long frameSize = 42; // 42ms = roundabout 23 fps
 
@@ -280,10 +286,11 @@ public class SoundControl extends Observable implements Observer, Runnable {
 			 4978.03f  //D#8/Eb8
 			};
 	
+	PApplet ourPApplet;
 	 
 	public SoundControl(PApplet papplet)
 	{
-	
+	  ourPApplet = papplet;
 	  
 	  movingAverageCompareThreshold = 0.5f;
 	  mainPeakThreshold = 3;
@@ -542,6 +549,10 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	{
 		// print current states
 		((PatternDetector)arg0).printCurrentStates();
+		
+		// notify BunnyHat
+		this.setChanged();
+		this.notifyObservers();
 	}
 
 
@@ -550,14 +561,41 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	@Override
 	public void run()
 	{
+		
+		
+		
+		lastFrameTime = 0; 
+		lastFpsTime = 0;
 		while (true) {
 			try
 			{
 				Thread.currentThread().sleep(frameSize);
-				this.analyseNextChunk();
+				
+				currentTimeStamp = ourPApplet.millis();
+				
+				if ((currentTimeStamp - lastFrameTime) >= frameSize) {
+					lastFrameTime = currentTimeStamp;
+				
+				
+					// analyse
+					this.analyseNextChunk();
+					
+					// Print the fps
+					
+					if ((currentTimeStamp - lastFpsTime) > 1000)
+					{
+						System.out.println("FPS-sound: " + fps);
+						lastFpsTime = currentTimeStamp;
+						fps = 0;
+					}
+					else
+					{
+						fps++;
+					}
+				}
 				
 			}
-			catch (InterruptedException e)
+			catch (Exception e)
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
