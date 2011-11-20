@@ -1,0 +1,13 @@
+name: Straight Solid
+states:
+  - # 0
+    name: initial
+    onSame: 1
+    weightSame: 7
+  - # 1
+    name: confirmed straigth solid!
+    confirmed: true
+    onSame: 1
+    weightSame: 1
+      
+      

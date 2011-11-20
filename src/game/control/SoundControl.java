@@ -169,6 +169,8 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	
 	
 	
+	
+	
 	// moving freq averages
 	int numberOfPeaksForMovingFreqAverage = 13;
 	float decreaseFreqAverageFactor = 0.5f;
@@ -324,8 +326,8 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  
 	  lastEventLF = lastEventHF = PatternDetector.SNDPT_NONE;
 	  lastPeakPosLF = lastPeakPosHF = -1;
-	  pattyLF = new PatternDetector("LF");
-	  pattyHF = new PatternDetector("HF");
+	  pattyLF = new PatternDetector("LF", "patternDetectors/lowFreq");
+	  pattyHF = new PatternDetector("HF", "patternDetectors/lowFreq");
 
 	  pattyLF.addObserver(this);
 	  pattyHF.addObserver(this);

@@ -1,8 +1,14 @@
 package game.control;
 
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Observable;
+
+import org.yaml.snakeyaml.Yaml;
+
 
 /**
  * Pattern detector for sound analysis
@@ -30,6 +36,29 @@ public class PatternDetector extends Observable {
 		// name 'n stuff
 		public String name = "(no name)";
 		public int pattern = PATTERN_NONE;
+		private boolean confirming = false; public boolean isConfirming() {return confirming;} 
+		private ArrayList<PDS> states;
+		
+		public PDS(ArrayList<PDS> knownStates) {
+			states = knownStates;
+		}
+		
+		
+		public void configure(LinkedHashMap<String, Object> conf) {
+			// name, confirming?
+			if (conf.containsKey("name")) {this.name = (String)conf.get("name");}
+			if (conf.containsKey("confirmed")) {this.confirming = true;}
+			if (conf.containsKey("onSame")) {this.onSame = states.get((Integer)conf.get("onSame"));}
+			if (conf.containsKey("weightSame")) {this.weightSame = (Integer)conf.get("weightSame");}
+			if (conf.containsKey("onNone")) {this.onNone = states.get((Integer)conf.get("onNone"));}
+			if (conf.containsKey("weightNone")) {this.weightNone = (Integer)conf.get("weightNone");}
+			if (conf.containsKey("onHigher")) {this.onHigher = states.get((Integer)conf.get("onHigher"));}
+			if (conf.containsKey("weightHigher")) {this.weightHigher = (Integer)conf.get("weightHigher");}
+			if (conf.containsKey("onLower")) {this.onLower = states.get((Integer)conf.get("onLower"));}
+			if (conf.containsKey("weightLower")) {this.weightLower = (Integer)conf.get("weightLower");}
+		}
+		
+		
 	}
 	
 	public static final int SNDPT_BIG_GAP = 0;
@@ -48,8 +77,6 @@ public class PatternDetector extends Observable {
 	public static final int PATTERN_STRAIGHT_SOLID = 3;
 	public static final int PATTERN_STRAIGHT_GAPISH = 4;
 	
-	//general tuning options
-    static final int minStraightSolidLength = 7;
     
     //debug
     static final boolean showStages = false;
@@ -60,18 +87,52 @@ public class PatternDetector extends Observable {
 	
 	
 	
-	private String name;
+	private String name; // 
 	
-	public PatternDetector(String name) {
+	
+	
+	
+	public PatternDetector(String name, String confDirName) {
 		this.name = name;
+	
 		currentStates = new ArrayList<PDS>();
 		initialStates = new ArrayList<PDS>();
 		patternNames = new ArrayList<String>();
 		
+		// reading configurations from our configuration directory
+		File confDir = new File(confDirName);
+		File[] confFiles = confDir.listFiles();
+		Yaml yaml = new Yaml();
+		// process all configuration files
+		for (int i = 0; i < confFiles.length; i++) {
+			// in case it is a valid file and ends on ".pyml" it should be a pattern conf file
+			if (confFiles[i].isFile() && confFiles[i].getName().endsWith(".yaml")) {
+				// setup defined pattern
+				ArrayList<PDS> newStates = new ArrayList<PDS>();
+				InputStream is = this.getClass().getClassLoader().getResourceAsStream(confFiles[i].getPath());
+				LinkedHashMap<String, Object> values = (LinkedHashMap<String, Object>) yaml.load(is);
+				System.out.print("yes, first cast successful");
+				
+				// get all the states
+				ArrayList<Object> stateConfs = (ArrayList<Object>)values.get("states");
+				for (int e = 0; e < stateConfs.size(); e++) { // create them
+					newStates.add(new PDS(newStates));
+				}
+				// and here a second loop, because first we needed all states to exist,
+				// so the states self configuration process can find them for the transitions!
+				for (int e = 0; e < stateConfs.size(); e++) { // configure them
+					// just tell them to go configure themselves!
+					newStates.get(e).configure((LinkedHashMap<String, Object>)stateConfs.get(e));
+				}
+				
+				addPattern(newStates.get(0), (String)values.get("name"));
+			}
+		}
+		
 		// setting up our state graphs
 		// straight solid
-		PDS initSS = new PDS();
-		PDS confirmSS = new PDS();
+		/*PDS initSS = new PDS(initialStates);
+		PDS confirmSS = new PDS(initialStates);
 		initSS.weightSame = 7; // at least 5 identical tones to make it straight solid
 		initSS.onSame = confirmSS; // it is confirmed after 5 tones in aline
 		initSS.name = "Initial SS";
@@ -81,15 +142,15 @@ public class PatternDetector extends Observable {
 		confirmSS.name = "Straight Solid! It is confirmed!";
 		confirmSS.pattern = PATTERN_STRAIGHT_SOLID;
 		
-		addPattern(initSS, "Straight Solid");
+		addPattern(initSS, "Straight Solid");*/
 		
 		// straight gapish
-		PDS initSG = new PDS();
-		PDS pre0SG = new PDS();
-		PDS pre1SG = new PDS();
-		PDS pre2SG = new PDS();
-		PDS conf0SG = new PDS();
-		PDS conf1SG = new PDS();
+		/*PDS initSG = new PDS(initialStates);
+		PDS pre0SG = new PDS(initialStates);
+		PDS pre1SG = new PDS(initialStates);
+		PDS pre2SG = new PDS(initialStates);
+		PDS conf0SG = new PDS(initialStates);
+		PDS conf1SG = new PDS(initialStates);
 		initSG.weightSame = 3;
 		initSG.onSame = pre0SG;
 		pre0SG.weightNone = 3;
@@ -110,7 +171,7 @@ public class PatternDetector extends Observable {
 		conf1SG.onNone = conf0SG;
 		conf1SG.pattern = PATTERN_STRAIGHT_GAPISH;
 		
-		addPattern(initSG, "Straight Gapish");
+		addPattern(initSG, "Straight Gapish");*/
 		
 	}
 	
@@ -187,7 +248,7 @@ public class PatternDetector extends Observable {
 		}
 		
 		// inform observers
-		if (newState.pattern != PATTERN_NONE) {
+		if (newState.isConfirming()) {
 			this.setChanged();
 			this.notifyObservers(newState.pattern);
 		}
