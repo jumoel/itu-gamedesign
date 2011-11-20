@@ -1,11 +1,15 @@
 package game;
+import java.util.Observable;
+import java.util.Observer;
+
 import game.gui.PlayerView;
 import game.gui.RaceIndicator;
 import game.level.Level;
+import game.control.SoundControl;
 import processing.core.*;
 
 @SuppressWarnings("serial")
-public class BunnyHat extends PApplet
+public class BunnyHat extends PApplet implements Observer
 {
 	public static Settings SETTINGS = new Settings();
 	
@@ -28,6 +32,8 @@ public class BunnyHat extends PApplet
 	public PlayerView view1;
 	public PlayerView view2;
 	public RaceIndicator indicator;
+	private SoundControl sndCtrl;
+	private Thread sndCtrlThread;
 
 	private State inputState;
 	
@@ -44,6 +50,7 @@ public class BunnyHat extends PApplet
 		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 1);
 		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2);
 		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
+		sndCtrl = new SoundControl(this);
 		
 		size(WINDOWWIDTH, WINDOWHEIGHT);
 		background(0);
@@ -72,6 +79,12 @@ public class BunnyHat extends PApplet
 		view1.update(inputState, LEFT, VIEW1Y, deltaT);
 		view2.update(inputState, LEFT, VIEW2Y, deltaT);
 		indicator.update(inputState, LEFT, RACEINDICATORY, deltaT);
+		
+		//setup & run sound input
+		sndCtrl = new SoundControl(this);
+		sndCtrl.addObserver(this);
+		sndCtrlThread = new Thread(sndCtrl);
+		sndCtrlThread.start();
 		
 		// Print the fps
 		if ((currentTimestamp - lastFpsTime) > 1000)
@@ -118,5 +131,12 @@ public class BunnyHat extends PApplet
 	public void keyReleased()
 	{
 		inputState.put(key, false);
+	}
+
+	@Override
+	public void update(Observable o, Object arg)
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

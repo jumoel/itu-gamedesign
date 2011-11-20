@@ -8,7 +8,7 @@ import ddf.minim.analysis.*;
 import ddf.minim.*;
 
 
-public class SoundControl extends Observable implements Observer {
+public class SoundControl extends Observable implements Observer, Runnable {
 	 
 	/**
 	 * Attention Window
@@ -138,6 +138,9 @@ public class SoundControl extends Observable implements Observer {
 	Minim minim;
 	AudioInput myinput;
 	FFT fft;
+	
+	//general settings
+	private long frameSize = 42; // 42ms = roundabout 23 fps
 
 	//input Attention Windows: Settings
 	float initStrengthMin = 5f;
@@ -326,7 +329,7 @@ public class SoundControl extends Observable implements Observer {
 	
 	
 	
-	public void draw()
+	public void analyseNextChunk()
 	{
 		
 	  
@@ -539,6 +542,29 @@ public class SoundControl extends Observable implements Observer {
 	{
 		// print current states
 		((PatternDetector)arg0).printCurrentStates();
+	}
+
+
+
+
+	@Override
+	public void run()
+	{
+		while (true) {
+			try
+			{
+				Thread.currentThread().sleep(frameSize);
+				this.analyseNextChunk();
+				
+			}
+			catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
+		
 	}
 	
 	
