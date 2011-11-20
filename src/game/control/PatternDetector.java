@@ -59,6 +59,7 @@ public class PatternDetector extends Observable {
 		}
 		
 		
+		
 	}
 	
 	public static final int SNDPT_BIG_GAP = 0;
@@ -87,7 +88,8 @@ public class PatternDetector extends Observable {
 	
 	
 	
-	private String name; // 
+	private String name; // name of this detector
+	
 	
 	
 	
@@ -129,61 +131,21 @@ public class PatternDetector extends Observable {
 			}
 		}
 		
-		// setting up our state graphs
-		// straight solid
-		/*PDS initSS = new PDS(initialStates);
-		PDS confirmSS = new PDS(initialStates);
-		initSS.weightSame = 7; // at least 5 identical tones to make it straight solid
-		initSS.onSame = confirmSS; // it is confirmed after 5 tones in aline
-		initSS.name = "Initial SS";
-		confirmSS.onSame = confirmSS; // every other same tone keeps it confirmed
-		confirmSS.onNone = initSS; 
-		confirmSS.weightNone = 2; // 2 times none in a row : not straight solid anymore
-		confirmSS.name = "Straight Solid! It is confirmed!";
-		confirmSS.pattern = PATTERN_STRAIGHT_SOLID;
 		
-		addPattern(initSS, "Straight Solid");*/
-		
-		// straight gapish
-		/*PDS initSG = new PDS(initialStates);
-		PDS pre0SG = new PDS(initialStates);
-		PDS pre1SG = new PDS(initialStates);
-		PDS pre2SG = new PDS(initialStates);
-		PDS conf0SG = new PDS(initialStates);
-		PDS conf1SG = new PDS(initialStates);
-		initSG.weightSame = 3;
-		initSG.onSame = pre0SG;
-		pre0SG.weightNone = 3;
-		pre0SG.weightSame = 4;
-		pre0SG.onNone = pre1SG;
-		pre1SG.weightNone = 4;
-		pre1SG.weightSame = 3;
-		pre1SG.onSame = pre2SG;
-		pre2SG.weightNone = 3;
-		pre2SG.weightSame = 4;
-		pre2SG.onNone = conf0SG;
-		conf0SG.weightNone = 4;
-		conf0SG.weightSame = 3;
-		conf0SG.onSame = conf1SG;
-		conf0SG.pattern = PATTERN_STRAIGHT_GAPISH;
-		conf1SG.weightNone = 3;
-		conf1SG.weightSame = 4;
-		conf1SG.onNone = conf0SG;
-		conf1SG.pattern = PATTERN_STRAIGHT_GAPISH;
-		
-		addPattern(initSG, "Straight Gapish");*/
 		
 	}
 	
-	public int getPattern() {
+	public String getPattern() {
 		Iterator<PDS> states = currentStates.iterator();
-		while (states.hasNext()) {
+		Iterator<String> names = patternNames.iterator(); 
+		while (states.hasNext() && names.hasNext()) {
 			PDS state = states.next();
-			if (state.pattern != PATTERN_NONE) {
-				return state.pattern;
+			String name = names.next();
+			if (state.isConfirming()) {
+				return name;
 			}
 		}
-		return PATTERN_NONE;
+		return "";
 	}
 	
 	private void addPattern(PDS initialState, String name) {
@@ -204,6 +166,7 @@ public class PatternDetector extends Observable {
 	public PDS applyEvent(int type, PDS pds, PDS initial) {
 		PDS newState = pds;
 		boolean stateSwitch = false;
+		
 		
 		switch (type) {
 		case SNDPT_NONE:
@@ -247,11 +210,7 @@ public class PatternDetector extends Observable {
 			pds.countSame = 0;
 		}
 		
-		// inform observers
-		if (newState.isConfirming()) {
-			this.setChanged();
-			this.notifyObservers(newState.pattern);
-		}
+		
 		
 		return newState;
 	}
@@ -265,7 +224,13 @@ public class PatternDetector extends Observable {
 		for (int i = 0; i < currentStates.size(); i++) {
 			PDS state = currentStates.get(i);
 			PDS initialState = initialStates.get(i);
-			currentStates.set(i, applyEvent(type, state, initialState));
+			PDS newState = applyEvent(type, state, initialState);
+			currentStates.set(i, newState);
+			// inform observers
+			if (newState.isConfirming() != state.isConfirming()) {
+				this.setChanged();
+				this.notifyObservers();
+			} 
 		}
 	}
 	public String stringEvent(int type) {

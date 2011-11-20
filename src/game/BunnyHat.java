@@ -138,7 +138,11 @@ public class BunnyHat extends PApplet implements Observer
 	@Override
 	public void update(Observable o, Object arg)
 	{
-		// TODO Auto-generated method stub
+		
+			inputState.put('d', ((String)arg).contentEquals("Straight Solid"));
+			/*if (((String)arg).contentEquals("Straight Solid")) {
+				System.out.print((String)arg);
+			}*/
 		
 	}
 }

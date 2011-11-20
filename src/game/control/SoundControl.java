@@ -327,7 +327,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  lastEventLF = lastEventHF = PatternDetector.SNDPT_NONE;
 	  lastPeakPosLF = lastPeakPosHF = -1;
 	  pattyLF = new PatternDetector("LF", "patternDetectors/lowFreq");
-	  pattyHF = new PatternDetector("HF", "patternDetectors/lowFreq");
+	  pattyHF = new PatternDetector("HF", "patternDetectors/highFreq");
 
 	  pattyLF.addObserver(this);
 	  pattyHF.addObserver(this);
@@ -498,21 +498,10 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  iAWHF.recalc(iAWPeakPercentageHF);
 	 
 	  
-	  
-	  
-	  
 	 
-	  
-	  
 	  pattyLF.pushEvent(lastFoundEventLF);
 	  pattyHF.pushEvent(lastFoundEventHF);
-	  
-	  
-	  
-	  
-	  	
-	    
-	    
+	     
 	}
 	
 	
@@ -550,11 +539,13 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	public void update(Observable arg0, Object arg1)
 	{
 		// print current states
-		((PatternDetector)arg0).printCurrentStates();
+		//((PatternDetector)arg0).printCurrentStates();
 		
 		// notify BunnyHat
 		this.setChanged();
-		this.notifyObservers();
+		String pattyName = ((PatternDetector)arg0).getName();
+		String pattyPattern = ((PatternDetector)arg0).getPattern();
+		this.notifyObservers(pattyPattern);
 	}
 
 
