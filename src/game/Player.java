@@ -240,6 +240,10 @@ public class Player
 		{
 			yAcceleration = GRAVITY;
 		}
+		else
+		{
+			yAcceleration = 0f;
+		}
 		
 		
 		ypos = ypos + ySpeed * deltaT + 0.5 * yAcceleration * Math.pow(deltaT, 2);
@@ -262,7 +266,7 @@ public class Player
 		// THIS IS VERY BROKEN :-(
 		if (collision != null)
 		{
-			System.out.println("lol");
+			//System.out.println("lol");
 			xpos = previous_xpos;
 			ypos = previous_ypos;
 			ySpeed = 0;
@@ -299,7 +303,7 @@ public class Player
 			{
 				int metadata = level.getMetaDataAt(x, y);
 				
-				boolean collides = metadata == Level.MetaTiles.Obstacle.index();
+				boolean collides = (metadata == Level.MetaTiles.Obstacle.index());
 				
 				if (collides)
 				{
@@ -310,7 +314,7 @@ public class Player
 			}
 		}
 		
-		if (collideX == -1 || collideY == -1)
+		if (collideX == -1 && collideY == -1)
 		{
 			return null;
 		}

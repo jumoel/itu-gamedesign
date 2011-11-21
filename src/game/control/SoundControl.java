@@ -11,7 +11,8 @@ import ddf.minim.*;
 
 
 public class SoundControl extends Observable implements Observer, Runnable {
-	 
+	private final boolean showFPS = false; 
+	
 	/**
 	 * Attention Window
 	 * Dimensions of our Window of Sound Interest
@@ -591,7 +592,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 					
 					if ((currentTimeStamp - lastFpsTime) > 1000)
 					{
-						System.out.println("FPS-sound: " + fps);
+						if (showFPS) System.out.println("FPS-sound: " + fps);
 						lastFpsTime = currentTimeStamp;
 						fps = 0;
 					}
