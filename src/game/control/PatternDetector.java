@@ -94,7 +94,7 @@ public class PatternDetector extends Observable {
 	
 	
 	
-	public PatternDetector(String name, String confDirName) {
+	public PatternDetector(String name, String confDirName) throws Exception {
 		this.name = name;
 	
 		currentStates = new ArrayList<PDS>();
@@ -112,11 +112,20 @@ public class PatternDetector extends Observable {
 				// setup defined pattern
 				ArrayList<PDS> newStates = new ArrayList<PDS>();
 				InputStream is = this.getClass().getClassLoader().getResourceAsStream(confFiles[i].getPath());
-				LinkedHashMap<String, Object> values = (LinkedHashMap<String, Object>) yaml.load(is);
-				System.out.print("yes, first cast successful");
+				Object possibleLinkedHashMap = yaml.load(is);
+				LinkedHashMap<String, Object> values = null;
+				if (possibleLinkedHashMap instanceof LinkedHashMap<?, ?>) {
+					values = (LinkedHashMap<String, Object>) possibleLinkedHashMap;
+				} else {
+					throw new Exception("PatternDetector: "+confFiles[i].getName()+ " is not compatible\n");
+				}
+				
 				
 				// get all the states
-				ArrayList<Object> stateConfs = (ArrayList<Object>)values.get("states");
+				if (!values.containsKey("states")) {throw new Exception(confFiles[i].getName()+" is missing any states\n");}
+				Object possibleArrayList = values.get("states");
+				if (!(possibleArrayList instanceof ArrayList<?>)) {throw new Exception(confFiles[i].getName()+" states list faulty\n");}
+				ArrayList<Object> stateConfs = (ArrayList<Object>)possibleArrayList;
 				for (int e = 0; e < stateConfs.size(); e++) { // create them
 					newStates.add(new PDS(newStates));
 				}
@@ -124,6 +133,8 @@ public class PatternDetector extends Observable {
 				// so the states self configuration process can find them for the transitions!
 				for (int e = 0; e < stateConfs.size(); e++) { // configure them
 					// just tell them to go configure themselves!
+					Object possibleLinkedHashMapConfs = stateConfs.get(e);
+					if (!(possibleLinkedHashMapConfs instanceof LinkedHashMap<?, ?>)) {throw new Exception(confFiles[i].getName()+" states list entry No."+e+" faulty\n");}
 					newStates.get(e).configure((LinkedHashMap<String, Object>)stateConfs.get(e));
 				}
 				

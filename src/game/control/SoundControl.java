@@ -1,5 +1,7 @@
 package game.control;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -326,8 +328,17 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  
 	  lastEventLF = lastEventHF = PatternDetector.SNDPT_NONE;
 	  lastPeakPosLF = lastPeakPosHF = -1;
-	  pattyLF = new PatternDetector("LF", "patternDetectors/lowFreq");
-	  pattyHF = new PatternDetector("HF", "patternDetectors/highFreq");
+	  try
+	  {
+			pattyLF = new PatternDetector("LF", "patternDetectors/lowFreq");
+			pattyHF = new PatternDetector("HF", "patternDetectors/lowFreq");
+	  }
+	  catch (Exception e)
+	  {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+	  }
+	  
 
 	  pattyLF.addObserver(this);
 	  pattyHF.addObserver(this);
@@ -541,16 +552,19 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		// print current states
 		//((PatternDetector)arg0).printCurrentStates();
 		
-		// notify BunnyHat
+		// notify BunnyHat and whoever might be interested
 		this.setChanged();
-		String pattyName = ((PatternDetector)arg0).getName();
-		String pattyPattern = ((PatternDetector)arg0).getPattern();
-		this.notifyObservers(pattyPattern);
+		HashMap arguments = new HashMap();
+		arguments.put("detector", ((PatternDetector)arg0).getName());
+		arguments.put("pattern", ((PatternDetector)arg0).getPattern());
+		this.notifyObservers();
+		
 	}
 
 
 
 
+	@SuppressWarnings("static-access")
 	@Override
 	public void run()
 	{
