@@ -24,7 +24,7 @@ public class PlayerView extends Updateable
 	private int xCoordCamera;
 	private int xCoordCameraMiddle;
 	
-	private int maxDistance;
+	private int playerPosition;
 
 	private Player ownPlayer;
 	private Player otherPlayer;
@@ -56,7 +56,7 @@ public class PlayerView extends Updateable
 		this.ownPlayer = new Player(processing, viewNumber, level);
 		this.otherPlayer = null;
 		
-		this.maxDistance = 0;
+		this.playerPosition = 0;
 		
 		this.xCoordCamera = 0;
 		this.xCoordCameraMiddle = xCoordCamera + halfwidth;
@@ -131,57 +131,51 @@ public class PlayerView extends Updateable
 		// Draw the player
 		int pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);
 		int pypos = BunnyHat.PLAYERVIEWHEIGHT - (int) (ownPlayer.ypos * BunnyHat.TILEDIMENSION);
+
+		int drawpxpos = 0;
+		int drawpypos = pypos;
 		
-		// Prevent the player from traveling further out than the level is
-		if (pxpos > levelLength)
-		{
-			pxpos = levelLength;
-			ownPlayer.cannotMoveRight = true;
-		}
-		
-		if (pxpos > maxDistance)
-		{
-			maxDistance = pxpos;
-		}
-		
-		/* If the player is about to travel across the middle of the screen,
-		 * make him stick in the middle and move the background instead;
-		 */
-		if (maxDistance > xCoordCameraMiddle)
-		{
-			xCoordCameraMiddle = maxDistance;
-			
-			if (xCoordCameraMiddle > (levelLength - halfwidth))
-			{
-				xCoordCameraMiddle = levelLength - halfwidth;
-				pxpos = width - (levelLength - pxpos);
-			}
-			else
-			{	
-				pxpos = halfwidth;
-			}
-			xCoordCamera = xCoordCameraMiddle - halfwidth;
-		}
-		
-		/* Like in Super Mario Bros, the player can move backwards, but the
-		 * camera won't pan with him.
-		 */
-		else
-		{
-			pxpos = halfwidth - (xCoordCameraMiddle - pxpos);
-		}
-		
-		/* And the player cannot move behind the cameras view
-		 */
 		if (pxpos < 0)
 		{
 			pxpos = 0;
 			ownPlayer.cannotMoveLeft = true;
 		}
 		
+		if (pxpos > level.levelWidth * BunnyHat.TILEDIMENSION)
+		{
+			pxpos = level.levelWidth * BunnyHat.TILEDIMENSION;
+			ownPlayer.cannotMoveRight = true;
+		}
+		
+		this.playerPosition = pxpos;
+		
+		// Place the player in the middle
+		xCoordCameraMiddle = pxpos;
+		xCoordCamera = xCoordCameraMiddle - halfwidth;
+		drawpxpos = halfwidth;
+		
+		if (xCoordCamera < 0)
+		{
+			int diff = -xCoordCamera;
+			drawpxpos = drawpxpos - diff;
+			xCoordCamera = 0;
+			xCoordCameraMiddle = halfwidth;
+		}
+		
+		int maxCameraPos = (level.levelWidth - BunnyHat.PLAYERVIEWTILEWIDTH) * BunnyHat.TILEDIMENSION;
+		
+		if (xCoordCamera > maxCameraPos)
+		{
+			int diff = xCoordCamera - maxCameraPos;
+			drawpxpos = drawpxpos + diff;
+			xCoordCamera = maxCameraPos;
+			xCoordCameraMiddle = xCoordCamera + halfwidth;
+		}
+		
+		
 		drawLevelGraphics(cb);
 		
-		drawImage(ownPlayer.getCurrentTexture(), cb, pxpos, pypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+		drawImage(ownPlayer.getCurrentTexture(), cb, drawpxpos, pypos, Horizontal.MIDDLE, Vertical.BOTTOM);
 		
 		// Draw the image to the surface
 		processing.image(cb, xpos, ypos);
@@ -253,7 +247,7 @@ public class PlayerView extends Updateable
 	
 	public int getPlayerPosition()
 	{
-		return maxDistance;
+		return playerPosition;
 	}
 	
 	public int getLevelLength()
