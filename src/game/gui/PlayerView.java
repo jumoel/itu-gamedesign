@@ -14,6 +14,7 @@ public class PlayerView extends Updateable
 	private int width;
 	private int halfwidth;
 	private int height;
+	private int halfheight;
 	private PApplet processing;
 	
 	private PGraphics buffers[];
@@ -23,6 +24,8 @@ public class PlayerView extends Updateable
 	private int viewNumber;
 	private int xCoordCamera;
 	private int xCoordCameraMiddle;
+	private int yCoordCamera;
+	private int yCoordCameraMiddle;
 	
 	private int playerPosition;
 
@@ -38,6 +41,8 @@ public class PlayerView extends Updateable
 		this.width = width;
 		this.halfwidth = this.width / 2;
 		this.height = height;
+		this.halfheight = this.height / 2;
+		
 		this.processing = applet;
 		
 		buffers = new PGraphics[NUMBER_OF_BUFFERS];
@@ -130,10 +135,10 @@ public class PlayerView extends Updateable
 		
 		// Draw the player
 		int pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);
-		int pypos = BunnyHat.PLAYERVIEWHEIGHT - (int) (ownPlayer.ypos * BunnyHat.TILEDIMENSION);
+		int pypos = (int) (ownPlayer.ypos * BunnyHat.TILEDIMENSION);
 
-		int drawpxpos = 0;
-		int drawpypos = pypos;
+		int drawpxpos;
+		int drawpypos;
 		
 		if (pxpos < 0)
 		{
@@ -146,13 +151,27 @@ public class PlayerView extends Updateable
 			pxpos = level.levelWidth * BunnyHat.TILEDIMENSION;
 			ownPlayer.cannotMoveRight = true;
 		}
+
+		if (pypos < 0)
+		{
+			pypos = 0;
+		}
+		
+		if (pypos + ownPlayer.getCurrentTexture().height > level.levelHeight * BunnyHat.TILEDIMENSION)
+		{
+			pypos = level.levelHeight * BunnyHat.TILEDIMENSION - ownPlayer.getCurrentTexture().height;
+		}
 		
 		this.playerPosition = pxpos;
 		
 		// Place the player in the middle
 		xCoordCameraMiddle = pxpos;
 		xCoordCamera = xCoordCameraMiddle - halfwidth;
+		yCoordCameraMiddle = pypos;
+		yCoordCamera = yCoordCameraMiddle - halfheight;
+		
 		drawpxpos = halfwidth;
+		drawpypos = halfheight;
 		
 		if (xCoordCamera < 0)
 		{
@@ -162,20 +181,40 @@ public class PlayerView extends Updateable
 			xCoordCameraMiddle = halfwidth;
 		}
 		
-		int maxCameraPos = (level.levelWidth - BunnyHat.PLAYERVIEWTILEWIDTH) * BunnyHat.TILEDIMENSION;
+		int maxCameraPosX = (level.levelWidth - BunnyHat.PLAYERVIEWTILEWIDTH) * BunnyHat.TILEDIMENSION;
 		
-		if (xCoordCamera > maxCameraPos)
+		if (xCoordCamera > maxCameraPosX)
 		{
-			int diff = xCoordCamera - maxCameraPos;
+			int diff = xCoordCamera - maxCameraPosX;
 			drawpxpos = drawpxpos + diff;
-			xCoordCamera = maxCameraPos;
+			xCoordCamera = maxCameraPosX;
 			xCoordCameraMiddle = xCoordCamera + halfwidth;
 		}
 		
+		if (yCoordCamera < 0)
+		{
+			int diff = -yCoordCamera;
+			drawpypos = drawpypos - diff;
+			yCoordCamera = 0;
+			yCoordCameraMiddle = halfheight;
+		}
+		
+		int maxCameraPosY = (level.levelHeight - BunnyHat.PLAYERVIEWTILEHEIGHT) * BunnyHat.TILEDIMENSION;
+		if (yCoordCamera > maxCameraPosY)
+		{
+			int diff = yCoordCamera - maxCameraPosY;
+			drawpypos = drawpypos + diff;
+			yCoordCamera = maxCameraPosY;
+			yCoordCameraMiddle = yCoordCamera + halfheight;
+		}
+		
+		drawpypos = BunnyHat.PLAYERVIEWTILEHEIGHT * BunnyHat.TILEDIMENSION - drawpypos;
 		
 		drawLevelGraphics(cb);
 		
-		drawImage(ownPlayer.getCurrentTexture(), cb, drawpxpos, pypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+		drawImage(ownPlayer.getCurrentTexture(), cb, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+		
+		System.out.println("Pypos: " + pypos);
 		
 		// Draw the image to the surface
 		processing.image(cb, xpos, ypos);
@@ -188,26 +227,25 @@ public class PlayerView extends Updateable
 	{
 		graphics.beginDraw();
 		
-		
-		int minimumTile = xCoordCamera / BunnyHat.TILEDIMENSION;
-		if (minimumTile < 0)
+		int minimumTileX = xCoordCamera / BunnyHat.TILEDIMENSION;
+		if (minimumTileX < 0)
 		{
-			minimumTile = 0;
+			minimumTileX = 0;
 		}
-		int minimumTileCoord = minimumTile * BunnyHat.TILEDIMENSION - xCoordCamera;
+		//int minimumTileCoord = minimumTileX * BunnyHat.TILEDIMENSION - xCoordCamera;
 		
 		int maximumTile = (xCoordCamera + graphics.width) / BunnyHat.TILEDIMENSION;
 		if (maximumTile > level.levelWidth)
 		{
 			maximumTile = level.levelWidth;
 		}
-		int maximumTileCoord = maximumTile * BunnyHat.TILEDIMENSION - xCoordCamera;
+		//int maximumTileCoord = maximumTile * BunnyHat.TILEDIMENSION - xCoordCamera;
 		
 		// Counting y from down towards the sky
 		for (int reversey = 0; reversey < BunnyHat.PLAYERVIEWTILEHEIGHT; reversey++)
 		{
 			// Counting x from left towards right
-			for (int x = minimumTile; x <= maximumTile; x++)
+			for (int x = minimumTileX; x <= maximumTile; x++)
 			{
 				int y = level.levelHeight - reversey;
 				PImage tile = level.getLevelImageAt(x, y);
