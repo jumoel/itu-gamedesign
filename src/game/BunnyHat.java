@@ -139,7 +139,7 @@ public class BunnyHat extends PApplet implements Observer
 	public void update(Observable o, Object arg)
 	{
 		
-			inputState.put('d', ((String)arg).contentEquals("Straight Solid"));
+			//inputState.put('d', ((String)arg).contentEquals("Straight Solid"));
 			/*if (((String)arg).contentEquals("Straight Solid")) {
 				System.out.print((String)arg);
 			}*/
