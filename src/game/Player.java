@@ -284,13 +284,12 @@ public class Player
 			
 			xSpeed = 0;
 		}
-		
 		if (collisionY != 0.0) { // bumped head / feet
-			if (collisionY > 0.0) { // head
+			if (collisionY > 0.0) { // feet
 				//ypos--;
 				isInAir = false;
 				isJumping = false;
-			} else { // feet
+			} else { // head
 				
 			}
 			//ypos = previous_ypos;
@@ -344,12 +343,12 @@ public class Player
 		int iy1 = (int)Math.floor(y1);
 		
 		for (int x=ix0; x <= ix1; x++) {
-			if (level.getMetaDataAt(x, iy1) == Level.MetaTiles.Obstacle.index()) {
+			if (level.getMetaDataAt(x, iy0) == Level.MetaTiles.Obstacle.index()) {
 				// hit head
-				return (iy1)-y1;
-			} else if (level.getMetaDataAt(x, iy0) == Level.MetaTiles.Obstacle.index()) {
-				// feet hit
 				return (iy0+1)-y0;
+			} else if (level.getMetaDataAt(x, iy1) == Level.MetaTiles.Obstacle.index()) {
+				// feet hit
+				return (iy1)-y1;
 			}
 		}
 		
