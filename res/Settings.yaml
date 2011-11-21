@@ -6,12 +6,12 @@ gameplay:
   gravity: -0.0005
   jumpforce: 0.1
   moveacceleration:
-    ground: 0.5
+    ground: 1.5
     air: 0.2
   breakacceleration:
     ground: 0.05
     air: 0.05
-  maxspeed: 0.5
+  maxspeed: 2.5
 gui:
   tiledimension: 16
   playerviewtileheight: 12
