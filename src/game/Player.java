@@ -201,6 +201,8 @@ public class Player
 		}
 	}
 
+	
+	private int collisionCount = 0; //counts collisions in series
 	public void update(int deltaT)
 	{
 		previous_xpos = xpos;
@@ -255,16 +257,52 @@ public class Player
 		int xmin, xmax, ymin, ymax;
 		BPoint collision;
 		
-		ymax = (int)ypos + currentTexture.height / BunnyHat.TILEDIMENSION;
-		ymin = (int)ypos + 1;
-		xmax = (int)xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2;
-		xmin = (int)xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2;
+		ymax = (int)Math.ceil(ypos + currentTexture.height / BunnyHat.TILEDIMENSION );
+		ymin = (int)Math.floor(ypos);
+		xmax = (int)Math.ceil(xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2 );
+		xmin = (int)Math.floor(xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2 );
 		
-		collision = detectCollision(xmin, xmax, ymin, ymax);
+		double x0, y0, x1, y1; // edge points of our body
+		x0 = (xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2);
+		y0 = (ypos+1);
+		x1 = (xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2);
+		y1 = (ypos + currentTexture.height / BunnyHat.TILEDIMENSION);
+		
+		double collisionY = detectCollisionBoxWiseY(x0, y0, x1, y1);
+		double collisionX = detectCollisionBoxWiseX(x0, y0, x1, y1);
+		
+		//collision = detectCollision(xmin, xmax, ymin, ymax);
 
-		// THIS IS VERY BROKEN :-(
-		if (collision != null)
+		if (collisionX != 0.0) { // bumped side
+			if (collisionX > 0.0) { // right side
+				//xpos--;
+			} else { // left side
+				//xpos++;
+			}
+			//xpos = previous_xpos;
+			xpos = Math.round(xpos + collisionX);
+			
+			xSpeed = 0;
+		}
+		
+		if (collisionY != 0.0) { // bumped head / feet
+			if (collisionY > 0.0) { // head
+				//ypos--;
+				isInAir = false;
+				isJumping = false;
+			} else { // feet
+				
+			}
+			//ypos = previous_ypos;
+			ypos = Math.round(ypos + collisionY);
+			System.out.print(ypos+"\n");
+			ySpeed = 0;
+		}
+		
+		// Not that broken anymore :|
+		/*if (collision != null)
 		{
+			collisionCount++;
 			boolean yCollision = false;
 			boolean xCollision = false;
 			
@@ -272,42 +310,81 @@ public class Player
 				yCollision = true;
 				isInAir = false;
 				isJumping = false;
+				//ypos=collision.y; ySpeed = 0;
+				//System.out.print(ypos+"\n");
 			}
 			if (collision.y == ymax) { // head bumps ceiling stuff - that hurts!
 				yCollision = true;
 			}
 			if (collision.x == xmin) { // bumped into sth on the left side
 				xCollision = true;
+				//xpos = collision.x + currentTexture.width / BunnyHat.TILEDIMENSION / 2; xSpeed = 0;
 			}
 			if (collision.x == xmax) { // bumped into sth on the right side
 				xCollision = true;
 			}
-			if (xCollision) System.out.println("lol:"+collision.x+":"+collision.y+" - x:"+xmin+"-"+xmax+" y:"+ymin+"-"+ymax+"\n");
+			System.out.println("lol:"+collision.x+":"+collision.y+" - x:"+xmin+"-"+xmax+" y:"+ymin+"-"+ymax+"\n");
 			if (xCollision) {xpos = previous_xpos; xSpeed = 0;}
 			if (yCollision) {ypos = previous_ypos; ySpeed = 0;}
 			
 			
 			
 			
-		}
+		} else {collisionCount = 0;}*/
 	
 		
-		/*
-		// Old collision detection
 		
-		if (ypos < 0)
-		{
-			ySpeed = 0;
-			ypos = 0;
-			isInAir = false;
-			yAcceleration = 0;
-			isJumping = false;
-		}
-		*/
 		
 	}
 	
+	private double detectCollisionBoxWiseY(double x0, double y0, double x1, double y1) {
+		int ix0 = (int)Math.floor(x0+0.3);
+		int iy0 = (int)Math.floor(y0);
+		int ix1 = (int)Math.floor(x1-0.3);
+		int iy1 = (int)Math.floor(y1);
+		
+		for (int x=ix0; x <= ix1; x++) {
+			if (level.getMetaDataAt(x, iy1) == Level.MetaTiles.Obstacle.index()) {
+				// hit head
+				return (iy1)-y1;
+			} else if (level.getMetaDataAt(x, iy0) == Level.MetaTiles.Obstacle.index()) {
+				// feet hit
+				return (iy0+1)-y0;
+			}
+		}
+		
+		return 0.0;
+	}
 	
+	private double detectCollisionBoxWiseX(double x0, double y0, double x1, double y1) {
+		int ix0 = (int)Math.floor(x0);
+		int iy0 = (int)Math.floor(y0+0.3);
+		int ix1 = (int)Math.floor(x1);
+		int iy1 = (int)Math.floor(y1-0.3);
+		
+		for (int y=iy0; y <= iy1; y++) {
+			if (level.getMetaDataAt(ix1, y) == Level.MetaTiles.Obstacle.index()) {
+				// hit right
+				return (ix1)-x1;
+			} else if (level.getMetaDataAt(ix0, y) == Level.MetaTiles.Obstacle.index()) {
+				// hit left
+				return (ix0+1)-x0;
+			}
+		}
+		
+		
+		return 0.0;
+	}
+	
+	/**
+	 * deprecated method - only use in case of emergency!
+	 * 
+	 * @param xmin_tile
+	 * @param xmax_tile
+	 * @param ymin_tile
+	 * @param ymax_tile
+	 * @return
+	 */
 	private BPoint detectCollision(int xmin_tile, int xmax_tile, int ymin_tile, int ymax_tile)
 	{	
 		boolean breakbreak = false;
