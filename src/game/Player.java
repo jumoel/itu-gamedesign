@@ -1,6 +1,7 @@
 package game;
 import game.graphics.Animation;
 import game.level.Level;
+import game.sound.Stereophone;
 import processing.core.*;
 import util.BImage;
 import util.BMath;
@@ -111,6 +112,9 @@ public class Player
 			ySpeed = JUMPFORCE;
 			isJumping = true;
 			isInAir = true;
+			
+			//play sound
+			Stereophone.playSound(0);
 		}
 	}
 	

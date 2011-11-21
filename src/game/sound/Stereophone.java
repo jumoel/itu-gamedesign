@@ -13,6 +13,7 @@ public class Stereophone
 	public Stereophone(String soundDirName) {
 		File soundDir = new File(soundDirName);
 		if (!soundDir.isDirectory()) {System.out.print(soundDirName + " is not a valid directory (just in case you care about having sounds.. .)\n");}
+		sounds = soundDir.listFiles();
 		
 	}
 	
@@ -33,14 +34,13 @@ public class Stereophone
 	    }).start();
 	  }
 
-	
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args)
-	{
-		// TODO Auto-generated method stub
-		// put some test routine here
+	public void printSounds() {
+		if (sounds != null) {
+			System.out.print("There are "+sounds.length+" sounds in the library:\n");
+			for (int i = 0; i < sounds.length; i++) {
+				System.out.print(" "+sounds[i].getPath()+"\n");
+			}
+		}
 	}
 
 }

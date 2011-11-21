@@ -76,6 +76,7 @@ public class BunnyHat extends PApplet implements Observer
 		
 		//setup sound output
 		sndOut = new Stereophone("sounds");
+		sndOut.printSounds();
 	}
 
 	public void draw()
