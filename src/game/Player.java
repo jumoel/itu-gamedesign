@@ -240,9 +240,8 @@ public class Player
 		{
 			yAcceleration = GRAVITY;
 		}
-		else
-		{
-			yAcceleration = 0f;
+		else {
+			//yAcceleration = 0f;
 		}
 		
 		
@@ -259,20 +258,37 @@ public class Player
 		ymax = (int)ypos + currentTexture.height / BunnyHat.TILEDIMENSION;
 		ymin = (int)ypos + 1;
 		xmax = (int)xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2;
-		xmin = (int)xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2 + 1;
+		xmin = (int)xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2;
 		
 		collision = detectCollision(xmin, xmax, ymin, ymax);
 
 		// THIS IS VERY BROKEN :-(
 		if (collision != null)
 		{
-			//System.out.println("lol");
-			xpos = previous_xpos;
-			ypos = previous_ypos;
-			ySpeed = 0;
-			xSpeed = 0;
-			isInAir = false;
-			isJumping = false;
+			boolean yCollision = false;
+			boolean xCollision = false;
+			
+			if (collision.y == ymin) { // feet touch the ground
+				yCollision = true;
+				isInAir = false;
+				isJumping = false;
+			}
+			if (collision.y == ymax) { // head bumps ceiling stuff - that hurts!
+				yCollision = true;
+			}
+			if (collision.x == xmin) { // bumped into sth on the left side
+				xCollision = true;
+			}
+			if (collision.x == xmax) { // bumped into sth on the right side
+				xCollision = true;
+			}
+			if (xCollision) System.out.println("lol:"+collision.x+":"+collision.y+" - x:"+xmin+"-"+xmax+" y:"+ymin+"-"+ymax+"\n");
+			if (xCollision) {xpos = previous_xpos; xSpeed = 0;}
+			if (yCollision) {ypos = previous_ypos; ySpeed = 0;}
+			
+			
+			
+			
 		}
 	
 		
@@ -291,6 +307,7 @@ public class Player
 		
 	}
 	
+	
 	private BPoint detectCollision(int xmin_tile, int xmax_tile, int ymin_tile, int ymax_tile)
 	{	
 		boolean breakbreak = false;
@@ -301,16 +318,24 @@ public class Player
 		{
 			for (int x = xmin_tile; x <= xmax_tile && !breakbreak; x++)
 			{
-				int metadata = level.getMetaDataAt(x, y);
 				
-				boolean collides = (metadata == Level.MetaTiles.Obstacle.index());
+					int metadata = level.getMetaDataAt(x, y);
+					
+					boolean collides = (metadata == Level.MetaTiles.Obstacle.index());
+					
+					
+					if (collides)
+					{
+						//breakbreak = true;
+						
+						if (!((x==xmin_tile && y==ymin_tile) 
+								|| (x==xmin_tile && y==ymax_tile)
+								||(x==xmax_tile && y==ymin_tile) 
+								|| (x==xmax_tile && y==ymax_tile))) collideX = x;
+						if ((y==ymin_tile || y==ymax_tile)) collideY = y;
+						
+					}
 				
-				if (collides)
-				{
-					breakbreak = true;
-					collideX = x;
-					collideY = y;
-				}
 			}
 		}
 		

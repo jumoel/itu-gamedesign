@@ -13,6 +13,8 @@ import processing.core.*;
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet implements Observer
 {
+	final boolean SHOW_FPS = false;
+	
 	public static Settings SETTINGS = new Settings();
 	
 	public static int TILEDIMENSION = SETTINGS.getValue("gui/tiledimension");
@@ -98,7 +100,7 @@ public class BunnyHat extends PApplet implements Observer
 		// Print the fps
 		if ((currentTimestamp - lastFpsTime) > 1000)
 		{
-			System.out.println("FPS: " + fps);
+			if (SHOW_FPS) System.out.println("FPS: " + fps);
 			lastFpsTime = currentTimestamp;
 			fps = 0;
 		}
