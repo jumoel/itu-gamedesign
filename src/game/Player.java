@@ -117,7 +117,7 @@ public class Player
 			isInAir = true;
 			
 			//play sound
-			Stereophone.playSound(0);
+			//Stereophone.playSound(0);
 		}
 	}
 	
@@ -202,7 +202,7 @@ public class Player
 	}
 
 	
-	private int collisionCount = 0; //counts collisions in series
+	private int feetCollisionCount = 0; //counts collisions in series
 	public void update(int deltaT)
 	{
 		previous_xpos = xpos;
@@ -250,11 +250,22 @@ public class Player
 		ySpeed = ySpeed + yAcceleration * deltaT;
 		
 		
-		if(deltaT > 30) {
+		/*if(deltaT > 100) {
 			System.out.println("high deltaT: "+ deltaT);
 			xpos = previous_xpos;
 			ypos = previous_ypos;
+		}*/
+		
+		//make sure, ypos and xpos did not travel to far for one frame 
+		// once they travel too far, they can cross a collision box  - and we surely do not want that!
+		if (Math.abs(ypos-previous_ypos)>=0.9) {
+			ypos = previous_ypos;
+			ySpeed = 0;
 		}
+		if (Math.abs(xpos-previous_xpos)>=0.9) {
+			xpos = previous_xpos;
+		}
+		
 		
 		PImage currentTexture = getCurrentTexture();
 
@@ -298,10 +309,11 @@ public class Player
 			}
 			//ypos = previous_ypos;
 			ypos = Math.round(ypos + collisionY);
-			collisionCount++;
+			if (feetCollisionCount==0) Stereophone.playSound(1);
+			feetCollisionCount++;
 			//System.out.print(ypos+" (ypos: "+ypos+", collisionY: "+collisionY+", deltaT: "+deltaT+") at collision #"+collisionCount+"\n");
 			ySpeed = 0;
-		}
+		} else {feetCollisionCount = 0;}
 		
 		// Not that broken anymore :|
 		/*if (collision != null)

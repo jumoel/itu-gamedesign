@@ -1,6 +1,7 @@
 package game.sound;
 
 import java.io.File;
+import java.io.FilenameFilter;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
@@ -13,7 +14,13 @@ public class Stereophone
 	public Stereophone(String soundDirName) {
 		File soundDir = new File(soundDirName);
 		if (!soundDir.isDirectory()) {System.out.print(soundDirName + " is not a valid directory (just in case you care about having sounds.. .)\n");}
-		sounds = soundDir.listFiles();
+		FilenameFilter filter = new FilenameFilter() {
+			public boolean accept(File dir, String name) {
+		        
+				return name.endsWith(".wav");
+			}
+		};
+		sounds = soundDir.listFiles(filter);
 		
 	}
 	
