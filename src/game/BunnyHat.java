@@ -1,10 +1,12 @@
 package game;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
 import game.gui.PlayerView;
 import game.gui.RaceIndicator;
 import game.level.Level;
+import game.sound.Stereophone;
 import game.control.SoundControl;
 import processing.core.*;
 
@@ -34,6 +36,7 @@ public class BunnyHat extends PApplet implements Observer
 	public RaceIndicator indicator;
 	private SoundControl sndCtrl;
 	private Thread sndCtrlThread;
+	private Stereophone sndOut;
 
 	private State inputState;
 	
@@ -70,6 +73,10 @@ public class BunnyHat extends PApplet implements Observer
 		sndCtrl.addObserver(this);
 		sndCtrlThread = new Thread(sndCtrl);
 		sndCtrlThread.start();
+		
+		//setup sound output
+		sndOut = new Stereophone("sounds");
+		sndOut.printSounds();
 	}
 
 	public void draw()
@@ -138,11 +145,16 @@ public class BunnyHat extends PApplet implements Observer
 	@Override
 	public void update(Observable o, Object arg)
 	{
-		
-			//inputState.put('d', ((String)arg).contentEquals("Straight Solid"));
-			/*if (((String)arg).contentEquals("Straight Solid")) {
-				System.out.print((String)arg);
-			}*/
+		if (arg instanceof HashMap) {
+			HashMap map = (HashMap)arg;
+			String detector = (String)map.get("detector");
+			String pattern = (String)map.get("pattern");
+			if (detector.contentEquals("HF")) {
+				inputState.put('d', (pattern.contentEquals("Straight Solid")));
+			} else {
+				inputState.put('l', (pattern.contentEquals("Straight Solid")));
+			}
+		}
 		
 	}
 }
