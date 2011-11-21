@@ -232,26 +232,36 @@ public class PlayerView extends Updateable
 		{
 			minimumTileX = 0;
 		}
-		//int minimumTileCoord = minimumTileX * BunnyHat.TILEDIMENSION - xCoordCamera;
 		
-		int maximumTile = (xCoordCamera + graphics.width) / BunnyHat.TILEDIMENSION;
-		if (maximumTile > level.levelWidth)
+		int maximumTileX = (xCoordCamera + graphics.width) / BunnyHat.TILEDIMENSION;
+		if (maximumTileX > level.levelWidth)
 		{
-			maximumTile = level.levelWidth;
+			maximumTileX = level.levelWidth;
 		}
-		//int maximumTileCoord = maximumTile * BunnyHat.TILEDIMENSION - xCoordCamera;
+		
+		int minimumTileY = yCoordCamera / BunnyHat.TILEDIMENSION;
+		if (minimumTileY < 0)
+		{
+			minimumTileY = 0;
+		}
+		
+		int maximumTileY = (yCoordCamera + graphics.height) / BunnyHat.TILEDIMENSION;
+		if (maximumTileY > level.levelHeight)
+		{
+			maximumTileY = level.levelHeight;
+		}
 		
 		// Counting y from down towards the sky
-		for (int reversey = 0; reversey < BunnyHat.PLAYERVIEWTILEHEIGHT; reversey++)
+		for (int reversey = minimumTileY; reversey < maximumTileY; reversey++)
 		{
 			// Counting x from left towards right
-			for (int x = minimumTileX; x <= maximumTile; x++)
+			for (int x = minimumTileX; x <= maximumTileX; x++)
 			{
 				int y = level.levelHeight - reversey;
 				PImage tile = level.getLevelImageAt(x, y);
 				
 				int xcoord = x * BunnyHat.TILEDIMENSION - xCoordCamera;
-				int ycoord = (BunnyHat.PLAYERVIEWTILEHEIGHT - reversey) * BunnyHat.TILEDIMENSION;
+				int ycoord = (BunnyHat.PLAYERVIEWTILEHEIGHT - reversey) * BunnyHat.TILEDIMENSION + yCoordCamera;
 				
 				if (tile != null)
 				{
