@@ -48,6 +48,7 @@ public class BunnyHat extends PApplet implements Observer
 	
 	private int lastFpsTime;
 	private int fps;
+	private int gameSeconds;
 	
 	public void setup()
 	{	
@@ -100,7 +101,8 @@ public class BunnyHat extends PApplet implements Observer
 		// Print the fps
 		if ((currentTimestamp - lastFpsTime) > 1000)
 		{
-			if (SHOW_FPS) System.out.println("FPS: " + fps);
+			gameSeconds++;
+			if (SHOW_FPS) System.out.println("FPS: " + fps + "  " + gameSeconds +"sec.");
 			lastFpsTime = currentTimestamp;
 			fps = 0;
 		}

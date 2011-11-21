@@ -242,15 +242,19 @@ public class Player
 		{
 			yAcceleration = GRAVITY;
 		}
-		else {
-			//yAcceleration = 0f;
-		}
+		
+		
 		
 		
 		ypos = ypos + ySpeed * deltaT + 0.5 * yAcceleration * Math.pow(deltaT, 2);
 		ySpeed = ySpeed + yAcceleration * deltaT;
 		
 		
+		if(deltaT > 30) {
+			System.out.println("high deltaT: "+ deltaT);
+			xpos = previous_xpos;
+			ypos = previous_ypos;
+		}
 		
 		PImage currentTexture = getCurrentTexture();
 
@@ -294,7 +298,8 @@ public class Player
 			}
 			//ypos = previous_ypos;
 			ypos = Math.round(ypos + collisionY);
-			System.out.print(ypos+"\n");
+			collisionCount++;
+			//System.out.print(ypos+" (ypos: "+ypos+", collisionY: "+collisionY+", deltaT: "+deltaT+") at collision #"+collisionCount+"\n");
 			ySpeed = 0;
 		}
 		
