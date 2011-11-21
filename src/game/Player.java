@@ -4,13 +4,14 @@ import game.level.Level;
 import processing.core.*;
 import util.BImage;
 import util.BMath;
+import util.BPoint;
 
 public class Player
 {
 	private enum Facing { LEFT, RIGHT };
 	
 	private PApplet processing;
-	public double xpos, ypos;
+	public double xpos, ypos, previous_xpos, previous_ypos;
 	
 	private boolean isInAir;
 	private boolean isJumping;
@@ -57,6 +58,8 @@ public class Player
 		
 		this.xpos = level.spawnX + 0.5;
 		this.ypos = level.spawnY + 0.5;
+		
+		System.out.println(this.xpos + ", " + this.ypos);
 		
 		isInAir = true;
 		isJumping = true;
@@ -193,16 +196,13 @@ public class Player
 			}
 		}
 	}
-	
-	public void checkCollisions()
-	{
-		
-	}
 
 	public void update(int deltaT)
 	{
-		// X
+		previous_xpos = xpos;
+		previous_ypos = ypos;
 		
+		// X
 		boolean hasXSpeed = Math.abs(xSpeed) > CLAMPTOZERO;
 		
 		controlAnimations();
@@ -243,7 +243,34 @@ public class Player
 		
 		
 		
+		PImage currentTexture = getCurrentTexture();
+
+		int xmin, xmax, ymin, ymax;
+		BPoint collision;
+		
+		ymax = (int)ypos + currentTexture.height / BunnyHat.TILEDIMENSION;
+		ymin = (int)ypos + 1;
+		xmax = (int)xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2;
+		xmin = (int)xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2 + 1;
+		
+		collision = detectCollision(xmin, xmax, ymin, ymax);
+
+		// THIS IS VERY BROKEN :-(
+		if (collision != null)
+		{
+			System.out.println("lol");
+			xpos = previous_xpos;
+			ypos = previous_ypos;
+			ySpeed = 0;
+			xSpeed = 0;
+			isInAir = false;
+			isJumping = false;
+		}
+	
+		
+		/*
 		// Old collision detection
+		
 		if (ypos < 0)
 		{
 			ySpeed = 0;
@@ -251,6 +278,41 @@ public class Player
 			isInAir = false;
 			yAcceleration = 0;
 			isJumping = false;
+		}
+		*/
+		
+	}
+	
+	private BPoint detectCollision(int xmin_tile, int xmax_tile, int ymin_tile, int ymax_tile)
+	{	
+		boolean breakbreak = false;
+		
+		int collideX = -1, collideY = -1;
+		
+		for (int y = ymin_tile; y <= ymax_tile && !breakbreak; y++)
+		{
+			for (int x = xmin_tile; x <= xmax_tile && !breakbreak; x++)
+			{
+				int metadata = level.getMetaDataAt(x, y);
+				
+				boolean collides = metadata == Level.MetaTiles.Obstacle.index();
+				
+				if (collides)
+				{
+					breakbreak = true;
+					collideX = x;
+					collideY = y;
+				}
+			}
+		}
+		
+		if (collideX == -1 || collideY == -1)
+		{
+			return null;
+		}
+		else
+		{
+			return new BPoint(collideX, collideY);
 		}
 	}
 }

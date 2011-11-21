@@ -214,8 +214,6 @@ public class PlayerView extends Updateable
 		
 		drawImage(ownPlayer.getCurrentTexture(), cb, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
 		
-		System.out.println("Pypos: " + pypos);
-		
 		// Draw the image to the surface
 		processing.image(cb, xpos, ypos);
 		

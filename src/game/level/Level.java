@@ -76,7 +76,8 @@ public class Level
 	
 	public int getMetaDataAt(int x, int y)
 	{
-		int index = levelWidth*y + x;
+		int realy = levelHeight - y;
+		int index = levelWidth*realy + x;
 		
 		if (index >= 0 && index < levelData.length)
 		{
@@ -167,9 +168,8 @@ public class Level
 				
 				if (metaData[i] == MetaTiles.SpawnPoint.index())
 				{
-					System.out.println("Yay");
-					this.spawnX = i / levelWidth;
-					this.spawnY = i % levelWidth;
+					this.spawnX = i % levelWidth;
+					this.spawnY = i / levelWidth;
 				}
 			}
 			
