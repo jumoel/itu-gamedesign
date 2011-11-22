@@ -13,39 +13,39 @@ gameplay:
     air: 0.05
   maxspeed: 2.5
 gui:
-  tiledimension: 16
+  tiledimension: 24
   playerviewtileheight: 12
   playerviewtilewidth: 30
 graphics:
   animations:
     animationpath: animations/
     player1run:
-      path: runboy.png
-      framewidth: 69
-      frameheight: 99
+      path: dreamrunevensmaller48x72.png
+      framewidth: 48
+      frameheight: 72
       fps: 27
     player1idle:
-      path: standboy.png
-      framewidth: 69
-      frameheight: 99
+      path: dreamstand48x72.png
+      framewidth: 48
+      frameheight: 72
       fps: 27
     player1jump:
-      path: jumpboy.png
-      framewidth: 69
-      frameheight: 99
+      path: dreamjump48x72.png
+      framewidth: 48
+      frameheight: 72
       fps: 27
     player2run:
-      path: rungirl.png
-      framewidth: 65
-      frameheight: 97
+      path: dreamrungirlevensmaller48x72.png
+      framewidth: 48
+      frameheight: 72
       fps: 27
     player2idle:
-      path: standgirl.png
-      framewidth: 65
-      frameheight: 97
+      path: dreamstandgirl48x72.png
+      framewidth: 48
+      frameheight: 72
       fps: 27
     player2jump:
-      path: jumpgirl.png
-      framewidth: 65
-      frameheight: 97
+      path: dreamjumpgirl48x72.png
+      framewidth: 48
+      frameheight: 72
       fps: 27

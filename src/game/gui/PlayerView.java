@@ -55,7 +55,7 @@ public class PlayerView extends Updateable
 		
 		this.viewNumber = viewNumber;
 		
-		this.level = new Level(processing, "levels/test.tmx");
+		this.level = new Level(processing, "levels/test_24.tmx");
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
 		
 		this.ownPlayer = new Player(processing, viewNumber, level);

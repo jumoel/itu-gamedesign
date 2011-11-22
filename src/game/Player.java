@@ -203,6 +203,7 @@ public class Player
 
 	
 	private int feetCollisionCount = 0; //counts collisions in series
+	private int collisionCount = 0;
 	public void update(int deltaT)
 	{
 		previous_xpos = xpos;
@@ -250,20 +251,23 @@ public class Player
 		ySpeed = ySpeed + yAcceleration * deltaT;
 		
 		
-		/*if(deltaT > 100) {
+		if(deltaT > 42) {
 			System.out.println("high deltaT: "+ deltaT);
 			xpos = previous_xpos;
 			ypos = previous_ypos;
-		}*/
+		}
 		
 		//make sure, ypos and xpos did not travel to far for one frame 
 		// once they travel too far, they can cross a collision box  - and we surely do not want that!
-		if (Math.abs(ypos-previous_ypos)>=0.9) {
-			ypos = previous_ypos;
-			ySpeed = 0;
+		double yDiff = ypos - previous_ypos;
+		double xDiff = xpos - previous_xpos;
+		double maxDistance = 0.5;
+		if (Math.abs(yDiff)>=maxDistance) {
+			ypos += maxDistance * (yDiff /Math.abs(yDiff)) * -1;
+			//ySpeed = 0;
 		}
-		if (Math.abs(xpos-previous_xpos)>=0.9) {
-			xpos = previous_xpos;
+		if (Math.abs(xDiff)>=maxDistance) {
+			xpos += maxDistance * (xDiff / Math.abs(xDiff)) * -1;
 		}
 		
 		
@@ -311,6 +315,7 @@ public class Player
 			ypos = Math.round(ypos + collisionY);
 			if (feetCollisionCount==0) Stereophone.playSound(1);
 			feetCollisionCount++;
+			//collisionCount++;
 			//System.out.print(ypos+" (ypos: "+ypos+", collisionY: "+collisionY+", deltaT: "+deltaT+") at collision #"+collisionCount+"\n");
 			ySpeed = 0;
 		} else {feetCollisionCount = 0;}

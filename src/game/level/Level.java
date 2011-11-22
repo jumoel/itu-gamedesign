@@ -136,8 +136,8 @@ public class Level
 			if (tileWidth != tileHeight || tileWidth != BunnyHat.TILEDIMENSION)
 			{
 				System.err.println(
-						"The tile dimensions in the level '" + levelName + "' aren't square, " +
-						"or doesn't match with the tile dimension in the settings file," +
+						"The tile dimensions in the level '" + levelName + "' aren't square (check: "+tileWidth+" by "+tileHeight+"),\n " +
+						"or doesn't match with the tile dimension in the settings file (check: "+BunnyHat.TILEDIMENSION+"),\n" +
 						"or the level doesn't conform to the quality control guidelines.");
 				
 				System.exit(-1);

@@ -69,7 +69,7 @@ public class BunnyHat extends PApplet implements Observer
 		fps = 0;
 		
 		//testing Level
-		Level level = new Level(this, "levels/test.tmx");
+		Level level = new Level(this, "levels/test_24.tmx");
 		
 		//setup & run sound input
 		sndCtrl = new SoundControl(this);
