@@ -7,25 +7,39 @@ import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Observer;
 
+import processing.core.PApplet;
+
 public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 {
 	
+	//Thread control
+	private Thread ourThread;
+	private static boolean awake = false;
 	
-	private final int SWITCH_SLEEP = 500;
+	private final static int SWITCH_SLEEP = 500;
 	
-	PlayerView playerView1, playerView2; 
+	private static PlayerView playerView1, playerView2;
 	
-	public AmazingSwitchWitch(PlayerView pv1, PlayerView pv2) {
+	private static boolean shouldSwitchDreams = false; 
+	
+	private PApplet ourPApplet;
+	
+	
+	public AmazingSwitchWitch(PlayerView pv1, PlayerView pv2, PApplet papplet) {
 		playerView1 = pv1;
 		playerView2 = pv2;
+		ourPApplet = papplet;
 	}
 
 	public void switchDreams() {
+		System.out.print("will switch dreams");
 		Level l1, l2;
 		l1 = playerView1.getLevel();
 		l2 = playerView2.getLevel();
 		playerView1.switchPrepare();
 		playerView2.switchPrepare();
+		
+		ourPApplet.tint(ourPApplet.color(255, 0, 0), 100);
 		
 		try
 		{
@@ -50,10 +64,21 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 			e.printStackTrace();
 		}
 		
+		ourPApplet.noTint();
+		
 		playerView1.switchFinish();
 		playerView2.switchFinish();
 	}
 	
+	public void wakeHer() {
+		awake = true;
+		ourThread = new Thread(this);
+		ourThread.start();
+	}
+	
+	public void makeHerSleep() {
+		awake = false;
+	}
 	
 	/**
 	 * doing the actual switch
@@ -61,8 +86,20 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	@Override
 	public void run()
 	{
-		// TODO Auto-generated method stub
 		
+		while (awake) {
+			try
+			{
+				if (shouldSwitchDreams) switchDreams();
+				shouldSwitchDreams = false;
+				Thread.currentThread().sleep(200);
+			}
+			catch (InterruptedException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Override
@@ -71,7 +108,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		if (o instanceof GameMaster && arg instanceof GameMaster.MSG) {
 			switch((GameMaster.MSG)arg) {
 				case SWITCH_DREAMS:
-					this.switchDreams();
+					shouldSwitchDreams = true;
 					break;
 			}
 		}

@@ -88,10 +88,13 @@ public class BunnyHat extends PApplet implements Observer
 		gameMaster.startGame();
 		
 		// setup our special workers
-		switcher = new AmazingSwitchWitch(view1, view2);
+		switcher = new AmazingSwitchWitch(view1, view2, this);
+		switcher.wakeHer();
 		
 		// setup communication
 		gameMaster.addObserver(switcher); // listen for level switch message
+		
+		
 	}
 
 	public void draw()
@@ -102,7 +105,7 @@ public class BunnyHat extends PApplet implements Observer
 		
 		deltaT = currentTimestamp - lastTimestamp;
 		
-		background(0);
+		//background(0);
 
 		view1.update(inputState, LEFT, VIEW1Y, deltaT);
 		view2.update(inputState, LEFT, VIEW2Y, deltaT);

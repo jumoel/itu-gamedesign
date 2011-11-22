@@ -28,7 +28,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 	private final static double DOORS_PLAYER_MIN_DISTANCE = BunnyHat.SETTINGS.getValue("gamerules/doors/playerMinDistance");
 	private final static int DOORS_DURATION = BunnyHat.SETTINGS.getValue("gamerules/doors/doorDuration");
 	
-	private final static boolean SHOW_FPS = true;
+	private final static boolean SHOW_FPS = false;
 	private PApplet ourPApplet;
 	private Thread ourThread;
 	private boolean runGame = false;

@@ -11,7 +11,7 @@ import ddf.minim.*;
 
 
 public class SoundControl extends Observable implements Observer, Runnable {
-	private final boolean showFPS = true;
+	private final boolean showFPS = false;
 	
 	// Thread Control
 	private Thread ourThread;

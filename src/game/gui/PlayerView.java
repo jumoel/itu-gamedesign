@@ -41,9 +41,15 @@ public class PlayerView extends Updateable
 	
 	//dream switch interaction methods
 	public Level getLevel() {return level;}
-	public void switchPrepare() { switchHappening = true; }
-	public void switchExecute(Level lv) { level = lv; }
-	public void switchFinish() { switchHappening = false; }
+	public void switchPrepare() { 
+		switchHappening = true;
+	}
+	public void switchExecute(Level lv) { 
+		level = lv; 
+	}
+	public void switchFinish() {
+		switchHappening = false;
+	}
 	
 	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber)
@@ -123,7 +129,7 @@ public class PlayerView extends Updateable
 	
 	public void update(State state, int xpos, int ypos, int deltaT)
 	{	
-		if (switchHappening) return; // yes, nothing happens while we are switching
+		if (switchHappening) deltaT = 0; // yes, nothing happens while we are switching - only screen updates
 
 		if (ownPlayer == null)
 		{
