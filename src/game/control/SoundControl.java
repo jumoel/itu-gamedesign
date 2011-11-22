@@ -11,7 +11,11 @@ import ddf.minim.*;
 
 
 public class SoundControl extends Observable implements Observer, Runnable {
-	private final boolean showFPS = false; 
+	private final boolean showFPS = true;
+	
+	// Thread Control
+	private Thread ourThread;
+	private boolean keepListening = false;
 	
 	/**
 	 * Attention Window
@@ -557,7 +561,16 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		
 	}
 
-
+	
+	public void startListening() {
+		keepListening = true;
+		ourThread = new Thread(this);
+		ourThread.start();
+	}
+	
+	public void stopListening() {
+		keepListening = false;
+	}
 
 
 	@SuppressWarnings("static-access")
@@ -569,7 +582,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		int fps = 0;
 		int lastFrameTime = 0; 
 		int lastFpsTime = 0;
-		while (true) {
+		while (keepListening) {
 			try
 			{
 				Thread.currentThread().sleep(frameSize);

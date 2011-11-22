@@ -36,6 +36,16 @@ public class PlayerView extends Updateable
 	
 	private Level level;
 	
+	// dream switch data
+	private boolean switchHappening = false;
+	
+	//dream switch interaction methods
+	public Level getLevel() {return level;}
+	public void switchPrepare() { switchHappening = true; }
+	public void switchExecute(Level lv) {}
+	public void switchFinish() { switchHappening = false; }
+	
+	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber)
 	{	
 		this.width = width;
@@ -69,6 +79,8 @@ public class PlayerView extends Updateable
 	
 	private void handleInput(State state)
 	{
+		if (switchHappening) return; // no input while a switch is happening
+		
 		boolean jumpbutton = (viewNumber == 1) ?
 				(state.containsKey('w') && state.get('w')) :
 				(state.containsKey('i') && state.get('i'));
@@ -111,6 +123,7 @@ public class PlayerView extends Updateable
 	
 	public void update(State state, int xpos, int ypos, int deltaT)
 	{	
+		if (switchHappening) return; // yes, nothing happens while we are switching
 
 		if (ownPlayer == null)
 		{

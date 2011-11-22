@@ -6,6 +6,7 @@ import java.util.Observer;
 import game.gui.PlayerView;
 import game.gui.RaceIndicator;
 import game.level.Level;
+import game.master.GameMaster;
 import game.sound.Stereophone;
 import game.control.SoundControl;
 import processing.core.*;
@@ -37,8 +38,8 @@ public class BunnyHat extends PApplet implements Observer
 	public PlayerView view2;
 	public RaceIndicator indicator;
 	private SoundControl sndCtrl;
-	private Thread sndCtrlThread;
 	private Stereophone sndOut;
+	private GameMaster gameMaster;
 
 	private State inputState;
 	
@@ -74,12 +75,15 @@ public class BunnyHat extends PApplet implements Observer
 		//setup & run sound input
 		sndCtrl = new SoundControl(this);
 		sndCtrl.addObserver(this);
-		sndCtrlThread = new Thread(sndCtrl);
-		sndCtrlThread.start();
+		sndCtrl.startListening();
 		
 		//setup sound output
 		sndOut = new Stereophone("sounds");
 		sndOut.printSounds();
+		
+		//setup and run game master
+		gameMaster = new GameMaster(this);
+		gameMaster.startGame();
 	}
 
 	public void draw()

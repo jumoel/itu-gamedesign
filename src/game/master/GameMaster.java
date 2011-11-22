@@ -18,6 +18,8 @@ import processing.core.PApplet;
  */
 public class GameMaster extends Observable implements Observer, Runnable
 {
+	public final static int MSG_SWITCH_DREAMS = 13;
+	
 	private final static int SWITCH_TIME_TILL_NEXT = BunnyHat.SETTINGS.getValue("gamerules/switch/timeTillNext"); 
 	private final static double SWITCH_TIME_VARIATION = BunnyHat.SETTINGS.getValue("gamerules/switch/timeVariation");
 	private final static int SWITCH_ALERT_PHASE_DURATION = BunnyHat.SETTINGS.getValue("gamerules/switch/alertPhaseDuration");
