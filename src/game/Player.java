@@ -261,13 +261,13 @@ public class Player
 		// once they travel too far, they can cross a collision box  - and we surely do not want that!
 		double yDiff = ypos - previous_ypos;
 		double xDiff = xpos - previous_xpos;
-		double maxDistance = 0.5;
+		double maxDistance = 0.8;
 		if (Math.abs(yDiff)>=maxDistance) {
-			ypos += maxDistance * (yDiff /Math.abs(yDiff)) * -1;
-			//ySpeed = 0;
+			ypos = previous_ypos + maxDistance * (yDiff /Math.abs(yDiff));
+			//ySpeed -= 0.1 * (yDiff /Math.abs(yDiff)) * -1;;
 		}
 		if (Math.abs(xDiff)>=maxDistance) {
-			xpos += maxDistance * (xDiff / Math.abs(xDiff)) * -1;
+			xpos = previous_xpos + maxDistance * (xDiff / Math.abs(xDiff));
 		}
 		
 		

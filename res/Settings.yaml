@@ -14,8 +14,8 @@ gameplay:
   maxspeed: 2.5
 gui:
   tiledimension: 24
-  playerviewtileheight: 12
-  playerviewtilewidth: 30
+  playerviewtileheight: 14
+  playerviewtilewidth: 42
 graphics:
   animations:
     animationpath: animations/
