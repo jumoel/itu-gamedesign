@@ -3,6 +3,7 @@ package game.gui;
 import game.level.Level;
 import game.master.GameMaster;
 
+import java.util.Enumeration;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -53,6 +54,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView2.switchFinish();
 	}
 	
+	
 	/**
 	 * doing the actual switch
 	 */
@@ -66,9 +68,9 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	@Override
 	public void update(Observable o, Object arg)
 	{
-		if (o instanceof GameMaster && arg instanceof Integer) {
-			switch((Integer)arg) {
-				case GameMaster.MSG_SWITCH_DREAMS:
+		if (o instanceof GameMaster && arg instanceof GameMaster.MSG) {
+			switch((GameMaster.MSG)arg) {
+				case SWITCH_DREAMS:
 					this.switchDreams();
 					break;
 			}

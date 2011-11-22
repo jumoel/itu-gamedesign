@@ -3,6 +3,7 @@ import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import game.gui.AmazingSwitchWitch;
 import game.gui.PlayerView;
 import game.gui.RaceIndicator;
 import game.level.Level;
@@ -40,6 +41,7 @@ public class BunnyHat extends PApplet implements Observer
 	private SoundControl sndCtrl;
 	private Stereophone sndOut;
 	private GameMaster gameMaster;
+	private AmazingSwitchWitch switcher;
 
 	private State inputState;
 	
@@ -84,6 +86,12 @@ public class BunnyHat extends PApplet implements Observer
 		//setup and run game master
 		gameMaster = new GameMaster(this);
 		gameMaster.startGame();
+		
+		// setup our special workers
+		switcher = new AmazingSwitchWitch(view1, view2);
+		
+		// setup communication
+		gameMaster.addObserver(switcher); // listen for level switch message
 	}
 
 	public void draw()

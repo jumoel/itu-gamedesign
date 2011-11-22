@@ -42,7 +42,7 @@ public class PlayerView extends Updateable
 	//dream switch interaction methods
 	public Level getLevel() {return level;}
 	public void switchPrepare() { switchHappening = true; }
-	public void switchExecute(Level lv) {}
+	public void switchExecute(Level lv) { level = lv; }
 	public void switchFinish() { switchHappening = false; }
 	
 	

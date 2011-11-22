@@ -18,7 +18,8 @@ import processing.core.PApplet;
  */
 public class GameMaster extends Observable implements Observer, Runnable
 {
-	public final static int MSG_SWITCH_DREAMS = 13;
+	public static enum MSG {SWITCH_DREAMS, SWITCH_ALERT_START, SWITCH_ALERT_STOP, 
+		DOORS_SPAWN_START, DOORS_SPAWN_STOP} 
 	
 	private final static int SWITCH_TIME_TILL_NEXT = BunnyHat.SETTINGS.getValue("gamerules/switch/timeTillNext"); 
 	private final static double SWITCH_TIME_VARIATION = BunnyHat.SETTINGS.getValue("gamerules/switch/timeVariation");
@@ -84,11 +85,19 @@ public class GameMaster extends Observable implements Observer, Runnable
 		msTillNextSwitch -= msSinceLastDecisions;
 		if (msTillNextSwitch < 0) { // yes, it is time
 			switchHappening = true;
+			this.setChanged();
+			this.notifyObservers(GameMaster.MSG.SWITCH_ALERT_STOP);
+			this.setChanged();
+			this.notifyObservers(GameMaster.MSG.SWITCH_DREAMS);
+			msTillNextSwitch = this.getNewTimeTillNextSwitch();
+			switchAlertStarted = false;
 			//TODO: switch dreams, stop alert
 			return;
 		} else if (msTillNextSwitch < SWITCH_ALERT_PHASE_DURATION
 				&& !switchAlertStarted) { // time to warn the players
 			switchAlertStarted = true;
+			this.setChanged();
+			this.notifyObservers(GameMaster.MSG.SWITCH_ALERT_START);
 			// TODO: start alert
 		}
 		
