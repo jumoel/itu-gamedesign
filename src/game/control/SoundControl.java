@@ -142,11 +142,6 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	AudioInput myinput;
 	FFT fft;
 	
-	// for fps statistics
-	private int currentTimeStamp;
-	private int lastFrameTime;
-	private int lastFpsTime;
-	private int fps = 0;
 	
 	//general settings
 	private long frameSize = 42; // 42ms = roundabout 23 fps
@@ -571,15 +566,15 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	{
 		
 		
-		
-		lastFrameTime = 0; 
-		lastFpsTime = 0;
+		int fps = 0;
+		int lastFrameTime = 0; 
+		int lastFpsTime = 0;
 		while (true) {
 			try
 			{
 				Thread.currentThread().sleep(frameSize);
 				
-				currentTimeStamp = ourPApplet.millis();
+				int currentTimeStamp = ourPApplet.millis();
 				
 				if ((currentTimeStamp - lastFrameTime) >= frameSize) {
 					lastFrameTime = currentTimeStamp;

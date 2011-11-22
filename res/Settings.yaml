@@ -12,6 +12,15 @@ gameplay:
     ground: 0.05
     air: 0.05
   maxspeed: 2.5
+gamerules:
+  switch:
+    timeTillNext: 7000
+    timeVariation: 0.2
+    alertPhaseDuration: 2000
+  doors:
+    playerMinDistance: 0.2
+    doorDuration: 3000
+   
 gui:
   tiledimension: 24
   playerviewtileheight: 14
@@ -24,8 +33,18 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+    player1runGun:
+      path: dreamrungun48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     player1idle:
       path: dreamstand48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    player1idleGun:
+      path: dreamstandgun48x72.png
       framewidth: 48
       frameheight: 72
       fps: 27
@@ -34,8 +53,23 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+    player1jumpGun:
+      path: dreamjumpgun48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    player1shot:
+      path: dreamfiregun48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     player2run:
       path: dreamrungirlevensmaller48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    player2runGun:
+      path: dreamrungirlgun48x72.png
       framewidth: 48
       frameheight: 72
       fps: 27
@@ -44,8 +78,23 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+    player2idleGun:
+      path: dreamstandgirlgun48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     player2jump:
       path: dreamjumpgirl48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    player2jumpGun:
+      path: dreamjumpgirlgun48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    player2shot:
+      path: dreamfiregirlgun48x72.png
       framewidth: 48
       frameheight: 72
       fps: 27
