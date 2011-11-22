@@ -43,9 +43,11 @@ public class PlayerView extends Updateable
 	public Level getLevel() {return level;}
 	public void switchPrepare() { 
 		switchHappening = true;
+		//TODO: get player character distance to ground
 	}
 	public void switchExecute(Level lv) { 
 		level = lv; 
+		//TODO: transfer player to same distance above ground
 	}
 	public void switchFinish() {
 		switchHappening = false;

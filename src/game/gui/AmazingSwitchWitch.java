@@ -39,11 +39,15 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView1.switchPrepare();
 		playerView2.switchPrepare();
 		
-		ourPApplet.tint(ourPApplet.color(255, 0, 0), 100);
+		
+		
 		
 		try
 		{
-			Thread.currentThread().sleep(SWITCH_SLEEP);
+			for (int i = 0; i < 255; i += 10) {
+				Thread.currentThread().sleep(SWITCH_SLEEP/25);
+				ourPApplet.tint(ourPApplet.color(255, 0, 0), i);
+			}
 		}
 		catch (InterruptedException e)
 		{
@@ -56,7 +60,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		try
 		{
-			Thread.currentThread().sleep(SWITCH_SLEEP);
+			for (int i = 255; i > 0; i -= 10) {
+				Thread.currentThread().sleep(SWITCH_SLEEP/25);
+				ourPApplet.tint(ourPApplet.color(255, 0, 0), i);
+			}
 		}
 		catch (InterruptedException e)
 		{
