@@ -34,7 +34,7 @@ public class PlayerView extends Updateable
 	
 	private int levelLength;
 	
-	private Level level;
+	private Level level; public void setLevel(Level lvl) {level = lvl; ownPlayer.setLevel(lvl);}
 	
 	// dream switch data
 	private boolean switchHappening = false;
@@ -45,8 +45,8 @@ public class PlayerView extends Updateable
 		switchHappening = true;
 		//TODO: get player character distance to ground
 	}
-	public void switchExecute(Level lv) { 
-		level = lv; 
+	public void switchExecute(Level lvl) {
+		setLevel(lvl);
 		//TODO: transfer player to same distance above ground
 	}
 	public void switchFinish() {
@@ -54,7 +54,9 @@ public class PlayerView extends Updateable
 	}
 	
 	
-	public PlayerView(int width, int height, PApplet applet, int viewNumber)
+	
+	
+	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath)
 	{	
 		this.width = width;
 		this.halfwidth = this.width / 2;
@@ -73,10 +75,10 @@ public class PlayerView extends Updateable
 		
 		this.viewNumber = viewNumber;
 		
-		this.level = new Level(processing, "levels/test_24.tmx");
+		this.level = new Level(processing, levelPath);
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
 		
-		this.ownPlayer = new Player(processing, viewNumber, level);
+		this.ownPlayer = new Player(processing, viewNumber, this.level);
 		this.otherPlayer = null;
 		
 		this.playerPosition = 0;

@@ -56,8 +56,10 @@ public class BunnyHat extends PApplet implements Observer
 	public void setup()
 	{	
 		inputState = new State();
-		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 1);
-		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2);
+		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 1, 
+				(String)SETTINGS.getValue("levels/level2/good"));
+		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2,
+				(String)SETTINGS.getValue("levels/level2/bad"));
 		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
 		sndCtrl = new SoundControl(this);
 		
@@ -71,8 +73,6 @@ public class BunnyHat extends PApplet implements Observer
 		lastFpsTime = 0;
 		fps = 0;
 		
-		//testing Level
-		Level level = new Level(this, "levels/test_24.tmx");
 		
 		//setup & run sound input
 		sndCtrl = new SoundControl(this);

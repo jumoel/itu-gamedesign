@@ -49,6 +49,10 @@ public class Player
 	
 	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
 
+	public void setLevel(Level level) {
+		this.level = level;
+	}
+	
 	public Player(PApplet applet, int playerNumber, Level level)
 	{
 		this.processing = applet;

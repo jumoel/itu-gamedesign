@@ -102,3 +102,10 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+levels:
+  level1:
+    good: levels/test_24.tmx
+    bad: levels/test_24.tmx
+  level2:
+    good: levels/Level design lucid twins_V5.tmx
+    bad: levels/Level design lucid twins_V5.tmx
