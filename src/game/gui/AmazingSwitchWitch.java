@@ -1,5 +1,6 @@
 package game.gui;
 
+import game.BunnyHat;
 import game.level.Level;
 import game.master.GameMaster;
 
@@ -38,15 +39,18 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		l2 = playerView2.getLevel();
 		playerView1.switchPrepare();
 		playerView2.switchPrepare();
+
+		int r = BunnyHat.SETTINGS.getValue("gui/colors/tintr");
+		int g = BunnyHat.SETTINGS.getValue("gui/colors/tintg");
+		int b = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
 		
-		
-		
+		int tintcolor = ourPApplet.color(r, g, b);
 		
 		try
 		{
 			for (int i = 0; i < 255; i += 10) {
 				Thread.currentThread().sleep(SWITCH_SLEEP/25);
-				ourPApplet.tint(ourPApplet.color(255, 0, 0), i);
+				ourPApplet.tint(tintcolor, i);
 			}
 		}
 		catch (InterruptedException e)
@@ -62,7 +66,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		{
 			for (int i = 255; i > 0; i -= 10) {
 				Thread.currentThread().sleep(SWITCH_SLEEP/25);
-				ourPApplet.tint(ourPApplet.color(255, 0, 0), i);
+				ourPApplet.tint(tintcolor, i);
 			}
 		}
 		catch (InterruptedException e)

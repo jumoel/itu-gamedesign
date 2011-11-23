@@ -25,6 +25,10 @@ gui:
   tiledimension: 24
   playerviewtileheight: 14
   playerviewtilewidth: 42
+  colors:
+    tintr: 255
+    tintg: 255
+    tintb: 0
 graphics:
   animations:
     animationpath: animations/

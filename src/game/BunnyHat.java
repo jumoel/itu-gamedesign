@@ -15,7 +15,7 @@ import processing.core.*;
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet implements Observer
 {
-	final boolean SHOW_FPS = false;
+	boolean SHOW_FPS = false;
 	
 	public static Settings SETTINGS = new Settings();
 	
@@ -117,7 +117,11 @@ public class BunnyHat extends PApplet implements Observer
 		if ((currentTimestamp - lastFpsTime) > 1000)
 		{
 			gameSeconds++;
-			if (SHOW_FPS) System.out.println("FPS: " + fps + "  " + gameSeconds +"sec.");
+			if (SHOW_FPS)
+			{
+				System.out.println("FPS: " + fps + "  " + gameSeconds +"sec.");
+			}
+			
 			lastFpsTime = currentTimestamp;
 			fps = 0;
 		}
@@ -153,6 +157,11 @@ public class BunnyHat extends PApplet implements Observer
 		if (key == 'l')
 		{
 			inputState.put('j', false);
+		}
+		
+		if (key == 'f')
+		{
+			SHOW_FPS = !SHOW_FPS;
 		}
 	}
 
