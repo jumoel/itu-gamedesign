@@ -4,6 +4,7 @@ import game.level.Level;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.geom.Rectangle2D.Double;
 
 /**
  * All we need for a nice collision detection
@@ -17,6 +18,8 @@ public abstract class CollisionBox
 	private Effects collisionEffect = Effects.STOP;
 	
 	private Level collisionLevel;
+	
+	private CollisionBox currentCollisionPartner;
 	
 	/**
 	 * Describing the path, a object can move along while being on ground
@@ -80,7 +83,35 @@ public abstract class CollisionBox
 	 */
 	protected boolean isColliding (double x, double y) {
 		
+		// get all the tiles which might be of interest
+		Rectangle2D.Double areaOfInterest = new Rectangle2D.Double();
+		Rectangle2D.union(collisionBoundaries, getFutureCollisionBox(x, y), areaOfInterest);
+		for (int curX = (int)areaOfInterest.x; 
+				 curX <= (int)(areaOfInterest.x + areaOfInterest.width); 
+				 curX++) {
+			for (int curY = (int)areaOfInterest.y; 
+					 curY <= (int)(areaOfInterest.y + areaOfInterest.height); 
+					 curY++) {
+				int metaType = collisionLevel.getMetaDataAt(curX, curY);
+				switch (metaType) {
+					case 1:
+						
+					case 2:
+						
+					default:
+						
+						break;
+				}
+			}
+			
+		}
+		
+		// check whether there will be a collision
 		return false;
+	}
+	
+	protected Effects getColliderEffect() {
+		return Effects.STOP;
 	}
 	
 	
