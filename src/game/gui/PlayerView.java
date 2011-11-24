@@ -311,6 +311,8 @@ public class PlayerView extends Updateable
 		graphics.line(cameraSecondTileCoord, 0, cameraSecondTileCoord, graphics.height);
 		*/
 		
+		//level.collisionDraw();
+		
 		graphics.endDraw();
 	}
 	

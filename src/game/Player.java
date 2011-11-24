@@ -7,7 +7,7 @@ import util.BImage;
 import util.BMath;
 import util.BPoint;
 
-public class Player
+public class Player extends CollisionBox
 {
 	private enum Facing { LEFT, RIGHT };
 	
@@ -51,10 +51,14 @@ public class Player
 
 	public void setLevel(Level level) {
 		this.level = level;
+		super.setLevel(level);
 	}
 	
 	public Player(PApplet applet, int playerNumber, Level level)
 	{
+		super(level.spawnX + 0.5, level.spawnY + 0.5, 2, 3);
+		super.setLevel(level);
+		
 		this.processing = applet;
 		
 		xSpeed = ySpeed = yAcceleration = 0.0;
@@ -268,35 +272,49 @@ public class Player
 		double maxDistance = 0.8;
 		if (Math.abs(yDiff)>=maxDistance) {
 			ypos = previous_ypos + maxDistance * (yDiff /Math.abs(yDiff));
-			//ySpeed -= 0.1 * (yDiff /Math.abs(yDiff)) * -1;;
+			//ySpeed = (yDiff/Math.abs(yDiff)) * 0.05;
 		}
 		if (Math.abs(xDiff)>=maxDistance) {
 			xpos = previous_xpos + maxDistance * (xDiff / Math.abs(xDiff));
 		}
 		
 		
-		PImage currentTexture = getCurrentTexture();
+		//PImage currentTexture = getCurrentTexture();
 
-		int xmin, xmax, ymin, ymax;
-		BPoint collision;
+		/*int xmin, xmax, ymin, ymax;
+		BPoint collision;*/
 		
-		ymax = (int)Math.ceil(ypos + currentTexture.height / BunnyHat.TILEDIMENSION );
+		/*ymax = (int)Math.ceil(ypos + currentTexture.height / BunnyHat.TILEDIMENSION );
 		ymin = (int)Math.floor(ypos);
 		xmax = (int)Math.ceil(xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2 );
-		xmin = (int)Math.floor(xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2 );
+		xmin = (int)Math.floor(xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2 );*/
 		
-		double x0, y0, x1, y1; // edge points of our body
+		/*double x0, y0, x1, y1; // edge points of our body
 		x0 = (xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2);
 		y0 = (ypos+1);
 		x1 = (xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2);
-		y1 = (ypos + currentTexture.height / BunnyHat.TILEDIMENSION);
+		y1 = (ypos + currentTexture.height / BunnyHat.TILEDIMENSION);*/
 		
-		double collisionY = detectCollisionBoxWiseY(x0, y0, x1, y1);
-		double collisionX = detectCollisionBoxWiseX(x0, y0, x1, y1);
+		//double collisionY = detectCollisionBoxWiseY(x0, y0, x1, y1);
+		//double collisionX = detectCollisionBoxWiseX(x0, y0, x1, y1);
 		
 		//collision = detectCollision(xmin, xmax, ymin, ymax);
 
-		if (collisionX != 0.0) { // bumped side
+		
+		
+		CollisionBox.CollisionBoxData data = new CollisionBoxData();
+		data.x = xpos-1; data.y = ypos;
+		data.xSpeed = xSpeed; data.ySpeed = ySpeed;
+		data = this.isColliding(data);
+		xpos = data.x+1; ypos = data.y;
+		xSpeed = data.xSpeed; ySpeed = data.ySpeed;
+		if (ySpeed == 0) isInAir = isJumping = false;
+		else isInAir = isJumping = true;
+		System.out.println(ySpeed);
+		
+			
+		
+		/*if (collisionX != 0.0) { // bumped side
 			if (collisionX > 0.0) { // right side
 				//xpos--;
 			} else { // left side
@@ -357,49 +375,12 @@ public class Player
 			
 		} else {collisionCount = 0;}*/
 	
-		
-		
+		// update the position of the characters collision box
+		this.updatePosition(xpos-1, ypos);
 		
 	}
 	
-	private double detectCollisionBoxWiseY(double x0, double y0, double x1, double y1) {
-		int ix0 = (int)Math.floor(x0+0.3);
-		int iy0 = (int)Math.floor(y0);
-		int ix1 = (int)Math.floor(x1-0.3);
-		int iy1 = (int)Math.floor(y1);
-		
-		for (int x=ix0; x <= ix1; x++) {
-			if (level.getMetaDataAt(x, iy0) == Level.MetaTiles.Obstacle.index()) {
-				// hit head
-				return (iy0+1)-y0;
-			} else if (level.getMetaDataAt(x, iy1) == Level.MetaTiles.Obstacle.index()) {
-				// feet hit
-				return (iy1)-y1;
-			}
-		}
-		
-		return 0.0;
-	}
 	
-	private double detectCollisionBoxWiseX(double x0, double y0, double x1, double y1) {
-		int ix0 = (int)Math.floor(x0);
-		int iy0 = (int)Math.floor(y0+0.3);
-		int ix1 = (int)Math.floor(x1);
-		int iy1 = (int)Math.floor(y1-0.3);
-		
-		for (int y=iy0; y <= iy1; y++) {
-			if (level.getMetaDataAt(ix1, y) == Level.MetaTiles.Obstacle.index()) {
-				// hit right
-				return (ix1)-x1;
-			} else if (level.getMetaDataAt(ix0, y) == Level.MetaTiles.Obstacle.index()) {
-				// hit left
-				return (ix0+1)-x0;
-			}
-		}
-		
-		
-		return 0.0;
-	}
 	
 	/**
 	 * deprecated method - only use in case of emergency!
@@ -449,5 +430,12 @@ public class Player
 		{
 			return new BPoint(collideX, collideY);
 		}
+	}
+
+	@Override
+	public void collisionDraw()
+	{
+		// TODO Auto-generated method stub
+		
 	}
 }

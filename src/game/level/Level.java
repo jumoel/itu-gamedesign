@@ -11,7 +11,7 @@ import javax.xml.xpath.*;
 
 import org.w3c.dom.Document;
 
-public class Level
+public class Level extends CollisionLevel
 {
 	public enum MetaTiles
 	{
@@ -33,11 +33,11 @@ public class Level
 		}
 	}
 	
-	private PApplet processing;
+	
 	
 	private PImage tiles[];
-	private int metaData[];
 	private int levelData[];
+	private int metaData[];
 	
 	public String levelName;
 	
@@ -48,16 +48,20 @@ public class Level
 	private int imageWidth;
 	private int imageHeight;
 	
-	public int levelWidth;
-	public int levelHeight;
+	private PApplet processing;
+	
 	
 	public Level (PApplet p, String levelName)
 	{
+		super(p);
 		this.processing = p;
 		this.levelName = levelName;
 		
 		loadXML();
 		tiles = BImage.cutImageSprite(processing, processing.loadImage("levels/" + imageFile), BunnyHat.TILEDIMENSION, BunnyHat.TILEDIMENSION);
+		
+		// setup collision level
+		this.collisionSetup();
 	}
 	
 	public int getLevelDataAt(int x, int y)

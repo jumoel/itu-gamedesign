@@ -24,6 +24,10 @@ public class Stereophone
 		
 	}
 	
+	public static void playSound(final int number, String identifier, int msCooldown) {
+		
+	}
+	
 	public static synchronized void playSound(final int number) {
 		if (number >= sounds.length) {return;}
 		

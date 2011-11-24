@@ -2,7 +2,9 @@ package game;
 
 import game.level.Level;
 
+import java.awt.Polygon;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
 
@@ -29,7 +31,12 @@ public abstract class CollisionBox
 	/**
 	 * collision box for this object
 	 */
-	private Rectangle2D.Double collisionBoundaries;
+	private Rectangle2D.Double cBox;
+	
+	public class CollisionBoxData {
+		double xSpeed, ySpeed, x, y;
+		
+	}
 	
 	/**
 	 * 
@@ -39,18 +46,18 @@ public abstract class CollisionBox
 	 * @param height
 	 */
 	public CollisionBox(double x, double y, double width, double height) {
-		collisionBoundaries = new Rectangle2D.Double(x, y, width, height);
+		cBox = new Rectangle2D.Double(x, y, width, height);
 	}
 	
 	protected void setLevel(Level lvl) {
 		collisionLevel = lvl;
 	}
 	
-	protected void setCollisionEffect(Effects effect) {
+	public void setCollisionEffect(Effects effect) {
 		this.collisionEffect = effect;
 	}
 	
-	public Effects getCollisionEffect() {
+	protected Effects getCollisionEffect() {
 		return this.collisionEffect;
 	}
 	
@@ -60,19 +67,19 @@ public abstract class CollisionBox
 	 * @param y
 	 */
 	protected void updatePosition(double x, double y) {
-		collisionBoundaries.setRect(x, y, collisionBoundaries.width, collisionBoundaries.height);
+		cBox.setRect(x, y, cBox.width, cBox.height);
 	}
 	
 	protected Rectangle2D.Double getFutureCollisionBox(double x, double y) {
-		return new Rectangle2D.Double(x, y, collisionBoundaries.width, collisionBoundaries.height);
+		return new Rectangle2D.Double(x, y, cBox.width, cBox.height);
 	}
 	
 	protected boolean isInTheWay(Line2D.Double line) {
-		return line.intersects(collisionBoundaries);
+		return line.intersects(cBox);
 	}
 	
 	protected boolean isCollidingWith(CollisionBox theOtherBox) {
-		return collisionBoundaries.intersects(theOtherBox.collisionBoundaries);
+		return cBox.intersects(theOtherBox.cBox);
 	}
 	
 	/**
@@ -81,41 +88,113 @@ public abstract class CollisionBox
 	 * @param y future y
 	 * @return
 	 */
-	protected boolean isColliding (double x, double y) {
+	protected CollisionBoxData isColliding (CollisionBoxData data) {
+		CollisionBoxData newData = new CollisionBoxData();
+		newData.x = data.x;
+		newData.y = data.y;
+		newData.xSpeed = data.xSpeed;
+		newData.ySpeed = data.ySpeed;
 		
-		// get all the tiles which might be of interest
-		Rectangle2D.Double areaOfInterest = new Rectangle2D.Double();
-		Rectangle2D.union(collisionBoundaries, getFutureCollisionBox(x, y), areaOfInterest);
-		for (int curX = (int)areaOfInterest.x; 
-				 curX <= (int)(areaOfInterest.x + areaOfInterest.width); 
-				 curX++) {
-			for (int curY = (int)areaOfInterest.y; 
-					 curY <= (int)(areaOfInterest.y + areaOfInterest.height); 
-					 curY++) {
-				int metaType = collisionLevel.getMetaDataAt(curX, curY);
-				switch (metaType) {
-					case 1:
-						
-					case 2:
-						
-					default:
-						
-						break;
+		//determine directions
+		double xDistance = data.x - cBox.x;
+		double yDistance = data.y - cBox.y;
+		int xDirection = (int)(xDistance / Math.abs(xDistance));
+		int yDirection = (int)(yDistance / Math.abs(yDistance));
+		
+		//determine points
+		int x0, y0, x1, y1, fx0, fy0, fx1, fy1;
+		x0 = (int)(cBox.x); y0 = (int)(cBox.y + 1);
+		x1 = (int)(cBox.x + cBox.width); y1 = (int)(cBox.y + cBox.height);
+		fx0 = (int)data.x; fy0 = (int)data.y + 1;
+		fx1 = (int)(data.x + cBox.width); fy1 = (int)(data.y + cBox.height);
+		
+		CollisionBox collider;
+		if (xDirection > 0) {
+			for (int curY = y0; curY <= y1; curY++) {
+				collider = collisionLevel.getBoxAt(fx1, curY);
+				if (collider != null) {
+					newData.xSpeed = 0;
+					newData.x = fx1-2;
 				}
 			}
-			
+		} else if (xDirection < 0) {
+			for (int curY = y0; curY <= y1; curY++) {
+				collider = collisionLevel.getBoxAt(fx0, curY);
+				if (collider != null) {
+					newData.xSpeed = 0;
+					newData.x = fx0+1;
+				}
+			}
+		}
+		if (collisionGroundPath != null) {
+			double xLeftEnd = newData.x;
+			double xRightEnd = newData.x + 2;
+			if (collisionGroundPath.x1 > xRightEnd
+					|| collisionGroundPath.x2 < xLeftEnd) {
+				collisionGroundPath = null; // we fell of an edge : no path anymore
+			}
 		}
 		
+		
+		if (yDirection > 0) {
+			this.collisionGroundPath = null; // jump or so: we are losing connection to ground
+			
+			for (int curX = x0; curX <= x1; curX++) {
+				collider = collisionLevel.getBoxAt(curX, fy1);
+				if (collider != null) {
+					// hit head
+					newData.ySpeed = 0;
+					newData.y = fy1-3;
+				}
+			}
+		} else if (yDirection < 0) {
+			if (collisionGroundPath != null) {
+				newData.ySpeed = 0;
+				newData.y = cBox.y;
+				//System.out.print("onground \n");
+			} else {
+				System.out.print("in air\n");
+				for (int curX = x0; curX <= x1; curX++) {
+					collider = collisionLevel.getBoxAt(curX, fy0);
+					if (collider != null) {
+						// hit feet
+						if (collider.getCollisionEffect() == Effects.STOP) {
+							newData.ySpeed = 0;
+							newData.y = fy0;
+							this.collisionGroundPath = collider.getHeadline();
+						} else if (collider.getCollisionEffect() == Effects.BOUNCE) {
+							newData.ySpeed = -data.ySpeed;
+							newData.y = fy0;
+						}
+					}
+				}
+			}
+		}
+		
+		
+		
+		
+		
+		//TODO iterate over the big box and get all the meta tiles within the polygone
+		
+		
+		// get all the tiles which might be of interest
+		
+		
+		
 		// check whether there will be a collision
-		return false;
+		return newData;
 	}
 	
-	protected Effects getColliderEffect() {
-		return Effects.STOP;
+	protected Line2D.Double getHeadline() {
+		return new Line2D.Double(cBox.x, cBox.y + cBox.height, cBox.x + cBox.width, cBox.y + cBox.height);
 	}
 	
 	
 	
+	
+	
+	public abstract void collisionDraw();
 	
 	
 }

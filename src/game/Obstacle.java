@@ -1,35 +1,30 @@
 package game;
 import processing.core.*;
 
-public class Obstacle
+public class Obstacle extends CollisionBox
 {
 
 	PApplet parent;
-	public int height;
-	public int width;
-	public float xPos;
-	public float yPos;
-
-	public Obstacle(PApplet p, float x, float y, int w, int h)
+	float xPos, yPos, width, height;
+	
+	public Obstacle(PApplet p, double x, double y, int w, int h)
 	{
-
-		parent = p;
-		height = h;
+		super(x, y, w, h);
+		
+		xPos = (float)x;
+		yPos = (float)y;
 		width = w;
-		xPos = x;
-		yPos = y;
-
+		height = h;
+		
+		parent = p;
 	}
 
-	public void draw()
+	public void collisionDraw()
 	{
-		parent.fill(255);
-		parent.stroke(255);
-		parent.rect(xPos, yPos, width, height);
+		parent.noFill();
+		parent.stroke(0);
+		parent.rect(xPos*2, yPos*2, width*2, height*2);
 	}
 
-	public boolean collidesWith(Player p)
-	{
-		return false; //(p.y >= yPos && p.y <= (yPos + height) && p.x >= xPos && p.x <= (xPos + width));
-	}
+	
 }
