@@ -16,10 +16,14 @@ import fullscreen.*;
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet implements Observer
 {
+	
+	
+	public static Settings SETTINGS = new Settings();
+	
 	boolean SHOW_FPS = SETTINGS.getValue("debug/fps");
 	int FPS_AVERAGE_SAMPLE_SIZE = 10; // number of last measurements to take into account
 	
-	public static Settings SETTINGS = new Settings();
+	public static boolean TWIN_JUMP = false;
 	
 	public static int TILEDIMENSION = SETTINGS.getValue("gui/tiledimension");
 	
@@ -159,7 +163,14 @@ public class BunnyHat extends PApplet implements Observer
 
 	public void keyPressed()
 	{
-		inputState.put(key, true);
+		if (TWIN_JUMP && (key == 'w' || key == 'i')) {
+			//nothing for the moment
+		} else if (TWIN_JUMP && key == ' ') {
+			inputState.put('w', true);
+			inputState.put('i', true);
+		} else {
+			inputState.put(key, true);
+		}
 		
 		if (key == 'd')
 		{
@@ -183,7 +194,14 @@ public class BunnyHat extends PApplet implements Observer
 
 	public void keyReleased()
 	{
-		inputState.put(key, false);
+		if (TWIN_JUMP && (key == 'w' || key == 'i')) {
+			//nothing for the moment
+		} else if (TWIN_JUMP && key == ' ') {
+			inputState.put('w', false);
+			inputState.put('i', false);
+		} else {
+			inputState.put(key, false);
+		}
 	}
 
 	@Override

@@ -119,7 +119,8 @@ public class PlayerView extends Updateable implements Observer
 				(state.containsKey('s') && state.get('s')) :
 				(state.containsKey('k') && state.get('k'));
 
-		if (didJump && !jumpbutton) didJump = false;
+		// a player should always have to press jump again for another jump
+		if (didJump && !jumpbutton) didJump = false;  
 		
 		if (jumpbutton && ownPlayer != null && !didJump)
 		{
