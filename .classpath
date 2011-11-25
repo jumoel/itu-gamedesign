@@ -12,5 +12,10 @@
 	<classpathentry kind="lib" path="external/mp3spi1.9.4.jar"/>
 	<classpathentry kind="lib" path="external/tritonus_aos.jar"/>
 	<classpathentry kind="lib" path="external/tritonus_share.jar"/>
+	<classpathentry kind="lib" path="external/fullscreen.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="bunnyhat/external/lib"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

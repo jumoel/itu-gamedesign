@@ -45,6 +45,8 @@ public class PlayerView extends Updateable implements Observer
 	// dream switch data
 	private boolean switchHappening = false;
 	
+	private boolean didJump = false;
+	
 	//dream switch interaction methods
 	public Level getLevel() {return level;}
 	public void switchPrepare() { 
@@ -117,10 +119,12 @@ public class PlayerView extends Updateable implements Observer
 				(state.containsKey('s') && state.get('s')) :
 				(state.containsKey('k') && state.get('k'));
 
+		if (didJump && !jumpbutton) didJump = false;
 		
-		if (jumpbutton && ownPlayer != null)
+		if (jumpbutton && ownPlayer != null && !didJump)
 		{
 			ownPlayer.jump();
+			this.didJump = true;
 		}
 		
 		if (leftbutton && ownPlayer != null)

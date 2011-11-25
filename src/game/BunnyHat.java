@@ -11,11 +11,12 @@ import game.master.GameMaster;
 import game.sound.Stereophone;
 import game.control.SoundControl;
 import processing.core.*;
+import fullscreen.*;
 
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet implements Observer
 {
-	boolean SHOW_FPS = SETTINGS.getValue("debug/fps");;
+	boolean SHOW_FPS = SETTINGS.getValue("debug/fps");
 	int FPS_AVERAGE_SAMPLE_SIZE = 10; // number of last measurements to take into account
 	
 	public static Settings SETTINGS = new Settings();
@@ -50,25 +51,32 @@ public class BunnyHat extends PApplet implements Observer
 	private int currentTimestamp;
 	private int deltaT;
 	
+	// statistics
 	private int lastFpsTime;
 	private int fps;
 	private int gameSeconds;
 	private double fpsAverage;
 	
+	// not working FullScreen stuff
+	private FullScreen fs;
+	
 	public void setup()
 	{	
 		inputState = new State();
 		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 1, 
-				(String)SETTINGS.getValue("levels/level2/good"));
+				(String)SETTINGS.getValue("levels/level1/good"));
 		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2,
-				(String)SETTINGS.getValue("levels/level2/bad"));
+				(String)SETTINGS.getValue("levels/level1/bad"));
 		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
 		sndCtrl = new SoundControl(this);
+		
 		
 		size(WINDOWWIDTH, WINDOWHEIGHT);
 		background(0);
 		
 		frameRate(2000);
+		
+		
 		
 		currentTimestamp = millis();
 		deltaT = 0;
@@ -96,10 +104,15 @@ public class BunnyHat extends PApplet implements Observer
 		
 		// setup communication
 		gameMaster.addObserver(switcher); // listen for level switch message
-		switcher.addObserver(view1);
-		switcher.addObserver(view2);
+		//switcher.addObserver(view1);
+		//switcher.addObserver(view2);
 		
-		
+		//attempt to get a full screen mode - not working - null pointer exception 		
+		/*fs = new FullScreen(this);
+		if (fs.available()) {
+			fs.enter();
+		}*/
+				
 	}
 
 	public void draw()
@@ -151,24 +164,20 @@ public class BunnyHat extends PApplet implements Observer
 		if (key == 'd')
 		{
 			inputState.put('a', false);
-		}
-		if (key == 'a')
+		}else if (key == 'a')
 		{
 			inputState.put('d', false);
-		}
-		
-		if (key == 'j')
+		} else if (key == 'j')
 		{
 			inputState.put('l', false);
-		}
-		if (key == 'l')
+		} else if (key == 'l')
 		{
 			inputState.put('j', false);
-		}
-		
-		if (key == 'f')
+		} else if (key == 'f')
 		{
 			SHOW_FPS = !SHOW_FPS;
+		} else if (key == 'q') {
+			exit();
 		}
 	}
 
