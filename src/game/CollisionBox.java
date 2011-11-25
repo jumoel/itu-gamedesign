@@ -54,6 +54,10 @@ public abstract class CollisionBox
 		
 	}
 	
+	public double collisionBoxWidth() {
+		return this.cBox.width;
+	}
+	
 	protected void setGameElement(Object gameElement) {
 		this.gameElement = gameElement;
 	}
@@ -113,8 +117,8 @@ public abstract class CollisionBox
 		
 		//determine points
 		int x0, y0, x1, y1, fx0, fy0, fx1, fy1;
-		x0 = (int)(cBox.x); y0 = (int)(cBox.y + 1);
-		x1 = (int)(cBox.x + cBox.width); y1 = (int)(cBox.y + cBox.height);
+		x0 = (int)(cBox.x + 0.2); x1 = (int)(cBox.x + cBox.width - 0.2);
+		y0 = (int)(cBox.y + 1 +0.2); y1 = (int)(cBox.y + cBox.height -0.2);
 		fx0 = (int)data.x; fy0 = (int)data.y + 1;
 		fx1 = (int)(data.x + cBox.width); fy1 = (int)(data.y + cBox.height);
 		
@@ -124,10 +128,10 @@ public abstract class CollisionBox
 				collider = collisionLevel.getBoxAt(fx1, curY);
 				if (collider != null) {
 					newXSpeed = 0;
-					newX = fx1-2;
+					newX = fx1-this.cBox.width;
 					collision = true;
 					newData.xSpeed = 0;
-					newData.x = fx1-2;
+					newData.x = fx1-this.cBox.width;
 					break;
 				}
 			}
@@ -162,7 +166,7 @@ public abstract class CollisionBox
 				if (collider != null) {
 					// hit head
 					newData.ySpeed = -0.01;
-					newData.y = fy1-3;
+					newData.y = fy1-this.cBox.height;
 					break;
 				}
 			}

@@ -69,7 +69,7 @@ public class Player extends CollisionBox
 	
 	public Player(PApplet applet, int playerNumber, Level level)
 	{
-		super(level.spawnX + 0.5, level.spawnY + 0.5, 2, 3);
+		super(level.spawnX + 0.5, level.spawnY + 0.5, 1.5, 3);
 		super.setLevel(level);
 		super.setGameElement(this);
 		
@@ -300,8 +300,8 @@ public class Player extends CollisionBox
 		xmax = (int)Math.ceil(xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2 );
 		xmin = (int)Math.floor(xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2 );*/
 		
-		double x0, y0, x1, y1; // edge points of our body
-		x0 = (xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2);
+		//double x0, y0, x1, y1; // edge points of our body
+		//x0 = (xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2);
 		/*y0 = (ypos+1);
 		x1 = (xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2);
 		y1 = (ypos + currentTexture.height / BunnyHat.TILEDIMENSION);*/
@@ -314,10 +314,10 @@ public class Player extends CollisionBox
 		
 		
 		CollisionBox.CollisionBoxData data = new CollisionBoxData();
-		data.x = xpos-1; data.y = ypos;
+		data.x = xpos-this.collisionBoxWidth()/2; data.y = ypos;
 		data.xSpeed = xSpeed; data.ySpeed = ySpeed;
 		data = this.isColliding(data);
-		xpos = data.x+1; ypos = data.y;
+		xpos = data.x+this.collisionBoxWidth()/2; ypos = data.y;
 		xSpeed = data.xSpeed; ySpeed = data.ySpeed;
 		if (ySpeed == 0) isInAir = isJumping = false;
 		else isInAir = isJumping = true;
