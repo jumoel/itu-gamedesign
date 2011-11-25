@@ -50,6 +50,7 @@ public class PlayerView extends Updateable implements Observer
 	public void switchPrepare() { 
 		switchHappening = true;
 		ownPlayer.holdAnimation();
+		// getting the player y-Offset (distance above ground)
 	}
 	public void switchExecute(Level lvl) {
 		setLevel(lvl);
@@ -163,7 +164,6 @@ public class PlayerView extends Updateable implements Observer
 		// Draw a white background
 		cb.beginDraw();
 		cb.background(255);
-		//cb.endDraw();
 		
 		// Draw the player
 		int pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);

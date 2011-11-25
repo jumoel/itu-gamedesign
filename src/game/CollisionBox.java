@@ -144,7 +144,7 @@ public abstract class CollisionBox
 					newX = fx0+1;
 					collision = true;
 					updateCollisionPartners(collider);
-					System.out.println("newX:"+newX+" x:"+x);
+					//System.out.println("newX:"+newX+" x:"+x);
 					break;
 				}
 			}

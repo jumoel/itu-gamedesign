@@ -15,7 +15,7 @@ import processing.core.*;
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet implements Observer
 {
-	boolean SHOW_FPS = true;
+	boolean SHOW_FPS = SETTINGS.getValue("debug/fps");;
 	int FPS_AVERAGE_SAMPLE_SIZE = 10; // number of last measurements to take into account
 	
 	public static Settings SETTINGS = new Settings();

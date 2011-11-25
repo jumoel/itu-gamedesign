@@ -56,8 +56,6 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 			for (int i = 0; i < 255; i += 10) {
 				Thread.currentThread().sleep(SWITCH_SLEEP/25);
 				ourPApplet.tint(tintColor, i);
-				this.hasChanged();
-				this.notifyObservers("stopAnimations");
 			}
 		}
 		catch (InterruptedException e)

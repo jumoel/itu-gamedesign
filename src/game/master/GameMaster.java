@@ -33,6 +33,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 	private Thread ourThread;
 	private boolean runGame = false;
 	
+	
 	// GAME FACTS
 	// general
 	private int msTillNextSwitch = getNewTimeTillNextSwitch();
