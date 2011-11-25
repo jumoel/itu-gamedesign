@@ -203,10 +203,7 @@ public abstract class CollisionBox
 	/**
 	 * informs about being bounced by another box
 	 */
-	protected void bounce(Object gameElement) {
-		
-	}
-	
+	protected abstract void bounce(Object gameElement);
 	
 	public abstract void collisionDraw();
 	

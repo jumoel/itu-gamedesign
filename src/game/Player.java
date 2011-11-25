@@ -392,4 +392,11 @@ public class Player extends CollisionBox
 		// TODO Auto-generated method stub
 		
 	}
+
+	@Override
+	protected void bounce(Object gameElement)
+	{
+		// TODO Auto-generated method stub
+		
+	}
 }

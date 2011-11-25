@@ -26,5 +26,12 @@ public class Obstacle extends CollisionBox
 		parent.rect(xPos*2, yPos*2, width*2, height*2);
 	}
 
+	@Override
+	protected void bounce(Object gameElement)
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
 	
 }
