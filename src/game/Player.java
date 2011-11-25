@@ -79,7 +79,7 @@ public class Player extends CollisionBox
 		
 		this.level = level;
 		
-		this.xpos = level.spawnX + 0.5;
+		this.xpos = level.spawnX + 5;
 		this.ypos = level.spawnY + 0.5;
 		
 		System.out.println(this.xpos + ", " + this.ypos);
@@ -317,13 +317,13 @@ public class Player extends CollisionBox
 		
 		
 		CollisionBox.CollisionBoxData data = new CollisionBoxData();
-		data.x = x0; data.y = ypos;
+		data.x = xpos-1; data.y = ypos;
 		data.xSpeed = xSpeed; data.ySpeed = ySpeed;
 		data = this.isColliding(data);
 		xpos = data.x+1; ypos = data.y;
 		xSpeed = data.xSpeed; ySpeed = data.ySpeed;
 		if (ySpeed == 0) isInAir = isJumping = false;
-		else {isInAir = isJumping = true; System.out.println("jump air?");}
+		else isInAir = isJumping = true;
 		
 			
 		

@@ -25,6 +25,8 @@ public abstract class CollisionBox
 	
 	private CollisionBox currentCollisionPartner;
 	
+	private double newX, newY, newXSpeed, newYSpeed;
+	
 	/**
 	 * Describing the path, a object can move along while being on ground
 	 */
@@ -97,6 +99,7 @@ public abstract class CollisionBox
 	 */
 	protected CollisionBoxData isColliding (CollisionBoxData data) {
 		CollisionBoxData newData = new CollisionBoxData();
+		boolean collision = false;
 		newData.x = data.x;
 		newData.y = data.y;
 		newData.xSpeed = data.xSpeed;
@@ -120,6 +123,9 @@ public abstract class CollisionBox
 			for (int curY = y0; curY <= y1; curY++) {
 				collider = collisionLevel.getBoxAt(fx1, curY);
 				if (collider != null) {
+					newXSpeed = 0;
+					newX = fx1-2;
+					collision = true;
 					newData.xSpeed = 0;
 					newData.x = fx1-2;
 					break;
@@ -129,6 +135,9 @@ public abstract class CollisionBox
 			for (int curY = y0; curY <= y1; curY++) {
 				collider = collisionLevel.getBoxAt(fx0, curY);
 				if (collider != null) {
+					newXSpeed = 0;
+					newX = fx0+1;
+					collision = true;
 					newData.xSpeed = 0;
 					newData.x = fx0+1;
 					break;
@@ -152,7 +161,7 @@ public abstract class CollisionBox
 				collider = collisionLevel.getBoxAt(curX, fy1);
 				if (collider != null) {
 					// hit head
-					newData.ySpeed = 0;
+					newData.ySpeed = -0.01;
 					newData.y = fy1-3;
 					break;
 				}
@@ -163,7 +172,7 @@ public abstract class CollisionBox
 				newData.y = cBox.y;
 				//System.out.print("onground \n");
 			} else {
-				System.out.print("in air\n");
+				//System.out.print("in air\n");
 				for (int curX = x0; curX <= x1; curX++) {
 					collider = collisionLevel.getBoxAt(curX, fy0);
 					if (collider != null) {
@@ -192,9 +201,9 @@ public abstract class CollisionBox
 	}
 	
 	/**
-	 * informs about being bounced by anothr box
+	 * informs about being bounced by another box
 	 */
-	protected void bounce() {
+	protected void bounce(Object gameElement) {
 		
 	}
 	
