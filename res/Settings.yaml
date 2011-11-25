@@ -43,7 +43,7 @@ graphics:
       frameheight: 72
       fps: 27
     player1idle:
-      path: dreamstand48x72.png
+      path: dreamstandanim48x72.png
       framewidth: 48
       frameheight: 72
       fps: 27

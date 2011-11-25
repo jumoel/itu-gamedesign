@@ -1,10 +1,12 @@
 package game.gui;
 
 import game.BunnyHat;
+import game.control.PatternDetector;
 import game.level.Level;
 import game.master.GameMaster;
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -21,15 +23,22 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	private static PlayerView playerView1, playerView2;
 	
-	private static boolean shouldSwitchDreams = false; 
+	private static boolean shouldSwitchDreams = false;
 	
 	private PApplet ourPApplet;
+	
+	private int tintColor; 
 	
 	
 	public AmazingSwitchWitch(PlayerView pv1, PlayerView pv2, PApplet papplet) {
 		playerView1 = pv1;
 		playerView2 = pv2;
 		ourPApplet = papplet;
+		int r = BunnyHat.SETTINGS.getValue("gui/colors/tintr");
+		int g = BunnyHat.SETTINGS.getValue("gui/colors/tintg");
+		int b = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
+		
+		tintColor = ourPApplet.color(r, g, b);
 	}
 
 	public void switchDreams() {
@@ -40,17 +49,15 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView1.switchPrepare();
 		playerView2.switchPrepare();
 
-		int r = BunnyHat.SETTINGS.getValue("gui/colors/tintr");
-		int g = BunnyHat.SETTINGS.getValue("gui/colors/tintg");
-		int b = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
 		
-		int tintcolor = ourPApplet.color(r, g, b);
 		
 		try
 		{
 			for (int i = 0; i < 255; i += 10) {
 				Thread.currentThread().sleep(SWITCH_SLEEP/25);
-				ourPApplet.tint(tintcolor, i);
+				ourPApplet.tint(tintColor, i);
+				this.hasChanged();
+				this.notifyObservers("stopAnimations");
 			}
 		}
 		catch (InterruptedException e)
@@ -66,7 +73,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		{
 			for (int i = 255; i > 0; i -= 10) {
 				Thread.currentThread().sleep(SWITCH_SLEEP/25);
-				ourPApplet.tint(tintcolor, i);
+				ourPApplet.tint(tintColor, i);
 			}
 		}
 		catch (InterruptedException e)
@@ -76,6 +83,9 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		}
 		
 		ourPApplet.noTint();
+		
+		this.hasChanged();
+		this.notifyObservers("startAnimations");
 		
 		playerView1.switchFinish();
 		playerView2.switchFinish();

@@ -1,5 +1,6 @@
 package game;
 import game.graphics.Animation;
+import game.gui.AmazingSwitchWitch;
 import game.level.Level;
 import game.sound.Stereophone;
 import processing.core.*;
@@ -49,6 +50,18 @@ public class Player extends CollisionBox
 	
 	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
 
+	public void holdAnimation() {
+		this.walkAnimation.holdAnimation();
+		this.jumpAnimation.holdAnimation();
+		this.idleAnimation.holdAnimation();
+	}
+	
+	public void unholdAnimation() {
+		this.walkAnimation.unholdAnimation();
+		this.jumpAnimation.unholdAnimation();
+		this.idleAnimation.unholdAnimation();
+	}
+	
 	public void setLevel(Level level) {
 		this.level = level;
 		super.setLevel(level);
@@ -58,6 +71,7 @@ public class Player extends CollisionBox
 	{
 		super(level.spawnX + 0.5, level.spawnY + 0.5, 2, 3);
 		super.setLevel(level);
+		super.setGameElement(this);
 		
 		this.processing = applet;
 		
@@ -121,8 +135,8 @@ public class Player extends CollisionBox
 		if (!isJumping)
 		{
 			ySpeed = JUMPFORCE;
-			isJumping = true;
-			isInAir = true;
+			//isJumping = true;
+			//isInAir = true;
 			
 			//play sound
 			//Stereophone.playSound(0);
@@ -259,10 +273,10 @@ public class Player extends CollisionBox
 		ySpeed = ySpeed + yAcceleration * deltaT;
 		
 		
-		if(deltaT > 42) {
+		if(deltaT > 84) {
 			System.out.println("high deltaT: "+ deltaT);
-			xpos = previous_xpos;
-			ypos = previous_ypos;
+			//xpos = previous_xpos;
+			//ypos = previous_ypos;
 		}
 		
 		//make sure, ypos and xpos did not travel to far for one frame 
@@ -279,7 +293,7 @@ public class Player extends CollisionBox
 		}
 		
 		
-		//PImage currentTexture = getCurrentTexture();
+		PImage currentTexture = getCurrentTexture();
 
 		/*int xmin, xmax, ymin, ymax;
 		BPoint collision;*/
@@ -289,9 +303,9 @@ public class Player extends CollisionBox
 		xmax = (int)Math.ceil(xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2 );
 		xmin = (int)Math.floor(xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2 );*/
 		
-		/*double x0, y0, x1, y1; // edge points of our body
+		double x0, y0, x1, y1; // edge points of our body
 		x0 = (xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2);
-		y0 = (ypos+1);
+		/*y0 = (ypos+1);
 		x1 = (xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2);
 		y1 = (ypos + currentTexture.height / BunnyHat.TILEDIMENSION);*/
 		
@@ -303,77 +317,17 @@ public class Player extends CollisionBox
 		
 		
 		CollisionBox.CollisionBoxData data = new CollisionBoxData();
-		data.x = xpos-1; data.y = ypos;
+		data.x = x0; data.y = ypos;
 		data.xSpeed = xSpeed; data.ySpeed = ySpeed;
 		data = this.isColliding(data);
 		xpos = data.x+1; ypos = data.y;
 		xSpeed = data.xSpeed; ySpeed = data.ySpeed;
 		if (ySpeed == 0) isInAir = isJumping = false;
-		else isInAir = isJumping = true;
-		System.out.println(ySpeed);
+		else {isInAir = isJumping = true; System.out.println("jump air?");}
 		
 			
 		
-		/*if (collisionX != 0.0) { // bumped side
-			if (collisionX > 0.0) { // right side
-				//xpos--;
-			} else { // left side
-				//xpos++;
-			}
-			//xpos = previous_xpos;
-			xpos = Math.round(xpos + collisionX);
-			
-			xSpeed = 0;
-		}
-		if (collisionY != 0.0) { // bumped head / feet
-			if (collisionY > 0.0) { // feet
-				//ypos--;
-				isInAir = false;
-				isJumping = false;
-			} else { // head
-				
-			}
-			//ypos = previous_ypos;
-			ypos = Math.round(ypos + collisionY);
-			if (feetCollisionCount==0) Stereophone.playSound(1);
-			feetCollisionCount++;
-			//collisionCount++;
-			//System.out.print(ypos+" (ypos: "+ypos+", collisionY: "+collisionY+", deltaT: "+deltaT+") at collision #"+collisionCount+"\n");
-			ySpeed = 0;
-		} else {feetCollisionCount = 0;}
 		
-		// Not that broken anymore :|
-		/*if (collision != null)
-		{
-			collisionCount++;
-			boolean yCollision = false;
-			boolean xCollision = false;
-			
-			if (collision.y == ymin) { // feet touch the ground
-				yCollision = true;
-				isInAir = false;
-				isJumping = false;
-				//ypos=collision.y; ySpeed = 0;
-				//System.out.print(ypos+"\n");
-			}
-			if (collision.y == ymax) { // head bumps ceiling stuff - that hurts!
-				yCollision = true;
-			}
-			if (collision.x == xmin) { // bumped into sth on the left side
-				xCollision = true;
-				//xpos = collision.x + currentTexture.width / BunnyHat.TILEDIMENSION / 2; xSpeed = 0;
-			}
-			if (collision.x == xmax) { // bumped into sth on the right side
-				xCollision = true;
-			}
-			System.out.println("lol:"+collision.x+":"+collision.y+" - x:"+xmin+"-"+xmax+" y:"+ymin+"-"+ymax+"\n");
-			if (xCollision) {xpos = previous_xpos; xSpeed = 0;}
-			if (yCollision) {ypos = previous_ypos; ySpeed = 0;}
-			
-			
-			
-			
-		} else {collisionCount = 0;}*/
 	
 		// update the position of the characters collision box
 		this.updatePosition(xpos-1, ypos);

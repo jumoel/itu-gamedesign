@@ -1,5 +1,8 @@
 package game.graphics;
 
+import java.util.Observable;
+import java.util.Observer;
+
 import game.BunnyHat;
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -18,6 +21,9 @@ public class Animation
 	private boolean isRunning;
 	private int startTime;
 	
+	private boolean holdAnimations;
+	private int timeOnStop;
+	
 	public Animation(PApplet p, String settingskey)
 	{
 		int fps = BunnyHat.SETTINGS.getValue(settingskey + "/fps");
@@ -32,6 +38,7 @@ public class Animation
 		this.numberOfFrames = sprites.length;
 		
 		this.isRunning = false;
+		this.holdAnimations = false;
 	}
 	
 	public boolean isRunning()
@@ -62,12 +69,14 @@ public class Animation
 			return null;
 		}
 		
+		if (holdAnimations) time = this.timeOnStop;
+		
 		int diff = time - startTime;
 		int timeindex = diff % 1000;
 		
 		int frame = (timeindex / millisPerFrame) % numberOfFrames;
 		
-		
+		if (frame < 0) frame = 0;
 		if (frame < numberOfFrames)
 		{
 			return sprites[frame];
@@ -78,5 +87,21 @@ public class Animation
 			System.out.println("Diff: " + diff + ". Timeindex: " + timeindex + ". Millis per frame: " + millisPerFrame);
 			return null;
 		}
+	}
+
+	
+	public void holdAnimation()
+	{
+		
+				this.timeOnStop = this.processing.millis();
+				this.holdAnimations = true;
+		
+		
+		
+		
+	}
+	
+	public void unholdAnimation() {
+		this.holdAnimations = false; 
 	}
 }

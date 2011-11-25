@@ -1,12 +1,16 @@
 package game.gui;
 
+import java.util.HashMap;
+import java.util.Observable;
+import java.util.Observer;
+
 import game.BunnyHat;
 import game.Player;
 import game.State;
 import game.level.Level;
 import processing.core.*;
 
-public class PlayerView extends Updateable
+public class PlayerView extends Updateable implements Observer
 {
 	private enum Horizontal { LEFT, RIGHT, MIDDLE }
 	private enum Vertical { TOP, BOTTOM, CENTER }
@@ -34,6 +38,8 @@ public class PlayerView extends Updateable
 	
 	private int levelLength;
 	
+	private static int timeSlowingFactor;
+	
 	private Level level; public void setLevel(Level lvl) {level = lvl; ownPlayer.setLevel(lvl);}
 	
 	// dream switch data
@@ -43,13 +49,14 @@ public class PlayerView extends Updateable
 	public Level getLevel() {return level;}
 	public void switchPrepare() { 
 		switchHappening = true;
-		//TODO: get player character distance to ground
+		ownPlayer.holdAnimation();
 	}
 	public void switchExecute(Level lvl) {
 		setLevel(lvl);
 		//TODO: transfer player to same distance above ground
 	}
 	public void switchFinish() {
+		ownPlayer.unholdAnimation();
 		switchHappening = false;
 	}
 	
@@ -85,6 +92,8 @@ public class PlayerView extends Updateable
 		
 		this.xCoordCamera = 0;
 		this.xCoordCameraMiddle = xCoordCamera + halfwidth;
+		
+		this.timeSlowingFactor = 1; // normal speed
 	}
 	
 	private void handleInput(State state)
@@ -133,7 +142,7 @@ public class PlayerView extends Updateable
 	
 	public void update(State state, int xpos, int ypos, int deltaT)
 	{	
-		if (switchHappening) deltaT = 0; // yes, nothing happens while we are switching - only screen updates
+		if (switchHappening) deltaT = 0; // freeze time
 
 		if (ownPlayer == null)
 		{
@@ -363,5 +372,10 @@ public class PlayerView extends Updateable
 		graphics.ellipse(xpos, ypos, 4, 4);
 		
 		graphics.endDraw();
+	}
+	@Override
+	public void update(Observable arg0, Object arg1)
+	{
+		
 	}
 }

@@ -21,6 +21,8 @@ public abstract class CollisionBox
 	
 	private Level collisionLevel;
 	
+	private Object gameElement;
+	
 	private CollisionBox currentCollisionPartner;
 	
 	/**
@@ -47,6 +49,11 @@ public abstract class CollisionBox
 	 */
 	public CollisionBox(double x, double y, double width, double height) {
 		cBox = new Rectangle2D.Double(x, y, width, height);
+		
+	}
+	
+	protected void setGameElement(Object gameElement) {
+		this.gameElement = gameElement;
 	}
 	
 	protected void setLevel(Level lvl) {
@@ -115,6 +122,7 @@ public abstract class CollisionBox
 				if (collider != null) {
 					newData.xSpeed = 0;
 					newData.x = fx1-2;
+					break;
 				}
 			}
 		} else if (xDirection < 0) {
@@ -123,6 +131,7 @@ public abstract class CollisionBox
 				if (collider != null) {
 					newData.xSpeed = 0;
 					newData.x = fx0+1;
+					break;
 				}
 			}
 		}
@@ -145,6 +154,7 @@ public abstract class CollisionBox
 					// hit head
 					newData.ySpeed = 0;
 					newData.y = fy1-3;
+					break;
 				}
 			}
 		} else if (yDirection < 0) {
@@ -166,6 +176,7 @@ public abstract class CollisionBox
 							newData.ySpeed = -data.ySpeed;
 							newData.y = fy0;
 						}
+						break;
 					}
 				}
 			}
@@ -173,16 +184,6 @@ public abstract class CollisionBox
 		
 		
 		
-		
-		
-		//TODO iterate over the big box and get all the meta tiles within the polygone
-		
-		
-		// get all the tiles which might be of interest
-		
-		
-		
-		// check whether there will be a collision
 		return newData;
 	}
 	
@@ -190,8 +191,12 @@ public abstract class CollisionBox
 		return new Line2D.Double(cBox.x, cBox.y + cBox.height, cBox.x + cBox.width, cBox.y + cBox.height);
 	}
 	
-	
-	
+	/**
+	 * informs about being bounced by anothr box
+	 */
+	protected void bounce() {
+		
+	}
 	
 	
 	public abstract void collisionDraw();
