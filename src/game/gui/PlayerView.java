@@ -163,7 +163,7 @@ public class PlayerView extends Updateable implements Observer
 		// Draw a white background
 		cb.beginDraw();
 		cb.background(255);
-		cb.endDraw();
+		//cb.endDraw();
 		
 		// Draw the player
 		int pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);
@@ -245,8 +245,14 @@ public class PlayerView extends Updateable implements Observer
 		drawLevelGraphics(cb);
 		
 		drawImage(ownPlayer.getCurrentTexture(), cb, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+		cb.endDraw();
 		
 		// Draw the image to the surface
+		/*int iOffset = xpos + ypos * cb.width;
+		for (int i = 0; i < cb.pixels.length; i++) {
+			processing.pixels[i+iOffset] = cb.pixels[i];
+			
+		}*/
 		processing.image(cb, xpos, ypos);
 		
 		// Swap the buffers
@@ -255,7 +261,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	private void drawLevelGraphics(PGraphics graphics)
 	{
-		graphics.beginDraw();
+		//graphics.beginDraw();
 		
 		int minimumTileX = xCoordCamera / BunnyHat.TILEDIMENSION;
 		if (minimumTileX < 0)
@@ -322,7 +328,7 @@ public class PlayerView extends Updateable implements Observer
 		
 		//level.collisionDraw();
 		
-		graphics.endDraw();
+		//graphics.endDraw();
 	}
 	
 	public int getPlayerPosition()

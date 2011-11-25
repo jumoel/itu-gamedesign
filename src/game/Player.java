@@ -275,8 +275,6 @@ public class Player extends CollisionBox
 		
 		if(deltaT > 84) {
 			System.out.println("high deltaT: "+ deltaT);
-			//xpos = previous_xpos;
-			//ypos = previous_ypos;
 		}
 		
 		//make sure, ypos and xpos did not travel to far for one frame 
@@ -286,7 +284,6 @@ public class Player extends CollisionBox
 		double maxDistance = 0.8;
 		if (Math.abs(yDiff)>=maxDistance) {
 			ypos = previous_ypos + maxDistance * (yDiff /Math.abs(yDiff));
-			//ySpeed = (yDiff/Math.abs(yDiff)) * 0.05;
 		}
 		if (Math.abs(xDiff)>=maxDistance) {
 			xpos = previous_xpos + maxDistance * (xDiff / Math.abs(xDiff));

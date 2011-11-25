@@ -15,7 +15,8 @@ import processing.core.*;
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet implements Observer
 {
-	boolean SHOW_FPS = false;
+	boolean SHOW_FPS = true;
+	int FPS_AVERAGE_SAMPLE_SIZE = 10; // number of last measurements to take into account
 	
 	public static Settings SETTINGS = new Settings();
 	
@@ -52,6 +53,7 @@ public class BunnyHat extends PApplet implements Observer
 	private int lastFpsTime;
 	private int fps;
 	private int gameSeconds;
+	private double fpsAverage;
 	
 	public void setup()
 	{	
@@ -72,6 +74,7 @@ public class BunnyHat extends PApplet implements Observer
 		deltaT = 0;
 		lastFpsTime = 0;
 		fps = 0;
+		fpsAverage = 0;
 		
 		
 		//setup & run sound input
@@ -108,11 +111,11 @@ public class BunnyHat extends PApplet implements Observer
 		deltaT = currentTimestamp - lastTimestamp;
 		
 		//background(0);
-
+		//loadPixels();
 		view1.update(inputState, LEFT, VIEW1Y, deltaT);
 		view2.update(inputState, LEFT, VIEW2Y, deltaT);
 		indicator.update(inputState, LEFT, RACEINDICATORY, deltaT);
-		
+		//updatePixels();
 		
 		
 		// Print the fps
@@ -121,7 +124,9 @@ public class BunnyHat extends PApplet implements Observer
 			gameSeconds++;
 			if (SHOW_FPS)
 			{
-				System.out.println("FPS: " + fps + "  " + gameSeconds +"sec.");
+				fpsAverage += fps;
+				//fpsAverage = (fpsAverage * (FPS_AVERAGE_SAMPLE_SIZE-1) + fps) / FPS_AVERAGE_SAMPLE_SIZE;
+				System.out.println("FPS: " + fps + " (Average: "+fpsAverage/gameSeconds+")  " + gameSeconds +"sec.");
 			}
 			
 			lastFpsTime = currentTimestamp;

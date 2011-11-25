@@ -37,7 +37,12 @@ public abstract class CollisionLevel
 	}
 	
 	public CollisionBox getBoxAt(int x, int y) {
-		return fixedObjects[levelWidth*y + x];
+		int index = levelWidth*y + x;
+		if (index < 0 || index > fixedObjects.length) {
+			return null;
+		} else {
+			return fixedObjects[index];
+		}
 	}
 	
 	private void setBoxAt(int x, int y, CollisionBox b) {
