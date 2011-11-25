@@ -26,6 +26,10 @@ public abstract class CollisionBox
 	private CollisionBox currentCollisionPartner;
 	
 	private double newX, newY, newXSpeed, newYSpeed;
+	protected double getNewX() {return newX;}
+	protected double getNewY() {return newY;}
+	protected double getNewXSpeed() {return newXSpeed;}
+	protected double getNewYSpeed() {return newYSpeed;}
 	
 	/**
 	 * Describing the path, a object can move along while being on ground
@@ -36,11 +40,6 @@ public abstract class CollisionBox
 	 * collision box for this object
 	 */
 	private Rectangle2D.Double cBox;
-	
-	public class CollisionBoxData {
-		double xSpeed, ySpeed, x, y;
-		
-	}
 	
 	/**
 	 * 
@@ -95,23 +94,21 @@ public abstract class CollisionBox
 		return cBox.intersects(theOtherBox.cBox);
 	}
 	
+	
 	/**
 	 * 
 	 * @param x future x
 	 * @param y future y
 	 * @return
 	 */
-	protected CollisionBoxData isColliding (CollisionBoxData data) {
-		CollisionBoxData newData = new CollisionBoxData();
+	protected boolean isColliding (double x, double y, double xSpeed, double ySpeed) {
 		boolean collision = false;
-		newData.x = data.x;
-		newData.y = data.y;
-		newData.xSpeed = data.xSpeed;
-		newData.ySpeed = data.ySpeed;
+		newX = x; newY = y; newXSpeed = xSpeed; newYSpeed = ySpeed;
+		
 		
 		//determine directions
-		double xDistance = data.x - cBox.x;
-		double yDistance = data.y - cBox.y;
+		double xDistance = x - cBox.x;
+		double yDistance = y - cBox.y;
 		int xDirection = (int)(xDistance / Math.abs(xDistance));
 		int yDirection = (int)(yDistance / Math.abs(yDistance));
 		
@@ -119,8 +116,8 @@ public abstract class CollisionBox
 		int x0, y0, x1, y1, fx0, fy0, fx1, fy1;
 		x0 = (int)(cBox.x + 0.2); x1 = (int)(cBox.x + cBox.width - 0.2);
 		y0 = (int)(cBox.y + 1 +0.2); y1 = (int)(cBox.y + cBox.height -0.2);
-		fx0 = (int)data.x; fy0 = (int)data.y + 1;
-		fx1 = (int)(data.x + cBox.width); fy1 = (int)(data.y + cBox.height);
+		fx0 = (int)x; fy0 = (int)y + 1;
+		fx1 = (int)(x + cBox.width); fy1 = (int)(y + cBox.height);
 		
 		CollisionBox collider;
 		if (xDirection > 0) {
@@ -130,8 +127,9 @@ public abstract class CollisionBox
 					newXSpeed = 0;
 					newX = fx1-this.cBox.width;
 					collision = true;
-					newData.xSpeed = 0;
-					newData.x = fx1-this.cBox.width;
+					//newData.xSpeed = 0;
+					//newData.x = fx1-this.cBox.width;
+					collider.bounce(this.gameElement);
 					break;
 				}
 			}
@@ -142,15 +140,16 @@ public abstract class CollisionBox
 					newXSpeed = 0;
 					newX = fx0+1;
 					collision = true;
-					newData.xSpeed = 0;
-					newData.x = fx0+1;
+					//newData.xSpeed = 0;
+					//newData.x = fx0+1;
+					collider.bounce(this.gameElement);
 					break;
 				}
 			}
 		}
 		if (collisionGroundPath != null) {
-			double xLeftEnd = newData.x;
-			double xRightEnd = newData.x + 2;
+			double xLeftEnd = newX;
+			double xRightEnd = newX + 2;
 			if (collisionGroundPath.x1 > xRightEnd
 					|| collisionGroundPath.x2 < xLeftEnd) {
 				collisionGroundPath = null; // we fell of an edge : no path anymore
@@ -165,15 +164,18 @@ public abstract class CollisionBox
 				collider = collisionLevel.getBoxAt(curX, fy1);
 				if (collider != null) {
 					// hit head
-					newData.ySpeed = -0.01;
-					newData.y = fy1-this.cBox.height;
+					newYSpeed = -0.01;
+					newY = fy1-this.cBox.height;
+					collision = true;
+					collider.bounce(this.gameElement);
 					break;
 				}
 			}
 		} else if (yDirection < 0) {
 			if (collisionGroundPath != null) {
-				newData.ySpeed = 0;
-				newData.y = cBox.y;
+				newYSpeed = 0;
+				newY = cBox.y;
+				collision = true;
 				//System.out.print("onground \n");
 			} else {
 				//System.out.print("in air\n");
@@ -182,13 +184,15 @@ public abstract class CollisionBox
 					if (collider != null) {
 						// hit feet
 						if (collider.getCollisionEffect() == Effects.STOP) {
-							newData.ySpeed = 0;
-							newData.y = fy0;
+							newYSpeed = 0;
+							newY = fy0;
 							this.collisionGroundPath = collider.getHeadline();
 						} else if (collider.getCollisionEffect() == Effects.BOUNCE) {
-							newData.ySpeed = -data.ySpeed;
-							newData.y = fy0;
+							newYSpeed = -ySpeed;
+							newY = fy0;
 						}
+						collision = true;
+						collider.bounce(this.gameElement);
 						break;
 					}
 				}
@@ -197,7 +201,7 @@ public abstract class CollisionBox
 		
 		
 		
-		return newData;
+		return collision;
 	}
 	
 	protected Line2D.Double getHeadline() {

@@ -313,12 +313,11 @@ public class Player extends CollisionBox
 
 		
 		
-		CollisionBox.CollisionBoxData data = new CollisionBoxData();
-		data.x = xpos-this.collisionBoxWidth()/2; data.y = ypos;
-		data.xSpeed = xSpeed; data.ySpeed = ySpeed;
-		data = this.isColliding(data);
-		xpos = data.x+this.collisionBoxWidth()/2; ypos = data.y;
-		xSpeed = data.xSpeed; ySpeed = data.ySpeed;
+		
+		if (this.isColliding(xpos - this.collisionBoxWidth()/2, ypos, xSpeed, ySpeed)) {
+			xpos = this.getNewX() + this.collisionBoxWidth()/2; ypos = this.getNewY();
+			xSpeed = this.getNewXSpeed(); ySpeed = this.getNewYSpeed();
+		}
 		if (ySpeed == 0) isInAir = isJumping = false;
 		else isInAir = isJumping = true;
 		
