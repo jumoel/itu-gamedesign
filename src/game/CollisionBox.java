@@ -25,11 +25,13 @@ public abstract class CollisionBox
 	
 	private CollisionBox currentCollisionPartner;
 	
+	private Object collidingGameElement;
 	private double newX, newY, newXSpeed, newYSpeed;
 	protected double getNewX() {return newX;}
 	protected double getNewY() {return newY;}
 	protected double getNewXSpeed() {return newXSpeed;}
 	protected double getNewYSpeed() {return newYSpeed;}
+	protected Object getBouncePartner() {return collidingGameElement;}
 	
 	/**
 	 * Describing the path, a object can move along while being on ground
@@ -109,8 +111,8 @@ public abstract class CollisionBox
 		//determine directions
 		double xDistance = x - cBox.x;
 		double yDistance = y - cBox.y;
-		int xDirection = (int)(xDistance / Math.abs(xDistance));
-		int yDirection = (int)(yDistance / Math.abs(yDistance));
+		//int xDirection = (int)(xDistance / Math.abs(xDistance));
+		//int yDirection = (int)(yDistance / Math.abs(yDistance));
 		
 		//determine points
 		int x0, y0, x1, y1, fx0, fy0, fx1, fy1;
@@ -120,7 +122,7 @@ public abstract class CollisionBox
 		fx1 = (int)(x + cBox.width); fy1 = (int)(y + cBox.height);
 		
 		CollisionBox collider;
-		if (xDirection > 0) {
+		if (xDistance > 0) {
 			for (int curY = y0; curY <= y1; curY++) {
 				collider = collisionLevel.getBoxAt(fx1, curY);
 				if (collider != null) {
@@ -133,7 +135,7 @@ public abstract class CollisionBox
 					break;
 				}
 			}
-		} else if (xDirection < 0) {
+		} else if (xDistance < 0) {
 			for (int curY = y0; curY <= y1; curY++) {
 				collider = collisionLevel.getBoxAt(fx0, curY);
 				if (collider != null) {
@@ -157,7 +159,7 @@ public abstract class CollisionBox
 		}
 		
 		
-		if (yDirection > 0) {
+		if (yDistance > 0) {
 			this.collisionGroundPath = null; // jump or so: we are losing connection to ground
 			
 			for (int curX = x0; curX <= x1; curX++) {
@@ -171,7 +173,7 @@ public abstract class CollisionBox
 					break;
 				}
 			}
-		} else if (yDirection < 0) {
+		} else if (yDistance < 0) {
 			if (collisionGroundPath != null) {
 				newYSpeed = 0;
 				newY = cBox.y;
@@ -204,6 +206,13 @@ public abstract class CollisionBox
 		return collision;
 	}
 	
+	private void updateCollisionPartners(CollisionBox collider) {
+		// inform collision partner
+		collider.bounce(this.gameElement);
+		// inform yourself
+		this.collidingGameElement = collider.gameElement;
+	}
+	
 	protected Line2D.Double getHeadline() {
 		return new Line2D.Double(cBox.x, cBox.y + cBox.height, cBox.x + cBox.width, cBox.y + cBox.height);
 	}
@@ -211,7 +220,9 @@ public abstract class CollisionBox
 	/**
 	 * informs about being bounced by another box
 	 */
-	protected abstract void bounce(Object gameElement);
+	protected void bounce(Object gameElement) {
+		collidingGameElement = gameElement;
+	}
 	
 	public abstract void collisionDraw();
 	

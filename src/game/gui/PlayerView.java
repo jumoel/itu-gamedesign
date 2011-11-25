@@ -343,7 +343,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	private void drawImage(PImage image, PGraphics graphics, int xpos, int ypos, Horizontal horizontal, Vertical vertical)
 	{
-		graphics.beginDraw();
+		//graphics.beginDraw();
 		
 		int tx = xpos, ty = ypos;
 		
@@ -377,7 +377,7 @@ public class PlayerView extends Updateable implements Observer
 		graphics.fill(processing.color(255, 0, 0, 255));
 		graphics.ellipse(xpos, ypos, 4, 4);
 		
-		graphics.endDraw();
+		//graphics.endDraw();
 	}
 	@Override
 	public void update(Observable arg0, Object arg1)

@@ -238,19 +238,28 @@ public class Player extends CollisionBox
 		
 		if (hasXSpeed)
 		{
+			double xSignum = Math.signum(xSpeed);
+			
 			if (!isMovingSideways)
 			{
+				double absXSpeed = Math.abs(xSpeed);
+				double breakAmount = 0;
 				if (isInAir)
 				{
-					xSpeed = BMath.addTowardsZero(xSpeed, BREAKACCEL_AIR);
+					breakAmount = BREAKACCEL_AIR * deltaT / DELTAT_DIVIDENT;
 				}
 				else
 				{
-					xSpeed = BMath.addTowardsZero(xSpeed, BREAKACCEL_GROUND);
+					breakAmount = BREAKACCEL_GROUND * deltaT / DELTAT_DIVIDENT;
+				}
+				if (absXSpeed > breakAmount) {
+					xSpeed = (absXSpeed - breakAmount) * xSignum;
+				} else {
+					xSpeed = 0.0;
 				}
 			}
 			
-			xSpeed = BMath.clamp(xSpeed, 0, Math.signum(xSpeed) * MAXSPEED);
+			xSpeed = BMath.clamp(xSpeed, 0, xSignum * MAXSPEED);
 		}
 		else
 		{	
@@ -258,6 +267,7 @@ public class Player extends CollisionBox
 		}
 		
 		xpos = xpos + xSpeed * deltaT / DELTAT_DIVIDENT;
+		//System.out.println(xSpeed);
 		
 		
 		// Y
@@ -389,10 +399,4 @@ public class Player extends CollisionBox
 		
 	}
 
-	@Override
-	protected void bounce(Object gameElement)
-	{
-		// TODO Auto-generated method stub
-		
-	}
 }

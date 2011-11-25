@@ -9,7 +9,7 @@ gameplay:
     ground: 1.5
     air: 0.2
   breakacceleration:
-    ground: 0.05
+    ground: 1.0
     air: 0.05
   maxspeed: 2.5
 gamerules:
