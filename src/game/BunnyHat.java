@@ -70,7 +70,7 @@ public class BunnyHat extends PApplet implements Observer
 		
 		frameRate(2000);
 		
-		lastTimestamp = currentTimestamp = millis();
+		currentTimestamp = millis();
 		deltaT = 0;
 		lastFpsTime = 0;
 		fps = 0;
@@ -109,13 +109,13 @@ public class BunnyHat extends PApplet implements Observer
 		currentTimestamp = millis();
 		
 		deltaT = currentTimestamp - lastTimestamp;
+		if (deltaT==0) deltaT=10;
 		
-		//background(0);
-		//loadPixels();
+		
 		view1.update(inputState, LEFT, VIEW1Y, deltaT);
 		view2.update(inputState, LEFT, VIEW2Y, deltaT);
 		indicator.update(inputState, LEFT, RACEINDICATORY, deltaT);
-		//updatePixels();
+		
 		
 		
 		// Print the fps

@@ -69,7 +69,7 @@ public class Player extends CollisionBox
 	
 	public Player(PApplet applet, int playerNumber, Level level)
 	{
-		super(level.spawnX + 0.5, level.spawnY + 0.5, 1.5, 3);
+		super(level.spawnX + 0.5, level.spawnY + 0.5, 2, 3);
 		super.setLevel(level);
 		super.setGameElement(this);
 		
@@ -224,12 +224,12 @@ public class Player extends CollisionBox
 	}
 
 	
-	private int feetCollisionCount = 0; //counts collisions in series
-	private int collisionCount = 0;
+	
 	public void update(int deltaT)
 	{
 		previous_xpos = xpos;
 		previous_ypos = ypos;
+		double deltaFactor = deltaT / (double)DELTAT_DIVIDENT;
 		
 		// X
 		boolean hasXSpeed = Math.abs(xSpeed) > CLAMPTOZERO;
@@ -246,11 +246,11 @@ public class Player extends CollisionBox
 				double breakAmount = 0;
 				if (isInAir)
 				{
-					breakAmount = BREAKACCEL_AIR * deltaT / DELTAT_DIVIDENT;
+					breakAmount = BREAKACCEL_AIR * deltaFactor;
 				}
 				else
 				{
-					breakAmount = BREAKACCEL_GROUND * deltaT / DELTAT_DIVIDENT;
+					breakAmount = BREAKACCEL_GROUND * deltaFactor;
 				}
 				if (absXSpeed > breakAmount) {
 					xSpeed = (absXSpeed - breakAmount) * xSignum;
@@ -266,21 +266,30 @@ public class Player extends CollisionBox
 			xSpeed = 0;
 		}
 		
-		xpos = xpos + xSpeed * deltaT / DELTAT_DIVIDENT;
-		//System.out.println(xSpeed);
+		xpos = xpos + xSpeed * deltaFactor;
+		
 		
 		
 		// Y
-		if (isInAir)
-		{
+		//if (isInAir)
+		//{
 			yAcceleration = GRAVITY;
-		}
+			//ypos = ypos + ySpeed * deltaFactor + 0.5 * yAcceleration * Math.pow(deltaFactor, 2);
+			ySpeed += yAcceleration * deltaFactor;
+			ypos += ySpeed * deltaFactor;// + yAcceleration;
+			//System.out.println("ySpeed:"+ySpeed+" yPos:"+ypos+" deltaT:"+deltaT+" deltaFactor:"+deltaFactor);
+		/*}
+		else
+		{
+			yAcceleration = 0.0;
+			ypos = ypos + ySpeed * deltaFactor;
+		}*/
 		
 		
 		
 		
-		ypos = ypos + ySpeed * deltaT + 0.5 * yAcceleration * Math.pow(deltaT, 2);
-		ySpeed = ySpeed + yAcceleration * deltaT;
+		
+		
 		
 		
 		if(deltaT > 84) {
@@ -291,16 +300,16 @@ public class Player extends CollisionBox
 		// once they travel too far, they can cross a collision box  - and we surely do not want that!
 		double yDiff = ypos - previous_ypos;
 		double xDiff = xpos - previous_xpos;
-		double maxDistance = 0.8;
+		double maxDistance = 0.9;
 		if (Math.abs(yDiff)>=maxDistance) {
-			ypos = previous_ypos + maxDistance * (yDiff /Math.abs(yDiff));
+			ypos = previous_ypos + maxDistance * Math.signum(yDiff);
 		}
 		if (Math.abs(xDiff)>=maxDistance) {
-			xpos = previous_xpos + maxDistance * (xDiff / Math.abs(xDiff));
+			xpos = previous_xpos + maxDistance * Math.signum(xDiff);
 		}
 		
 		
-		PImage currentTexture = getCurrentTexture();
+		//PImage currentTexture = getCurrentTexture();
 
 		/*int xmin, xmax, ymin, ymax;
 		BPoint collision;*/
@@ -327,9 +336,12 @@ public class Player extends CollisionBox
 		if (this.isColliding(xpos - this.collisionBoxWidth()/2, ypos, xSpeed, ySpeed)) {
 			xpos = this.getNewX() + this.collisionBoxWidth()/2; ypos = this.getNewY();
 			xSpeed = this.getNewXSpeed(); ySpeed = this.getNewYSpeed();
+			if (ySpeed == 0) isInAir = isJumping = false;
+			//isInAir = isJumping = this.getNewIsJumping();
 		}
-		if (ySpeed == 0) isInAir = isJumping = false;
-		else isInAir = isJumping = true;
+		
+		if (ySpeed != 0) isInAir = isJumping = true;
+		
 		
 			
 		

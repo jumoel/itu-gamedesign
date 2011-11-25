@@ -27,6 +27,8 @@ public abstract class CollisionBox
 	
 	private Object collidingGameElement;
 	private double newX, newY, newXSpeed, newYSpeed;
+	private boolean newIsJumping;
+	protected boolean getNewIsJumping() {return newIsJumping;}
 	protected double getNewX() {return newX;}
 	protected double getNewY() {return newY;}
 	protected double getNewXSpeed() {return newXSpeed;}
@@ -105,6 +107,7 @@ public abstract class CollisionBox
 	 */
 	protected boolean isColliding (double x, double y, double xSpeed, double ySpeed) {
 		boolean collision = false;
+		newIsJumping = true;
 		newX = x; newY = y; newXSpeed = xSpeed; newYSpeed = ySpeed;
 		
 		
@@ -116,8 +119,8 @@ public abstract class CollisionBox
 		
 		//determine points
 		int x0, y0, x1, y1, fx0, fy0, fx1, fy1;
-		x0 = (int)(cBox.x + 0.2); x1 = (int)(cBox.x + cBox.width - 0.2);
-		y0 = (int)(cBox.y + 1 +0.2); y1 = (int)(cBox.y + cBox.height -0.2);
+		x0 = (int)(cBox.x + 0.3); x1 = (int)(cBox.x + cBox.width - 0.3);
+		y0 = (int)(cBox.y + 1); y1 = (int)(cBox.y + cBox.height);
 		fx0 = (int)x; fy0 = (int)y + 1;
 		fx1 = (int)(x + cBox.width); fy1 = (int)(y + cBox.height);
 		
@@ -129,9 +132,7 @@ public abstract class CollisionBox
 					newXSpeed = 0;
 					newX = fx1-this.cBox.width;
 					collision = true;
-					//newData.xSpeed = 0;
-					//newData.x = fx1-this.cBox.width;
-					collider.bounce(this.gameElement);
+					updateCollisionPartners(collider);
 					break;
 				}
 			}
@@ -142,9 +143,8 @@ public abstract class CollisionBox
 					newXSpeed = 0;
 					newX = fx0+1;
 					collision = true;
-					//newData.xSpeed = 0;
-					//newData.x = fx0+1;
-					collider.bounce(this.gameElement);
+					updateCollisionPartners(collider);
+					System.out.println("newX:"+newX+" x:"+x);
 					break;
 				}
 			}
@@ -168,8 +168,9 @@ public abstract class CollisionBox
 					// hit head
 					newYSpeed = -0.01;
 					newY = fy1-this.cBox.height;
+					newIsJumping=true;
 					collision = true;
-					collider.bounce(this.gameElement);
+					updateCollisionPartners(collider);
 					break;
 				}
 			}
@@ -177,6 +178,7 @@ public abstract class CollisionBox
 			if (collisionGroundPath != null) {
 				newYSpeed = 0;
 				newY = cBox.y;
+				newIsJumping = false;
 				collision = true;
 				//System.out.print("onground \n");
 			} else {
@@ -188,13 +190,14 @@ public abstract class CollisionBox
 						if (collider.getCollisionEffect() == Effects.STOP) {
 							newYSpeed = 0;
 							newY = fy0;
+							newIsJumping = true;
 							this.collisionGroundPath = collider.getHeadline();
 						} else if (collider.getCollisionEffect() == Effects.BOUNCE) {
 							newYSpeed = -ySpeed;
 							newY = fy0;
 						}
 						collision = true;
-						collider.bounce(this.gameElement);
+						updateCollisionPartners(collider);
 						break;
 					}
 				}

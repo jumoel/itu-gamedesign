@@ -3,14 +3,14 @@ game:
 gameplay:
   deltatdivident: 100
   clamptozero: 0.001
-  gravity: -0.0004
-  jumpforce: 0.1
+  gravity: -0.981
+  jumpforce: 3.4
   moveacceleration:
-    ground: 1.5
+    ground: 1.2
     air: 0.2
   breakacceleration:
     ground: 1.0
-    air: 0.05
+    air: 0.2
   maxspeed: 2.5
 gamerules:
   switch:
