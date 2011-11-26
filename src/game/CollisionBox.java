@@ -7,6 +7,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
+import java.util.Observable;
 
 /**
  * All we need for a nice collision detection
@@ -14,9 +15,9 @@ import java.awt.geom.Rectangle2D.Double;
  * @author samuelwalz
  *
  */
-public abstract class CollisionBox
+public abstract class CollisionBox extends Observable
 {
-	public enum Effects {STOP, BOUNCE, SLOW_DOWN}
+	public enum Effects {STOP, BOUNCE, SLOW_DOWN, FINISH}
 	private Effects collisionEffect = Effects.STOP;
 	
 	private Level collisionLevel;
@@ -129,8 +130,10 @@ public abstract class CollisionBox
 			for (int curY = y0; curY <= y1; curY++) {
 				collider = collisionLevel.getBoxAt(fx1, curY);
 				if (collider != null) {
-					newXSpeed = 0;
-					newX = fx1-this.cBox.width;
+					if (collider.getCollisionEffect() == Effects.STOP) {
+						newXSpeed = 0;
+						newX = fx1-this.cBox.width;
+					}
 					collision = true;
 					updateCollisionPartners(collider);
 					break;
@@ -140,8 +143,10 @@ public abstract class CollisionBox
 			for (int curY = y0; curY <= y1; curY++) {
 				collider = collisionLevel.getBoxAt(fx0, curY);
 				if (collider != null) {
-					newXSpeed = 0;
-					newX = fx0+1;
+					if (collider.getCollisionEffect() == Effects.STOP) {
+						newXSpeed = 0;
+						newX = fx0+1;
+					}
 					collision = true;
 					updateCollisionPartners(collider);
 					//System.out.println("newX:"+newX+" x:"+x);
@@ -165,9 +170,10 @@ public abstract class CollisionBox
 			for (int curX = x0; curX <= x1; curX++) {
 				collider = collisionLevel.getBoxAt(curX, fy1);
 				if (collider != null) {
-					// hit head
-					newYSpeed = -0.01;
-					newY = fy1-this.cBox.height;
+					if (collider.getCollisionEffect() == Effects.STOP) {
+						newYSpeed = -0.01;
+						newY = fy1-this.cBox.height;
+					}
 					newIsJumping=true;
 					collision = true;
 					updateCollisionPartners(collider);

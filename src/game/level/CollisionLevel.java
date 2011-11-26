@@ -3,6 +3,7 @@ package game.level;
 import processing.core.PApplet;
 import game.CollisionBox;
 import game.CollisionBox.Effects;
+import game.FinishLine;
 import game.Obstacle;
 
 public abstract class CollisionLevel
@@ -28,8 +29,9 @@ public abstract class CollisionLevel
 				if (getMetaDataAt(x, y) == Level.MetaTiles.Obstacle.index()) {
 					cBox = new Obstacle(processing, x, y, 1, 1);
 					cBox.setCollisionEffect(Effects.STOP);
-				} else {
-					
+				} else if (getMetaDataAt(x, y) == Level.MetaTiles.FinishLine.index()) {
+					cBox = new FinishLine(processing, x, y, 1, 1);
+					cBox.setCollisionEffect(Effects.FINISH);
 				}
 				setBoxAt(x, y, cBox);
 			}

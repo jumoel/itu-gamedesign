@@ -76,6 +76,7 @@ public class BunnyHat extends PApplet implements Observer
 		
 		
 		size(WINDOWWIDTH, WINDOWHEIGHT);
+		//size(1024, 768);
 		background(0);
 		
 		frameRate(2000);

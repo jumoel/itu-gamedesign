@@ -331,7 +331,7 @@ public class PlayerView extends Updateable implements Observer
 		graphics.line(cameraSecondTileCoord, 0, cameraSecondTileCoord, graphics.height);
 		*/
 		
-		//level.collisionDraw();
+		level.collisionDraw();
 		
 		//graphics.endDraw();
 	}

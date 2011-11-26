@@ -1,4 +1,6 @@
 package game;
+import java.util.HashMap;
+
 import game.graphics.Animation;
 import game.gui.AmazingSwitchWitch;
 import game.level.Level;
@@ -11,6 +13,7 @@ import util.BPoint;
 public class Player extends CollisionBox
 {
 	private enum Facing { LEFT, RIGHT };
+	private int myID;
 	
 	private PApplet processing;
 	public double xpos, ypos, previous_xpos, previous_ypos;
@@ -73,7 +76,11 @@ public class Player extends CollisionBox
 		super.setLevel(level);
 		super.setGameElement(this);
 		
+		this.myID = playerNumber;
+		
 		this.processing = applet;
+		
+		
 		
 		xSpeed = ySpeed = yAcceleration = 0.0;
 		
@@ -308,36 +315,23 @@ public class Player extends CollisionBox
 			xpos = previous_xpos + maxDistance * Math.signum(xDiff);
 		}
 		
-		
-		//PImage currentTexture = getCurrentTexture();
 
-		/*int xmin, xmax, ymin, ymax;
-		BPoint collision;*/
-		
-		/*ymax = (int)Math.ceil(ypos + currentTexture.height / BunnyHat.TILEDIMENSION );
-		ymin = (int)Math.floor(ypos);
-		xmax = (int)Math.ceil(xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2 );
-		xmin = (int)Math.floor(xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2 );*/
-		
-		//double x0, y0, x1, y1; // edge points of our body
-		//x0 = (xpos - currentTexture.width / BunnyHat.TILEDIMENSION / 2);
-		/*y0 = (ypos+1);
-		x1 = (xpos + currentTexture.width / BunnyHat.TILEDIMENSION / 2);
-		y1 = (ypos + currentTexture.height / BunnyHat.TILEDIMENSION);*/
-		
-		//double collisionY = detectCollisionBoxWiseY(x0, y0, x1, y1);
-		//double collisionX = detectCollisionBoxWiseX(x0, y0, x1, y1);
-		
-		//collision = detectCollision(xmin, xmax, ymin, ymax);
-
-		
-		
 		
 		if (this.isColliding(xpos - this.collisionBoxWidth()/2, ypos, xSpeed, ySpeed)) {
 			xpos = this.getNewX() + this.collisionBoxWidth()/2; ypos = this.getNewY();
 			xSpeed = this.getNewXSpeed(); ySpeed = this.getNewYSpeed();
 			if (ySpeed == 0) isInAir = isJumping = false;
 			//isInAir = isJumping = this.getNewIsJumping();
+			
+			// any interesting collision partners?
+			Object gameElement = this.getBouncePartner();
+			if (gameElement instanceof FinishLine) {
+				// we won!!!
+				this.hasChanged();
+				HashMap map = new HashMap();
+				map.put("IFUCKINGWON", myID);
+				this.notifyObservers(map);
+			}
 		}
 		
 		if (ySpeed != 0) isInAir = isJumping = true;
@@ -354,55 +348,7 @@ public class Player extends CollisionBox
 	
 	
 	
-	/**
-	 * deprecated method - only use in case of emergency!
-	 * 
-	 * @param xmin_tile
-	 * @param xmax_tile
-	 * @param ymin_tile
-	 * @param ymax_tile
-	 * @return
-	 */
-	private BPoint detectCollision(int xmin_tile, int xmax_tile, int ymin_tile, int ymax_tile)
-	{	
-		boolean breakbreak = false;
-		
-		int collideX = -1, collideY = -1;
-		
-		for (int y = ymin_tile; y <= ymax_tile && !breakbreak; y++)
-		{
-			for (int x = xmin_tile; x <= xmax_tile && !breakbreak; x++)
-			{
-				
-					int metadata = level.getMetaDataAt(x, y);
-					
-					boolean collides = (metadata == Level.MetaTiles.Obstacle.index());
-					
-					
-					if (collides)
-					{
-						//breakbreak = true;
-						
-						if (!((x==xmin_tile && y==ymin_tile) 
-								|| (x==xmin_tile && y==ymax_tile)
-								||(x==xmax_tile && y==ymin_tile) 
-								|| (x==xmax_tile && y==ymax_tile))) collideX = x;
-						if ((y==ymin_tile || y==ymax_tile)) collideY = y;
-						
-					}
-				
-			}
-		}
-		
-		if (collideX == -1 && collideY == -1)
-		{
-			return null;
-		}
-		else
-		{
-			return new BPoint(collideX, collideY);
-		}
-	}
+	
 
 	@Override
 	public void collisionDraw()
