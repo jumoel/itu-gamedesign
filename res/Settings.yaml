@@ -4,7 +4,7 @@ gameplay:
   deltatdivident: 100
   clamptozero: 0.001
   gravity: -0.981
-  jumpforce: 3.4
+  jumpforce: 3.9
   moveacceleration:
     ground: 1.2
     air: 0.2

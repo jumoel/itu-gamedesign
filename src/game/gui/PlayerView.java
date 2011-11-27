@@ -257,7 +257,7 @@ public class PlayerView extends Updateable implements Observer
 	private void drawLevelEndScreen(PGraphics graphics, int xpos, int ypos) {
 		// draw something cool!
 		graphics.fill(0, 0, 0);
-		graphics.text((ownPlayerWon?"WIN!!!":"LOOSE :/"), xpos + width / 2, ypos + height / 3, 200, 100);
+		graphics.text((ownPlayerWon?"WIN!!!":"LOOSE :/\n\npress q -> main screen"), xpos + width / 2, ypos + height / 3, 200, 100);
 	}
 	
 	private void drawLevelGraphics(PGraphics graphics, int xpos, int ypos)
@@ -268,7 +268,7 @@ public class PlayerView extends Updateable implements Observer
 			minimumTileX = 0;
 		}
 		
-		int maximumTileX = (xCoordCamera + graphics.width) / BunnyHat.TILEDIMENSION;
+		int maximumTileX = (xCoordCamera + this.width) / BunnyHat.TILEDIMENSION;
 		if (maximumTileX > level.levelWidth)
 		{
 			maximumTileX = level.levelWidth;
@@ -280,14 +280,14 @@ public class PlayerView extends Updateable implements Observer
 			minimumTileY = 0;
 		}
 		
-		int maximumTileY = (yCoordCamera + graphics.height) / BunnyHat.TILEDIMENSION;
+		int maximumTileY = ((yCoordCamera + this.height) / BunnyHat.TILEDIMENSION)+1;
 		if (maximumTileY > level.levelHeight)
 		{
 			maximumTileY = level.levelHeight;
 		}
 		
 		// Counting y from down towards the sky
-		for (int reversey = minimumTileY; reversey < maximumTileY; reversey++)
+		for (int reversey = minimumTileY; reversey <= maximumTileY; reversey++)
 		{
 			// Counting x from left towards right
 			for (int x = minimumTileX; x <= maximumTileX; x++)

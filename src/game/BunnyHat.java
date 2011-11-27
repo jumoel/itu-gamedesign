@@ -76,15 +76,10 @@ public class BunnyHat extends PApplet implements Observer
 	
 	public void setup()
 	{	
-		currentView = Screens.GAME;
+		currentView = Screens.INTRO;
 		
 		inputState = new State();
-		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 1, 
-				(String)SETTINGS.getValue("levels/level1/good"));
-		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2,
-				(String)SETTINGS.getValue("levels/level1/bad"));
-		view1.setOtherPlayerView(view2); view2.setOtherPlayerView(view1);
-		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
+		
 		sndCtrl = new SoundControl(this);
 		
 		
@@ -108,24 +103,15 @@ public class BunnyHat extends PApplet implements Observer
 		//setup & run sound input
 		sndCtrl = new SoundControl(this);
 		sndCtrl.addObserver(this);
-		sndCtrl.startListening();
+		
 		
 		//setup sound output
 		sndOut = new Stereophone("sounds", this);
 		sndOut.printSounds();
 		
-		//setup and run game master
-		gameMaster = new GameMaster(this);
-		gameMaster.startGame();
 		
-		// setup our special workers
-		switcher = new AmazingSwitchWitch(view1, view2, this);
-		switcher.wakeHer();
 		
-		// setup communication
-		gameMaster.addObserver(switcher); // listen for level switch message
-		//switcher.addObserver(view1);
-		//switcher.addObserver(view2);
+		
 		
 		//attempt to get a full screen mode - not working - null pointer exception 		
 		/*fs = new FullScreen(this);
@@ -149,10 +135,11 @@ public class BunnyHat extends PApplet implements Observer
 		
 		switch (currentView) {
 		case INTRO:
-			drawIntroScreen();
+			drawIntroScreen(cb);
 			break;
 		case MENU_MAIN:
-			drawMenuMainScreen();
+			drawMenuMainScreen(cb);
+			break;
 		case GAME:
 			view1.update(inputState, LEFT, VIEW1Y, deltaT, cb);
 			view2.update(inputState, LEFT, VIEW2Y, deltaT, cb);
@@ -182,16 +169,20 @@ public class BunnyHat extends PApplet implements Observer
 		}
 	}
 
-	private void drawMenuMainScreen()
+	private void drawMenuMainScreen(PGraphics cb)
 	{
 		// TODO Auto-generated method stub
-		background(255);
+		cb.background(255);
+		cb.fill(0);
+		cb.text("press 1 for level 1 and 2 for level 2 .) \n and q to quit this game..", width/2, height/2);
 	}
 
-	private void drawIntroScreen()
+	private void drawIntroScreen(PGraphics cb)
 	{
 		// TODO Auto-generated method stub
 		background(255);
+		cb.fill(0);
+		cb.text("d(^_^)b amaaazing intro screen - press space to go on!", width/2, height/2);
 	}
 
 	public static void main(String args[])
@@ -202,6 +193,20 @@ public class BunnyHat extends PApplet implements Observer
 
 	public void keyPressed()
 	{
+		switch (this.currentView) {
+		case GAME:
+			handleKeyGame();
+			break;
+		case MENU_MAIN:
+			handleKeyMenuMain();
+			break;
+		case INTRO:
+			handleKeyIntro();
+			break;
+		}
+	}
+	
+	private void handleKeyGame() {
 		if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i')) {
 			//nothing for the moment
 		} else if (TWIN_JUMP_SPACEBAR && key == ' ') {
@@ -227,20 +232,75 @@ public class BunnyHat extends PApplet implements Observer
 		{
 			SHOW_FPS = !SHOW_FPS;
 		} else if (key == 'q') {
-			exit();
+			gameMaster.stopGame();
+			currentView = Screens.MENU_MAIN;
+		}
+	}
+	
+	private void handleKeyMenuMain() {
+		switch (key) {
+			case '1':
+				setupGame(1);
+				currentView = Screens.GAME;
+				break;
+			case '2':
+				setupGame(2);
+				currentView = Screens.GAME;
+				break;
+			case 'q':
+				exit();
+				break;
+				
+		}
+	}
+	
+	private void handleKeyIntro() {
+		if (key == ' ') {
+			currentView = Screens.MENU_MAIN;
 		}
 	}
 
 	public void keyReleased()
 	{
-		if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i')) {
-			//nothing for the moment
-		} else if (TWIN_JUMP_SPACEBAR && key == ' ') {
-			inputState.put('w', false);
-			inputState.put('i', false);
-		} else {
-			inputState.put(key, false);
+		switch (this.currentView) {
+		case GAME:
+			if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i')) {
+				//nothing for the moment
+			} else if (TWIN_JUMP_SPACEBAR && key == ' ') {
+				inputState.put('w', false);
+				inputState.put('i', false);
+			} else {
+				inputState.put(key, false);
+			}
+			break;
+		case MENU_MAIN:
+			break;
 		}
+	}
+	
+	private void setupGame(int level) {
+		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 1, 
+				(String)SETTINGS.getValue("levels/level"+level+"/good"));
+		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2,
+				(String)SETTINGS.getValue("levels/level"+level+"/bad"));
+		view1.setOtherPlayerView(view2); view2.setOtherPlayerView(view1);
+		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
+		
+		sndCtrl.startListening();
+		
+		//setup and run game master
+		gameMaster = new GameMaster(this);
+		gameMaster.startGame();
+		
+		
+		// setup our special workers
+		switcher = new AmazingSwitchWitch(view1, view2, this);
+		switcher.wakeHer();
+		
+		// setup communication
+		gameMaster.addObserver(switcher); // listen for level switch message
+		//switcher.addObserver(view1);
+		//switcher.addObserver(view2);
 	}
 
 	@Override
