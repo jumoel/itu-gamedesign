@@ -23,7 +23,9 @@ public class BunnyHat extends PApplet implements Observer
 	boolean SHOW_FPS = SETTINGS.getValue("debug/fps");
 	int FPS_AVERAGE_SAMPLE_SIZE = 10; // number of last measurements to take into account
 	
-	public static boolean TWIN_JUMP = false;
+	// game modes
+	public static boolean TWIN_JUMP_SPACEBAR = false;
+	public static boolean TWIN_JUMP = true; 
 	
 	public static int TILEDIMENSION = SETTINGS.getValue("gui/tiledimension");
 	
@@ -71,6 +73,7 @@ public class BunnyHat extends PApplet implements Observer
 				(String)SETTINGS.getValue("levels/level1/good"));
 		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level1/bad"));
+		view1.setOtherPlayerView(view2); view2.setOtherPlayerView(view1);
 		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
 		sndCtrl = new SoundControl(this);
 		
@@ -164,9 +167,9 @@ public class BunnyHat extends PApplet implements Observer
 
 	public void keyPressed()
 	{
-		if (TWIN_JUMP && (key == 'w' || key == 'i')) {
+		if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i')) {
 			//nothing for the moment
-		} else if (TWIN_JUMP && key == ' ') {
+		} else if (TWIN_JUMP_SPACEBAR && key == ' ') {
 			inputState.put('w', true);
 			inputState.put('i', true);
 		} else {
@@ -195,9 +198,9 @@ public class BunnyHat extends PApplet implements Observer
 
 	public void keyReleased()
 	{
-		if (TWIN_JUMP && (key == 'w' || key == 'i')) {
+		if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i')) {
 			//nothing for the moment
-		} else if (TWIN_JUMP && key == ' ') {
+		} else if (TWIN_JUMP_SPACEBAR && key == ' ') {
 			inputState.put('w', false);
 			inputState.put('i', false);
 		} else {

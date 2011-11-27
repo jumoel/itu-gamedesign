@@ -35,6 +35,9 @@ public class PlayerView extends Updateable implements Observer
 
 	private Player ownPlayer;
 	private Player otherPlayer;
+	private PlayerView otherPlayerView;
+	private boolean ownPlayerWon = false;
+	private boolean gameOver = false;
 	
 	private int levelLength;
 	
@@ -45,6 +48,7 @@ public class PlayerView extends Updateable implements Observer
 	// dream switch data
 	private boolean switchHappening = false;
 	
+	// jumping stuff
 	private boolean didJump = false;
 	
 	//dream switch interaction methods
@@ -63,8 +67,15 @@ public class PlayerView extends Updateable implements Observer
 		switchHappening = false;
 	}
 	
+	protected Player getPlayer() {
+		return this.ownPlayer;
+	}
 	
-	
+	public void setOtherPlayerView(PlayerView pv) {
+		this.otherPlayerView = pv;
+		this.ownPlayer.addObserver(pv);
+		this.otherPlayer = pv.getPlayer();
+	}
 	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath)
 	{	
@@ -89,7 +100,8 @@ public class PlayerView extends Updateable implements Observer
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
 		
 		this.ownPlayer = new Player(processing, viewNumber, this.level);
-		this.otherPlayer = null;
+		this.ownPlayer.addObserver(this);
+		//this.otherPlayer = null;
 		
 		this.playerPosition = 0;
 		
@@ -121,11 +133,14 @@ public class PlayerView extends Updateable implements Observer
 
 		// a player should always have to press jump again for another jump
 		if (didJump && !jumpbutton) didJump = false;  
+		// once the game is over, players can not move left / right
+		if (gameOver) leftbutton = rightbutton = false;
 		
 		if (jumpbutton && ownPlayer != null && !didJump)
 		{
 			ownPlayer.jump();
 			this.didJump = true;
+			if (BunnyHat.TWIN_JUMP) otherPlayer.jump();
 		}
 		
 		if (leftbutton && ownPlayer != null)
@@ -250,6 +265,8 @@ public class PlayerView extends Updateable implements Observer
 		drawLevelGraphics(cb);
 		
 		drawImage(ownPlayer.getCurrentTexture(), cb, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+		
+		
 		cb.endDraw();
 		
 		// Draw the image to the surface
@@ -259,15 +276,20 @@ public class PlayerView extends Updateable implements Observer
 			
 		}*/
 		processing.image(cb, xpos, ypos);
+		if (gameOver) drawLevelEndScreen(cb, xpos, ypos);
 		
 		// Swap the buffers
 		currentBuffer = (currentBuffer + 1) % NUMBER_OF_BUFFERS;
 	}
 	
+	private void drawLevelEndScreen(PGraphics graphics, int xpos, int ypos) {
+		// draw something cool!
+		processing.fill(0, 0, 0);
+		processing.text((ownPlayerWon?"WIN!!!":"LOOSE :/"), xpos + width / 2, ypos + height / 3, 200, 100);
+	}
+	
 	private void drawLevelGraphics(PGraphics graphics)
-	{
-		//graphics.beginDraw();
-		
+	{	
 		int minimumTileX = xCoordCamera / BunnyHat.TILEDIMENSION;
 		if (minimumTileX < 0)
 		{
@@ -333,7 +355,6 @@ public class PlayerView extends Updateable implements Observer
 		
 		level.collisionDraw();
 		
-		//graphics.endDraw();
 	}
 	
 	public int getPlayerPosition()
@@ -384,9 +405,18 @@ public class PlayerView extends Updateable implements Observer
 		
 		//graphics.endDraw();
 	}
+	
 	@Override
 	public void update(Observable arg0, Object arg1)
 	{
-		
+		if (arg1 instanceof HashMap) {
+			HashMap map = (HashMap)arg1;
+			if (map.containsKey("IFUCKINGWON") && !gameOver) {
+				this.gameOver = true;
+				if (((Integer)map.get("IFUCKINGWON"))==this.viewNumber) {
+					this.ownPlayerWon = true;
+				}
+			}
+		}
 	}
 }

@@ -327,7 +327,7 @@ public class Player extends CollisionBox
 			Object gameElement = this.getBouncePartner();
 			if (gameElement instanceof FinishLine) {
 				// we won!!!
-				this.hasChanged();
+				this.setChanged();
 				HashMap map = new HashMap();
 				map.put("IFUCKINGWON", myID);
 				this.notifyObservers(map);
