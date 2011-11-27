@@ -32,9 +32,14 @@ public class Player extends CollisionBox
 	
 	private Facing facing;
 
+	private boolean unarmed;
+	
 	private Animation walkAnimation;
 	private Animation jumpAnimation;
 	private Animation idleAnimation;
+	private Animation walkAnimationGun;
+	private Animation jumpAnimationGun;
+	private Animation idleAnimationGun;
 	
 	private Level level;
 
@@ -60,12 +65,18 @@ public class Player extends CollisionBox
 		this.walkAnimation.holdAnimation();
 		this.jumpAnimation.holdAnimation();
 		this.idleAnimation.holdAnimation();
+		this.walkAnimationGun.holdAnimation();
+		this.jumpAnimationGun.holdAnimation();
+		this.idleAnimationGun.holdAnimation();
 	}
 	
 	public void unholdAnimation() {
 		this.walkAnimation.unholdAnimation();
 		this.jumpAnimation.unholdAnimation();
 		this.idleAnimation.unholdAnimation();
+		this.walkAnimationGun.unholdAnimation();
+		this.jumpAnimationGun.unholdAnimation();
+		this.idleAnimationGun.unholdAnimation();
 	}
 	
 	public void setLevel(Level level) {
@@ -99,9 +110,14 @@ public class Player extends CollisionBox
 		isMovingSideways = false;
 		cannotMoveLeft = false;
 
+		unarmed = true;
+		
 		this.walkAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "run");
 		this.idleAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "idle");
 		this.jumpAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "jump");
+		this.walkAnimationGun = new Animation(processing, "graphics/animations/player" + playerNumber + "runGun");
+		this.idleAnimationGun = new Animation(processing, "graphics/animations/player" + playerNumber + "idleGun");
+		this.jumpAnimationGun = new Animation(processing, "graphics/animations/player" + playerNumber + "jumpGun");
 		
 		this.idleAnimation.start();
 		
@@ -116,20 +132,20 @@ public class Player extends CollisionBox
 		
 		if (jumpAnimation.isRunning())
 		{
-			ret = jumpAnimation.getCurrentImage(time);
+			ret = unarmed?jumpAnimation.getCurrentImage(time):jumpAnimationGun.getCurrentImage(time);
 		}
 		else if (walkAnimation.isRunning())
 		{
-			ret = walkAnimation.getCurrentImage(time);
+			ret = unarmed?walkAnimation.getCurrentImage(time):walkAnimationGun.getCurrentImage(time);
 		}
 		else if (idleAnimation.isRunning())
 		{
-			ret = idleAnimation.getCurrentImage(time);
+			ret = unarmed?idleAnimation.getCurrentImage(time):idleAnimationGun.getCurrentImage(time);
 		}
 		else
 		{
 			idleAnimation.start();
-			ret = idleAnimation.getCurrentImage(time);
+			ret = unarmed?idleAnimation.getCurrentImage(time):idleAnimationGun.getCurrentImage(time);
 		}
 		
 		if (facing == Facing.LEFT)
@@ -192,6 +208,7 @@ public class Player extends CollisionBox
 		}
 	}
 	
+	
 	private void controlAnimations()
 	{
 		boolean hasXSpeed = Math.abs(xSpeed) > CLAMPTOZERO;
@@ -200,30 +217,39 @@ public class Player extends CollisionBox
 		{
 			idleAnimation.stop();
 			walkAnimation.stop();
+			idleAnimationGun.stop();
+			walkAnimationGun.stop();
 			
 			if (jumpAnimation.isStopped())
 			{
 				jumpAnimation.start();
+				jumpAnimationGun.start();
 			}
 		}
 		else if (hasXSpeed || isMovingSideways)
 		{
 			idleAnimation.stop();
 			jumpAnimation.stop();
+			idleAnimationGun.stop();
+			jumpAnimationGun.stop();
 			
 			if (walkAnimation.isStopped())
 			{
 				walkAnimation.start();
+				walkAnimationGun.start();
 			}
 		}
 		else
 		{
 			jumpAnimation.stop();
 			walkAnimation.stop();
+			jumpAnimationGun.stop();
+			walkAnimationGun.stop();
 			
 			if (idleAnimation.isStopped())
 			{
 				idleAnimation.start();
+				idleAnimationGun.start();
 			}
 		}
 	}
