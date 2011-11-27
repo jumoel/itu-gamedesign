@@ -25,7 +25,7 @@ public class BunnyHat extends PApplet implements Observer
 	
 	// game modes
 	public static boolean TWIN_JUMP_SPACEBAR = false;
-	public static boolean TWIN_JUMP = true; 
+	public static boolean TWIN_JUMP = false; 
 	
 	public static int TILEDIMENSION = SETTINGS.getValue("gui/tiledimension");
 	
@@ -66,8 +66,18 @@ public class BunnyHat extends PApplet implements Observer
 	// not working FullScreen stuff
 	private FullScreen fs;
 	
+	// which screen we are on right now?
+	public static enum Screens {GAME, MENU_MAIN, MENU_SETUP, MENU_STORY, MENU_CREDITS, INTRO}
+	private static Screens currentView;
+	
+	//buffer stuff
+	private PGraphics buffer;
+	
+	
 	public void setup()
 	{	
+		currentView = Screens.GAME;
+		
 		inputState = new State();
 		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 1, 
 				(String)SETTINGS.getValue("levels/level1/good"));
@@ -84,8 +94,10 @@ public class BunnyHat extends PApplet implements Observer
 		
 		frameRate(2000);
 		
+		//setup buffers 
+		buffer = createGraphics(this.width, this.height, PConstants.JAVA2D);
 		
-		
+		//setup statistics
 		currentTimestamp = millis();
 		deltaT = 0;
 		lastFpsTime = 0;
@@ -125,6 +137,9 @@ public class BunnyHat extends PApplet implements Observer
 
 	public void draw()
 	{
+		PGraphics cb = buffer;
+		cb.beginDraw();
+		cb.background(255);
 		
 		lastTimestamp = currentTimestamp;
 		currentTimestamp = millis();
@@ -132,12 +147,21 @@ public class BunnyHat extends PApplet implements Observer
 		deltaT = currentTimestamp - lastTimestamp;
 		if (deltaT==0) deltaT=10;
 		
+		switch (currentView) {
+		case INTRO:
+			drawIntroScreen();
+			break;
+		case MENU_MAIN:
+			drawMenuMainScreen();
+		case GAME:
+			view1.update(inputState, LEFT, VIEW1Y, deltaT, cb);
+			view2.update(inputState, LEFT, VIEW2Y, deltaT, cb);
+			indicator.update(inputState, LEFT, RACEINDICATORY, deltaT, cb);
+			break;
+		}
 		
-		view1.update(inputState, LEFT, VIEW1Y, deltaT);
-		view2.update(inputState, LEFT, VIEW2Y, deltaT);
-		indicator.update(inputState, LEFT, RACEINDICATORY, deltaT);
-		
-		
+		cb.endDraw();
+		image(cb, 0, 0);
 		
 		// Print the fps
 		if ((currentTimestamp - lastFpsTime) > 1000)
@@ -146,7 +170,6 @@ public class BunnyHat extends PApplet implements Observer
 			if (SHOW_FPS)
 			{
 				fpsAverage += fps;
-				//fpsAverage = (fpsAverage * (FPS_AVERAGE_SAMPLE_SIZE-1) + fps) / FPS_AVERAGE_SAMPLE_SIZE;
 				System.out.println("FPS: " + fps + " (Average: "+fpsAverage/gameSeconds+")  " + gameSeconds +"sec.");
 			}
 			
@@ -157,6 +180,18 @@ public class BunnyHat extends PApplet implements Observer
 		{
 			fps++;
 		}
+	}
+
+	private void drawMenuMainScreen()
+	{
+		// TODO Auto-generated method stub
+		background(255);
+	}
+
+	private void drawIntroScreen()
+	{
+		// TODO Auto-generated method stub
+		background(255);
 	}
 
 	public static void main(String args[])

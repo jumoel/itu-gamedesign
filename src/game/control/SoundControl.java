@@ -557,7 +557,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		HashMap arguments = new HashMap();
 		arguments.put("detector", ((PatternDetector)arg0).getName());
 		arguments.put("pattern", ((PatternDetector)arg0).getPattern());
-		this.notifyObservers();
+		this.notifyObservers(arguments);
 		
 	}
 

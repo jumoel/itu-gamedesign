@@ -21,9 +21,6 @@ public class PlayerView extends Updateable implements Observer
 	private int halfheight;
 	private PApplet processing;
 	
-	private PGraphics buffers[];
-	private int currentBuffer;
-	private static int NUMBER_OF_BUFFERS = 2;
 	
 	private int viewNumber;
 	private int xCoordCamera;
@@ -86,13 +83,6 @@ public class PlayerView extends Updateable implements Observer
 		
 		this.processing = applet;
 		
-		buffers = new PGraphics[NUMBER_OF_BUFFERS];
-		currentBuffer = 0;
-		
-		for (int i = 0; i < NUMBER_OF_BUFFERS; i++)
-		{
-			buffers[i] = processing.createGraphics(this.width, this.height, PConstants.JAVA2D);
-		}
 		
 		this.viewNumber = viewNumber;
 		
@@ -101,7 +91,6 @@ public class PlayerView extends Updateable implements Observer
 		
 		this.ownPlayer = new Player(processing, viewNumber, this.level);
 		this.ownPlayer.addObserver(this);
-		//this.otherPlayer = null;
 		
 		this.playerPosition = 0;
 		
@@ -161,7 +150,7 @@ public class PlayerView extends Updateable implements Observer
 		}
 	}
 	
-	public void update(State state, int xpos, int ypos, int deltaT)
+	public void update(State state, int xpos, int ypos, int deltaT, PGraphics cb)
 	{	
 		if (switchHappening) deltaT = 0; // freeze time
 
@@ -170,20 +159,12 @@ public class PlayerView extends Updateable implements Observer
 			return;
 		}
 		
-		// Just a shortcut :)
-		PGraphics cb = buffers[currentBuffer];
-		
-		
 		ownPlayer.isMovingSideways = false;
 		
 		handleInput(state);
 		
 		// Update the players physics, etc.
 		ownPlayer.update(deltaT);
-		
-		// Draw a white background
-		cb.beginDraw();
-		cb.background(255);
 		
 		// Draw the player
 		int pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);
@@ -255,40 +236,31 @@ public class PlayerView extends Updateable implements Observer
 		if (yCoordCamera > maxCameraPosY)
 		{
 			int diff = yCoordCamera - maxCameraPosY;
-			drawpypos = drawpypos + diff;
+			drawpypos = (drawpypos + diff);
 			yCoordCamera = maxCameraPosY;
 			yCoordCameraMiddle = yCoordCamera + halfheight;
 		}
 		
-		drawpypos = BunnyHat.PLAYERVIEWTILEHEIGHT * BunnyHat.TILEDIMENSION - drawpypos;
+		drawpypos = (BunnyHat.PLAYERVIEWTILEHEIGHT * BunnyHat.TILEDIMENSION - drawpypos) + ypos;
 		
-		drawLevelGraphics(cb);
+		drawLevelGraphics(cb, xpos, ypos);
 		
 		drawImage(ownPlayer.getCurrentTexture(), cb, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
 		
 		
-		cb.endDraw();
 		
-		// Draw the image to the surface
-		/*int iOffset = xpos + ypos * cb.width;
-		for (int i = 0; i < cb.pixels.length; i++) {
-			processing.pixels[i+iOffset] = cb.pixels[i];
-			
-		}*/
-		processing.image(cb, xpos, ypos);
 		if (gameOver) drawLevelEndScreen(cb, xpos, ypos);
 		
-		// Swap the buffers
-		currentBuffer = (currentBuffer + 1) % NUMBER_OF_BUFFERS;
+		
 	}
 	
 	private void drawLevelEndScreen(PGraphics graphics, int xpos, int ypos) {
 		// draw something cool!
-		processing.fill(0, 0, 0);
-		processing.text((ownPlayerWon?"WIN!!!":"LOOSE :/"), xpos + width / 2, ypos + height / 3, 200, 100);
+		graphics.fill(0, 0, 0);
+		graphics.text((ownPlayerWon?"WIN!!!":"LOOSE :/"), xpos + width / 2, ypos + height / 3, 200, 100);
 	}
 	
-	private void drawLevelGraphics(PGraphics graphics)
+	private void drawLevelGraphics(PGraphics graphics, int xpos, int ypos)
 	{	
 		int minimumTileX = xCoordCamera / BunnyHat.TILEDIMENSION;
 		if (minimumTileX < 0)
@@ -328,7 +300,7 @@ public class PlayerView extends Updateable implements Observer
 				
 				if (tile != null)
 				{
-					graphics.image(tile, xcoord, ycoord);
+					graphics.image(tile, xcoord+xpos, ycoord+ypos);
 				}
 			}
 		}
@@ -353,7 +325,8 @@ public class PlayerView extends Updateable implements Observer
 		graphics.line(cameraSecondTileCoord, 0, cameraSecondTileCoord, graphics.height);
 		*/
 		
-		level.collisionDraw();
+		level.collisionDraw(graphics, xpos, ypos);
+		this.ownPlayer.collisionDraw(graphics, xpos, ypos);
 		
 	}
 	

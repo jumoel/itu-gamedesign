@@ -24,13 +24,13 @@ public class RaceIndicator extends Updateable
 		this.triangleHeight = 10;
 	}
 	
-	public void update(State state, int xpos, int ypos, int deltaT)
+	public void update(State state, int xpos, int ypos, int deltaT, PGraphics cb)
 	{
-		processing.noStroke();
-		processing.fill(processing.color(255, 0, 0, 255));
-		processing.rect(xpos, ypos, width, height);
+		cb.noStroke();
+		cb.fill(processing.color(255, 0, 0, 255));
+		cb.rect(xpos, ypos, width, height);
 
-		processing.fill(255);
+		cb.fill(255);
 		
 		int levelOneLength = bunnyhat.view1.getLevelLength();
 		int playerOneProgress = bunnyhat.view1.getPlayerPosition();
@@ -38,7 +38,7 @@ public class RaceIndicator extends Updateable
 		
 		int xOne = (int)(width * percentageOne);
 		
-		processing.triangle(xOne, ypos, xOne - triangleWidth / 2, ypos + triangleHeight, xOne + triangleWidth / 2, ypos + triangleHeight);
+		cb.triangle(xOne, ypos, xOne - triangleWidth / 2, ypos + triangleHeight, xOne + triangleWidth / 2, ypos + triangleHeight);
 		
 
 		int levelTwoLength = bunnyhat.view2.getLevelLength();
@@ -47,6 +47,6 @@ public class RaceIndicator extends Updateable
 		
 		int xTwo = (int)(width * percentageTwo);
 		
-		processing.triangle(xTwo, ypos + height, xTwo - triangleWidth / 2, ypos + height - triangleHeight, xTwo + triangleWidth / 2, ypos + height - triangleHeight);
+		cb.triangle(xTwo, ypos + height, xTwo - triangleWidth / 2, ypos + height - triangleHeight, xTwo + triangleWidth / 2, ypos + height - triangleHeight);
 	}
 }

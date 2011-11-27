@@ -9,6 +9,8 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.Rectangle2D.Double;
 import java.util.Observable;
 
+import processing.core.PGraphics;
+
 /**
  * All we need for a nice collision detection
  * 
@@ -60,6 +62,10 @@ public abstract class CollisionBox extends Observable
 	
 	public double collisionBoxWidth() {
 		return this.cBox.width;
+	}
+	
+	public double collisionBoxHeight() {
+		return this.cBox.height;
 	}
 	
 	protected void setGameElement(Object gameElement) {
@@ -233,7 +239,7 @@ public abstract class CollisionBox extends Observable
 		collidingGameElement = gameElement;
 	}
 	
-	public abstract void collisionDraw();
+	public abstract void collisionDraw(PGraphics cb, int xOff, int yOff);
 	
 	
 }

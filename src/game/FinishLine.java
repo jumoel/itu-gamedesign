@@ -21,11 +21,11 @@ public class FinishLine extends CollisionBox
 		this.setGameElement(this);
 	}
 
-	public void collisionDraw()
+	public void collisionDraw(PGraphics cb, int xOff, int yOff)
 	{
-		parent.fill(0, 255, 0);
-		parent.stroke(0, 255, 0);
-		parent.rect(xPos*2, yPos*2, width*2, height*2);
+		cb.fill(0, 255, 0);
+		cb.stroke(0, 255, 0);
+		cb.rect(xPos*2, yPos*2+yOff, width*2, height*2);
 	}
 
 	@Override

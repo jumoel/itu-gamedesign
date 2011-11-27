@@ -1,6 +1,7 @@
 package game.level;
 
 import processing.core.PApplet;
+import processing.core.PGraphics;
 import game.CollisionBox;
 import game.CollisionBox.Effects;
 import game.FinishLine;
@@ -54,10 +55,10 @@ public abstract class CollisionLevel
 	/**
 	 * draw all collision boxes
 	 */
-	public void collisionDraw() {
+	public void collisionDraw(PGraphics cb, int xpos, int ypos) {
 		for (int i = 0; i < fixedObjects.length; i++) {
 			if (fixedObjects[i] != null) {
-				fixedObjects[i].collisionDraw();
+				fixedObjects[i].collisionDraw(cb, xpos, ypos);
 			}
 		}
 	}

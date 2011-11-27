@@ -19,11 +19,11 @@ public class Obstacle extends CollisionBox
 		parent = p;
 	}
 
-	public void collisionDraw()
+	public void collisionDraw(PGraphics cb, int xOff, int yOff)
 	{
-		parent.noFill();
-		parent.stroke(0);
-		parent.rect(xPos*2, yPos*2, width*2, height*2);
+		cb.noFill();
+		cb.stroke(0);
+		cb.rect(xPos*2, yPos*2+yOff, width*2, height*2);
 	}
 
 	@Override

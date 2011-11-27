@@ -351,10 +351,13 @@ public class Player extends CollisionBox
 	
 
 	@Override
-	public void collisionDraw()
+	public void collisionDraw(PGraphics cb, int xOff, int yOff)
 	{
 		// TODO Auto-generated method stub
-		
+		cb.noFill();
+		cb.stroke(255, 0, 0);
+		//System.out.println("draw player "+xpos+":"+ypos);
+		cb.rect((float)xpos*2, (float)ypos*2+yOff, (float)this.collisionBoxWidth()*2, (float)this.collisionBoxHeight()*2);
 	}
 
 }
