@@ -347,7 +347,7 @@ public class Player extends CollisionBox
 			if (ySpeed == 0) {
 				isInAir = isJumping = false;
 				if (! this.soundHitBottomPlayed) {
-					Stereophone.playSound("001", "player"+this.myID+"_jump", 100);
+					Stereophone.playSound("001", "player_hitground", 100);
 					this.soundHitBottomPlayed = true;
 				}
 			}
@@ -361,6 +361,7 @@ public class Player extends CollisionBox
 				HashMap map = new HashMap();
 				map.put("IFUCKINGWON", myID);
 				this.notifyObservers(map);
+				Stereophone.playSound("310", "playerwon", 10000);
 			}
 			
 		} else {
