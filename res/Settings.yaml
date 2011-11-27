@@ -16,9 +16,9 @@ debug:
   fps: false
 gamerules:
   switch:
-    timeTillNext: 20000
+    timeTillNext: 23000
     timeVariation: 0.2
-    alertPhaseDuration: 2000
+    alertPhaseDuration: 5000
   doors:
     playerMinDistance: 0.2
     doorDuration: 3000

@@ -52,6 +52,9 @@ public class Player extends CollisionBox
 	private static double CLAMPTOZERO = BunnyHat.SETTINGS.getValue("gameplay/clamptozero");
 	
 	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
+	
+	//sound stuff
+	private boolean soundHitBottomPlayed = false;
 
 	public void holdAnimation() {
 		this.walkAnimation.holdAnimation();
@@ -142,11 +145,6 @@ public class Player extends CollisionBox
 		if (!isJumping)
 		{
 			ySpeed = JUMPFORCE;
-			//isJumping = true;
-			//isInAir = true;
-			
-			//play sound
-			//Stereophone.playSound(0);
 		}
 	}
 	
@@ -320,7 +318,13 @@ public class Player extends CollisionBox
 		if (this.isColliding(xpos - this.collisionBoxWidth()/2, ypos, xSpeed, ySpeed)) {
 			xpos = this.getNewX() + this.collisionBoxWidth()/2; ypos = this.getNewY();
 			xSpeed = this.getNewXSpeed(); ySpeed = this.getNewYSpeed();
-			if (ySpeed == 0) isInAir = isJumping = false;
+			if (ySpeed == 0) {
+				isInAir = isJumping = false;
+				if (! this.soundHitBottomPlayed) {
+					Stereophone.playSound("001", "player"+this.myID+"_jump", 100);
+					this.soundHitBottomPlayed = true;
+				}
+			}
 			//isInAir = isJumping = this.getNewIsJumping();
 			
 			// any interesting collision partners?
@@ -332,6 +336,9 @@ public class Player extends CollisionBox
 				map.put("IFUCKINGWON", myID);
 				this.notifyObservers(map);
 			}
+			
+		} else {
+			this.soundHitBottomPlayed = false;
 		}
 		
 		if (ySpeed != 0) isInAir = isJumping = true;

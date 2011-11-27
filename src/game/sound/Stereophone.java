@@ -2,16 +2,22 @@ package game.sound;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.HashMap;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 
+import processing.core.PApplet;
+
 public class Stereophone
 {
 	static File[] sounds;
+	static HashMap snds;
+	static HashMap soundCooldowns; // contains timestamps for played sounds
+	static PApplet processing;
 	
-	public Stereophone(String soundDirName) {
+	public Stereophone(String soundDirName, PApplet processing) {
 		File soundDir = new File(soundDirName);
 		if (!soundDir.isDirectory()) {System.out.print(soundDirName + " is not a valid directory (just in case you care about having sounds.. .)\n");}
 		FilenameFilter filter = new FilenameFilter() {
@@ -21,21 +27,40 @@ public class Stereophone
 			}
 		};
 		sounds = soundDir.listFiles(filter);
+		snds = new HashMap();
+		for (int i = 0; i < sounds.length; i++) {
+			String firstThreeChars = sounds[i].getName().substring(0, 3);
+			System.out.println("file starts with:"+firstThreeChars);
+			snds.put(firstThreeChars, sounds[i]);
+		}
+		soundCooldowns = new HashMap();
+		this.processing = processing;
+	}
+	
+	public static void playSound(final String number, String identifier, int msCooldown) {
+		int currentTime = processing.millis();
+		if (soundCooldowns.containsKey(identifier)) {
+			if (currentTime - ((Integer)soundCooldowns.get(identifier)) > msCooldown) {
+				playSound(number);
+				soundCooldowns.put(identifier, currentTime);
+			}
+		} else {
+			playSound(number);
+			soundCooldowns.put(identifier, currentTime);
+		}
 		
 	}
 	
-	public static void playSound(final int number, String identifier, int msCooldown) {
-		
-	}
-	
-	public static synchronized void playSound(final int number) {
-		if (number >= sounds.length) {return;}
+	public static synchronized void playSound(final String number) {
+		if (!snds.containsKey(number)) {return;}
 		
 	    new Thread(new Runnable() {
 	      public void run() {
 	        try {
 	          Clip clip = AudioSystem.getClip();
-	          AudioInputStream inputStream = AudioSystem.getAudioInputStream(this.getClass().getClassLoader().getResourceAsStream(sounds[number].getPath()));
+	          AudioInputStream inputStream = 
+	        		  AudioSystem.getAudioInputStream(
+	        				  this.getClass().getClassLoader().getResourceAsStream(((File)snds.get(number)).getPath()));
 	          clip.open(inputStream);
 	          clip.start(); 
 	        } catch (Exception e) {

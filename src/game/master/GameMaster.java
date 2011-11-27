@@ -1,6 +1,7 @@
 package game.master;
 
 import game.BunnyHat;
+import game.sound.Stereophone;
 
 import java.util.Observable;
 import java.util.Observer;
@@ -99,6 +100,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 			switchAlertStarted = true;
 			this.setChanged();
 			this.notifyObservers(GameMaster.MSG.SWITCH_ALERT_START);
+			Stereophone.playSound("300");
 			// TODO: start alert
 		}
 		

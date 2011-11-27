@@ -111,7 +111,7 @@ public class BunnyHat extends PApplet implements Observer
 		sndCtrl.startListening();
 		
 		//setup sound output
-		sndOut = new Stereophone("sounds");
+		sndOut = new Stereophone("sounds", this);
 		sndOut.printSounds();
 		
 		//setup and run game master
@@ -167,9 +167,9 @@ public class BunnyHat extends PApplet implements Observer
 		if ((currentTimestamp - lastFpsTime) > 1000)
 		{
 			gameSeconds++;
+			fpsAverage += fps;
 			if (SHOW_FPS)
 			{
-				fpsAverage += fps;
 				System.out.println("FPS: " + fps + " (Average: "+fpsAverage/gameSeconds+")  " + gameSeconds +"sec.");
 			}
 			
