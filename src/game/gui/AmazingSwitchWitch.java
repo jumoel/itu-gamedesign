@@ -24,6 +24,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	private static PlayerView playerView1, playerView2;
 	
 	private static boolean shouldSwitchDreams = false;
+	private static boolean shouldSwitchPlayerBack = false;
 	
 	private PApplet ourPApplet;
 	
@@ -32,6 +33,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	private Level player1backup, player2backup;
 	private double player1xbackup, player1ybackup;
 	private double player2xbackup, player2ybackup;
+	private boolean player1switched, player2switched;
 	
 	
 	public AmazingSwitchWitch(PlayerView pv1, PlayerView pv2, PApplet papplet) {
@@ -43,6 +45,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		int b = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
 		
 		tintColor = ourPApplet.color(r, g, b);
+		player1switched = player2switched = false;
 	}
 	
 	public void swapPlayer1()
@@ -61,6 +64,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView1.setLevel(playerView2.getLevel());
 		
 		playerView2.drawOtherPlayer = true;
+		player1switched = true;
 	}
 	
 	public void resetPlayer1()
@@ -73,6 +77,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView1.setLevel(player1backup);
 		
 		playerView1.drawOwnPlayer = true;
+		player1switched = false;
 	}
 	
 	public void swapPlayer2()
@@ -91,6 +96,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView2.setLevel(playerView1.getLevel());
 		
 		playerView1.drawOtherPlayer = true;
+		player2switched = true;
 	}
 	
 	public void resetPlayer2()
@@ -103,6 +109,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView2.setLevel(player1backup);
 		
 		playerView2.drawOwnPlayer = true;
+		player2switched = false;
 	}
 
 	public void switchDreams() {
@@ -173,8 +180,9 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		while (awake) {
 			try
 			{
-				if (shouldSwitchDreams) switchDreams();
-				shouldSwitchDreams = false;
+				if (shouldSwitchDreams) {switchDreams(); shouldSwitchDreams = false;}
+				if (shouldSwitchPlayerBack) {switchPlayerBack(); shouldSwitchPlayerBack = false;}
+				
 				Thread.currentThread().sleep(200);
 			}
 			catch (InterruptedException e)
@@ -185,6 +193,16 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		}
 	}
 
+	private void switchPlayerBack()
+	{
+		// TODO Auto-generated method stub
+		if (this.player1switched) {
+			this.resetPlayer1();
+		} else {
+			this.resetPlayer2();
+		}
+	}
+
 	@Override
 	public void update(Observable o, Object arg)
 	{
@@ -192,6 +210,15 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 			switch((GameMaster.MSG)arg) {
 				case SWITCH_DREAMS:
 					shouldSwitchDreams = true;
+					break;
+				case DOORS_SPAWN_STOP:
+					shouldSwitchPlayerBack = true;
+					break;
+				case SWITCH_PLAYER_1:
+					this.swapPlayer1();
+					break;
+				case SWITCH_PLAYER_2:
+					this.swapPlayer2();
 					break;
 			}
 		}

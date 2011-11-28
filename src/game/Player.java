@@ -364,19 +364,17 @@ public class Player extends CollisionBox
 				map.put("IFUCKINGWON", myID);
 				this.notifyObservers(map);
 				Stereophone.playSound("310", "playerwon", 10000);
-			}
-
-			if (gameElement instanceof Creature) {
+			} else if (gameElement instanceof Creature) {
 				// player hit a creature
 				((Creature) gameElement).contact(this);
+			} else if (gameElement instanceof Door)
+			{
+				this.setChanged();
+				HashMap map = new HashMap();
+				map.put("OHDOORTAKEMEAWAY", myID);
+				this.notifyObservers(map);
 			}
 			
-			/*
-			if (gameElement instanceof Door)
-			{
-				
-			}
-			*/
 
 		} else {
 			this.soundHitBottomPlayed = false;

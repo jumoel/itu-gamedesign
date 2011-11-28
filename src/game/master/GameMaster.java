@@ -21,7 +21,7 @@ import processing.core.PApplet;
 public class GameMaster extends Observable implements Observer, Runnable
 {
 	public static enum MSG {SWITCH_DREAMS, SWITCH_ALERT_START, SWITCH_ALERT_STOP, 
-		DOORS_SPAWN_START, DOORS_SPAWN_STOP} 
+		DOORS_SPAWN_START, DOORS_SPAWN_STOP, SWITCH_PLAYER_1, SWITCH_PLAYER_2} 
 	
 	private final static int SWITCH_TIME_TILL_NEXT = BunnyHat.SETTINGS.getValue("gamerules/switch/timeTillNext"); 
 	private final static double SWITCH_TIME_VARIATION = BunnyHat.SETTINGS.getValue("gamerules/switch/timeVariation");
@@ -182,6 +182,14 @@ public class GameMaster extends Observable implements Observer, Runnable
 				/*if (((Integer)map.get("IFUCKINGWON"))==this.viewNumber) {
 					this.ownPlayerWon = true;
 				}*/
+			} else if (map.containsKey("OHDOORTAKEMEAWAY") && !gameOver) {
+				if ((Integer)map.get("OHDOORTAKEMEAWAY") == 1) {
+					this.setChanged();
+					this.notifyObservers(MSG.SWITCH_PLAYER_1);
+				} else {
+					this.setChanged();
+					this.notifyObservers(MSG.SWITCH_PLAYER_2);
+				}
 			}
 		}
 		
