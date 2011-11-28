@@ -42,6 +42,9 @@ public class PlayerView extends Updateable implements Observer
 	public boolean drawOwnPlayer = true;
 	public boolean drawOtherPlayer = false;
 	
+	public double xbackup;
+	public double ybackup;
+	
 	private int levelLength;
 	
 	private static int timeSlowingFactor;
@@ -179,8 +182,18 @@ public class PlayerView extends Updateable implements Observer
 		ownPlayer.update(deltaT);
 		
 		// Draw the player
-		int pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);
-		int pypos = (int) (ownPlayer.ypos * BunnyHat.TILEDIMENSION);
+		int pxpos, pypos;
+		
+		if (drawOwnPlayer)
+		{
+			pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);
+			pypos = (int) (ownPlayer.ypos * BunnyHat.TILEDIMENSION);
+		}
+		else
+		{
+			pxpos = (int) (xbackup * BunnyHat.TILEDIMENSION);
+			pypos = (int) (ybackup * BunnyHat.TILEDIMENSION);
+		}
 
 		int drawpxpos;
 		int drawpypos;
@@ -264,7 +277,39 @@ public class PlayerView extends Updateable implements Observer
 		
 		if (drawOtherPlayer)
 		{
+			int opxpos = (int) (otherPlayer.xpos * BunnyHat.TILEDIMENSION);
+			int opypos = (int) (otherPlayer.ypos * BunnyHat.TILEDIMENSION);
 			
+			if (opxpos < 0)
+			{
+				opxpos = 0;
+				otherPlayer.cannotMoveLeft = true;
+			}
+			
+			if (opxpos > level.levelWidth * BunnyHat.TILEDIMENSION)
+			{
+				opxpos = level.levelWidth * BunnyHat.TILEDIMENSION;
+				otherPlayer.cannotMoveRight = true;
+			}
+
+			if (opypos < 0)
+			{
+				opypos = 0;
+			}
+			
+			if (opypos + otherPlayer.getCurrentTexture().height > level.levelHeight * BunnyHat.TILEDIMENSION)
+			{
+				opypos = level.levelHeight * BunnyHat.TILEDIMENSION - otherPlayer.getCurrentTexture().height;
+			}
+			
+			int xdiff = opxpos - pxpos;
+			int ydiff = opypos - pypos;
+			
+
+			int drawopypos = drawpypos - ydiff;
+			int drawopxpos = drawpxpos + xdiff;
+			
+			drawImage(otherPlayer.getCurrentTexture(), cb, drawopxpos, drawopypos, Horizontal.MIDDLE, Vertical.BOTTOM);
 		}
 		
 		if (gameOver)

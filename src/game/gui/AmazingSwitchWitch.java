@@ -31,6 +31,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	private Level player1backup, player2backup;
 	private double player1xbackup, player1ybackup;
+	private double player2xbackup, player2ybackup;
 	
 	
 	public AmazingSwitchWitch(PlayerView pv1, PlayerView pv2, PApplet papplet) {
@@ -52,6 +53,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		player1xbackup = playerView1.getPlayer().xpos;
 		player1ybackup = playerView1.getPlayer().ypos;
+		playerView1.xbackup = player1xbackup;
+		playerView1.ybackup = player1ybackup;
 
 		playerView1.getPlayer().xpos = playerView2.getPlayer().xpos;
 		playerView1.getPlayer().ypos = playerView2.getPlayer().ypos;
@@ -70,6 +73,36 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView1.setLevel(player1backup);
 		
 		playerView1.drawOwnPlayer = true;
+	}
+	
+	public void swapPlayer2()
+	{
+		playerView2.drawOwnPlayer = false;
+		
+		player2backup = playerView2.getLevel();
+		
+		player2xbackup = playerView2.getPlayer().xpos;
+		player2ybackup = playerView2.getPlayer().ypos;
+		playerView2.xbackup = player2xbackup;
+		playerView2.ybackup = player2ybackup;
+
+		playerView2.getPlayer().xpos = playerView1.getPlayer().xpos;
+		playerView2.getPlayer().ypos = playerView1.getPlayer().ypos;
+		playerView2.setLevel(playerView1.getLevel());
+		
+		playerView1.drawOtherPlayer = true;
+	}
+	
+	public void resetPlayer2()
+	{
+		playerView1.drawOtherPlayer = false;
+		
+		playerView2.getPlayer().ypos = player2ybackup;
+		playerView2.getPlayer().xpos = player2xbackup;
+		
+		playerView2.setLevel(player1backup);
+		
+		playerView2.drawOwnPlayer = true;
 	}
 
 	public void switchDreams() {

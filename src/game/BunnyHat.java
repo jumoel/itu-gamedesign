@@ -249,6 +249,11 @@ public class BunnyHat extends PApplet implements Observer
 		{
 			switcher.swapPlayer1();
 		}
+		
+		if (key == 'm')
+		{
+			switcher.resetPlayer1();
+		}
 	}
 	
 	private void handleKeyMenuMain() {
