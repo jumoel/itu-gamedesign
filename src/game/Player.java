@@ -363,7 +363,12 @@ public class Player extends CollisionBox
 				this.notifyObservers(map);
 				Stereophone.playSound("310", "playerwon", 10000);
 			}
-			
+			/*
+			if (gameElement instanceof Door)
+			{
+				
+			}
+			*/
 		} else {
 			this.soundHitBottomPlayed = false;
 		}
