@@ -1,6 +1,7 @@
 package game.creatures;
 import processing.core.*;
 import game.BunnyHat;
+import game.CollisionBox;
 import game.Player;
 import game.graphics.Animation;
 import game.level.Level;
@@ -13,8 +14,9 @@ import game.level.Level;
  * @author samuelwalz
  *
  */
-public abstract class Creature
+public abstract class Creature extends CollisionBox
 {
+	
 	private PApplet processing;
 	private Animation idleAnimation;
 	private Animation interactAnimation;
@@ -26,6 +28,7 @@ public abstract class Creature
 	public int lastXPos;
 	public int lastYPos;
 	private int MOVESPEED = BunnyHat.SETTINGS.getValue("gameplay/creatures/speed");
+	private boolean moveRight = false;
 	
 	/*
 	 * effect types
@@ -35,7 +38,11 @@ public abstract class Creature
 	 */
 	private int effectType;
 	
-	public Creature(PApplet applet, int creatureNumber, int effect){
+	public Creature(PApplet applet, int creatureNumber, int effect, Level level){
+		super(level.spawnX + 0.5, level.spawnY + 0.5, 2, 3);
+		super.setLevel(level);
+		super.setGameElement(this);
+		
 		this.processing = applet;
 
 		this.idleAnimation = new Animation(processing, "graphics/animations/creature" + creatureNumber + "idle");
@@ -70,9 +77,19 @@ public abstract class Creature
 	
 	/* creature moves */
 	public void update(){
-		walkAnimation.start();
+		lastXPos = xPos;
+		/*
+		 * Implement collision with walls
+		 */
+		
+		if (moveRight){
+			xPos = xPos + MOVESPEED;
+		} else {
+			xPos = xPos - MOVESPEED;
+		}
 		
 		
+		 	
 		
 	}
 		
