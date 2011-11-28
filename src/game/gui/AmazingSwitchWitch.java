@@ -27,7 +27,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	private PApplet ourPApplet;
 	
-	private int tintColor; 
+	private int tintColor;
+	
+	private Level player1backup, player2backup;
+	private double player1xbackup, player1ybackup;
 	
 	
 	public AmazingSwitchWitch(PlayerView pv1, PlayerView pv2, PApplet papplet) {
@@ -39,6 +42,34 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		int b = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
 		
 		tintColor = ourPApplet.color(r, g, b);
+	}
+	
+	public void swapPlayer1()
+	{
+		playerView1.drawOwnPlayer = false;
+		
+		player1backup = playerView1.getLevel();
+		
+		player1xbackup = playerView1.getPlayer().xpos;
+		player1ybackup = playerView1.getPlayer().ypos;
+
+		playerView1.getPlayer().xpos = playerView2.getPlayer().xpos;
+		playerView1.getPlayer().ypos = playerView2.getPlayer().ypos;
+		playerView1.setLevel(playerView2.getLevel());
+		
+		playerView2.drawOtherPlayer = true;
+	}
+	
+	public void resetPlayer1()
+	{
+		playerView2.drawOtherPlayer = false;
+		
+		playerView1.getPlayer().ypos = player1ybackup;
+		playerView1.getPlayer().xpos = player1xbackup;
+		
+		playerView1.setLevel(player1backup);
+		
+		playerView1.drawOwnPlayer = true;
 	}
 
 	public void switchDreams() {

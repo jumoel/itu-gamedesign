@@ -22,7 +22,6 @@ public class PlayerView extends Updateable implements Observer
 	private int halfheight;
 	private PApplet processing;
 	
-	
 	private int viewNumber;
 	private int xCoordCamera;
 	private int xCoordCameraMiddle;
@@ -35,9 +34,13 @@ public class PlayerView extends Updateable implements Observer
 	
 	private Player ownPlayer;
 	private Player otherPlayer;
+	
 	private PlayerView otherPlayerView;
 	private boolean ownPlayerWon = false;
 	private boolean gameOver = false;
+
+	public boolean drawOwnPlayer = true;
+	public boolean drawOtherPlayer = false;
 	
 	private int levelLength;
 	
@@ -58,10 +61,12 @@ public class PlayerView extends Updateable implements Observer
 		ownPlayer.holdAnimation();
 		// getting the player y-Offset (distance above ground)
 	}
+	
 	public void switchExecute(Level lvl) {
 		setLevel(lvl);
 		//TODO: transfer player to same distance above ground
 	}
+	
 	public void switchFinish() {
 		ownPlayer.unholdAnimation();
 		switchHappening = false;
@@ -133,7 +138,10 @@ public class PlayerView extends Updateable implements Observer
 		{
 			ownPlayer.jump();
 			this.didJump = true;
-			if (BunnyHat.TWIN_JUMP) otherPlayer.jump();
+			if (BunnyHat.TWIN_JUMP)
+			{
+				otherPlayer.jump();
+			}
 		}
 		
 		if (leftbutton && ownPlayer != null)
@@ -249,19 +257,26 @@ public class PlayerView extends Updateable implements Observer
 		
 		drawLevelGraphics(cb, xpos, ypos);
 		
-		drawImage(ownPlayer.getCurrentTexture(), cb, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+		if (drawOwnPlayer)
+		{
+			drawImage(ownPlayer.getCurrentTexture(), cb, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+		}
 		
+		if (drawOtherPlayer)
+		{
+			
+		}
 		
-		
-		if (gameOver) drawLevelEndScreen(cb, xpos, ypos);
-		
-		
+		if (gameOver)
+		{
+			drawLevelEndScreen(cb, xpos, ypos);	
+		}
 	}
 	
 	private void drawLevelEndScreen(PGraphics graphics, int xpos, int ypos) {
 		// draw something cool!
 		graphics.fill(0, 0, 0);
-		graphics.text((ownPlayerWon?"WIN!!!":"LOOSE :/\n\npress q -> main screen"), xpos + width / 2, ypos + height / 3, 200, 100);
+		graphics.text((ownPlayerWon?"WIN!!!":"LOSE :/\n\npress q -> main screen"), xpos + width / 2, ypos + height / 3, 200, 100);
 	}
 	
 	private void drawLevelGraphics(PGraphics graphics, int xpos, int ypos)

@@ -207,33 +207,47 @@ public class BunnyHat extends PApplet implements Observer
 	}
 	
 	private void handleKeyGame() {
-		if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i')) {
+		if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i'))
+		{
 			//nothing for the moment
-		} else if (TWIN_JUMP_SPACEBAR && key == ' ') {
+		}
+		else if (TWIN_JUMP_SPACEBAR && key == ' ')
+		{
 			inputState.put('w', true);
 			inputState.put('i', true);
-		} else {
+		}
+		else {
 			inputState.put(key, true);
 		}
 		
 		if (key == 'd')
 		{
 			inputState.put('a', false);
-		}else if (key == 'a')
+		}
+		else if (key == 'a')
 		{
 			inputState.put('d', false);
-		} else if (key == 'j')
+		}
+		else if (key == 'j')
 		{
 			inputState.put('l', false);
-		} else if (key == 'l')
+		}
+		else if (key == 'l')
 		{
 			inputState.put('j', false);
-		} else if (key == 'f')
+		}
+		else if (key == 'f')
 		{
 			SHOW_FPS = !SHOW_FPS;
-		} else if (key == 'q') {
+		}
+		else if (key == 'q') {
 			gameMaster.stopGame();
 			currentView = Screens.MENU_MAIN;
+		}
+		
+		if (key == 'n')
+		{
+			switcher.swapPlayer1();
 		}
 	}
 	
@@ -286,19 +300,20 @@ public class BunnyHat extends PApplet implements Observer
 				(String)SETTINGS.getValue("levels/level"+level+"/good"), gameMaster);
 		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);
-		view1.setOtherPlayerView(view2); view2.setOtherPlayerView(view1);
+		view1.setOtherPlayerView(view2);
+		view2.setOtherPlayerView(view1);
+		
 		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
-		
+
 		sndCtrl.startListening();
-		
+
 		//setup and run game master
 		gameMaster.startGame();
-		
-		
+
 		// setup our special workers
 		switcher = new AmazingSwitchWitch(view1, view2, this);
 		switcher.wakeHer();
-		
+
 		// setup communication
 		gameMaster.addObserver(switcher); // listen for level switch message
 		

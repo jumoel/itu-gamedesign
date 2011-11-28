@@ -365,11 +365,19 @@ public class Player extends CollisionBox
 				this.notifyObservers(map);
 				Stereophone.playSound("310", "playerwon", 10000);
 			}
+
 			if (gameElement instanceof Creature) {
 				// player hit a creature
 				((Creature) gameElement).contact(this);
 			}
 			
+			/*
+			if (gameElement instanceof Door)
+			{
+				
+			}
+			*/
+
 		} else {
 			this.soundHitBottomPlayed = false;
 		}
