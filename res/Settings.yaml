@@ -22,6 +22,8 @@ gamerules:
   doors:
     playerMinDistance: 0.2
     doorDuration: 3000
+  creatures:
+    speed: 1
    
 gui:
   tiledimension: 24
