@@ -3,6 +3,7 @@ package game.master;
 import game.BunnyHat;
 import game.sound.Stereophone;
 
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -42,6 +43,8 @@ public class GameMaster extends Observable implements Observer, Runnable
 	private boolean switchHappening = false;
 	private boolean doorsHappening = false;
 	private boolean switchAlertStarted = false;
+	private boolean gameOver = false;
+	private int winner = -1; public int getWinner() {return winner;};
 	
 	//players
 	private class PlayerStats {
@@ -64,6 +67,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 	 * Yay! Let's play a game!
 	 */
 	public void startGame() {
+		msTillNextSwitch = getNewTimeTillNextSwitch();
 		runGame = true;
 		ourThread = new Thread(this);
 		ourThread.start();
@@ -132,7 +136,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 				if ((deltaT) >= timeStepSize) {
 					
 					// make up your mind about the game
-					makeDecisions(deltaT);
+					if (!gameOver) makeDecisions(deltaT);
 					
 					
 					lastFrameTime = currentTimeStamp;
@@ -171,7 +175,15 @@ public class GameMaster extends Observable implements Observer, Runnable
 	@Override
 	public void update(Observable arg0, Object arg1)
 	{
-		// TODO: receive interesting informations
+		if (arg1 instanceof HashMap) {
+			HashMap map = (HashMap)arg1;
+			if (map.containsKey("IFUCKINGWON") && !gameOver) {
+				this.gameOver = true;
+				/*if (((Integer)map.get("IFUCKINGWON"))==this.viewNumber) {
+					this.ownPlayerWon = true;
+				}*/
+			}
+		}
 		
 	}
 	

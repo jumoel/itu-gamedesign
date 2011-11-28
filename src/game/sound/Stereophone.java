@@ -30,7 +30,7 @@ public class Stereophone
 		snds = new HashMap();
 		for (int i = 0; i < sounds.length; i++) {
 			String firstThreeChars = sounds[i].getName().substring(0, 3);
-			System.out.println("file starts with:"+firstThreeChars);
+			//System.out.println("file starts with:"+firstThreeChars);
 			snds.put(firstThreeChars, sounds[i]);
 		}
 		soundCooldowns = new HashMap();

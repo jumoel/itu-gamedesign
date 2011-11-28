@@ -8,6 +8,7 @@ import game.BunnyHat;
 import game.Player;
 import game.State;
 import game.level.Level;
+import game.master.GameMaster;
 import processing.core.*;
 
 public class PlayerView extends Updateable implements Observer
@@ -30,6 +31,8 @@ public class PlayerView extends Updateable implements Observer
 	
 	private int playerPosition;
 
+	private GameMaster gameMaster;
+	
 	private Player ownPlayer;
 	private Player otherPlayer;
 	private PlayerView otherPlayerView;
@@ -74,7 +77,7 @@ public class PlayerView extends Updateable implements Observer
 		this.otherPlayer = pv.getPlayer();
 	}
 	
-	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath)
+	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath, GameMaster gameMaster)
 	{	
 		this.width = width;
 		this.halfwidth = this.width / 2;
@@ -82,7 +85,7 @@ public class PlayerView extends Updateable implements Observer
 		this.halfheight = this.height / 2;
 		
 		this.processing = applet;
-		
+		this.gameMaster = gameMaster;
 		
 		this.viewNumber = viewNumber;
 		
@@ -91,6 +94,7 @@ public class PlayerView extends Updateable implements Observer
 		
 		this.ownPlayer = new Player(processing, viewNumber, this.level);
 		this.ownPlayer.addObserver(this);
+		this.ownPlayer.addObserver(gameMaster);
 		
 		this.playerPosition = 0;
 		

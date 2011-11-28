@@ -10,7 +10,7 @@ gameplay:
     air: 0.2
   breakacceleration:
     ground: 1.0
-    air: 0.2
+    air: 0.5
   maxspeed: 2.5
 debug:
   fps: false

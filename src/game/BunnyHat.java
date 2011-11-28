@@ -279,17 +279,19 @@ public class BunnyHat extends PApplet implements Observer
 	}
 	
 	private void setupGame(int level) {
+		//setup game master
+		gameMaster = new GameMaster(this);
+		
 		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 1, 
-				(String)SETTINGS.getValue("levels/level"+level+"/good"));
+				(String)SETTINGS.getValue("levels/level"+level+"/good"), gameMaster);
 		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2,
-				(String)SETTINGS.getValue("levels/level"+level+"/bad"));
+				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);
 		view1.setOtherPlayerView(view2); view2.setOtherPlayerView(view1);
 		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
 		
 		sndCtrl.startListening();
 		
 		//setup and run game master
-		gameMaster = new GameMaster(this);
 		gameMaster.startGame();
 		
 		
@@ -299,6 +301,7 @@ public class BunnyHat extends PApplet implements Observer
 		
 		// setup communication
 		gameMaster.addObserver(switcher); // listen for level switch message
+		
 		//switcher.addObserver(view1);
 		//switcher.addObserver(view2);
 	}

@@ -42,7 +42,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	}
 
 	public void switchDreams() {
-		System.out.print("will switch dreams");
+		//System.out.print("will switch dreams");
 		Level l1, l2;
 		l1 = playerView1.getLevel();
 		l2 = playerView2.getLevel();
