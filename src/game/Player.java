@@ -1,10 +1,12 @@
 package game;
 import java.util.HashMap;
 
+
 import game.graphics.Animation;
 import game.gui.AmazingSwitchWitch;
 import game.level.Level;
 import game.sound.Stereophone;
+import game.creatures.Creature;
 import processing.core.*;
 import util.BImage;
 import util.BMath;
@@ -27,8 +29,8 @@ public class Player extends CollisionBox
 	public boolean cannotMoveRight;
 	
 	private double yAcceleration;
-	private double ySpeed;
-	private double xSpeed;
+	public double ySpeed;
+	public double xSpeed;
 	
 	private Facing facing;
 
@@ -363,12 +365,17 @@ public class Player extends CollisionBox
 				this.notifyObservers(map);
 				Stereophone.playSound("310", "playerwon", 10000);
 			}
+			if (gameElement instanceof Creature) {
+				// player hit a creature
+				((Creature) gameElement).contact(this);
+			}
 			
 		} else {
 			this.soundHitBottomPlayed = false;
 		}
 		
 		if (ySpeed != 0) isInAir = isJumping = true;
+		
 		
 		
 			
