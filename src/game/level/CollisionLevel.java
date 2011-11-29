@@ -4,6 +4,7 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import game.CollisionBox;
 import game.CollisionBox.Effects;
+import game.Door;
 import game.FinishLine;
 import game.Obstacle;
 
@@ -33,6 +34,9 @@ public abstract class CollisionLevel
 				} else if (getMetaDataAt(x, y) == Level.MetaTiles.FinishLine.index()) {
 					cBox = new FinishLine(processing, x, y, 1, 1);
 					cBox.setCollisionEffect(Effects.FINISH);
+				} else if (getMetaDataAt(x, y) == Level.MetaTiles.DoorSpawnPoint.index()) {
+					cBox = new Door(processing, x, y, 1, 1);
+					cBox.setCollisionEffect(Effects.STOP);
 				}
 				setBoxAt(x, y, cBox);
 			}

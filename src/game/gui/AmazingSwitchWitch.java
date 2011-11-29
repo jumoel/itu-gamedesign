@@ -4,6 +4,7 @@ import game.BunnyHat;
 import game.control.PatternDetector;
 import game.level.Level;
 import game.master.GameMaster;
+import game.util.Animator;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -35,6 +36,26 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	private double player2xbackup, player2ybackup;
 	private boolean player1switched, player2switched;
 	
+	// animate camera position
+	private class MoveCamera extends Animator {
+		private PlayerView pv;
+		
+		
+		public MoveCamera(int from, int to, int stepSize, int timeSpan, PlayerView pv)
+		{
+			super(from, to, stepSize, timeSpan);
+			this.pv = pv;
+			super.begin();
+		}
+
+		@Override
+		protected void applyValue(int value)
+		{
+			pv.cameraOffsetX = value;
+		}
+		
+	}
+	
 	
 	public AmazingSwitchWitch(PlayerView pv1, PlayerView pv2, PApplet papplet) {
 		playerView1 = pv1;
@@ -50,6 +71,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	public void swapPlayer1()
 	{
+		new MoveCamera(0, playerView2.getWidth()/2 - 100, 2, 1000, playerView2);
+		
 		playerView1.drawOwnPlayer = false;
 		
 		player1backup = playerView1.getLevel();
@@ -113,7 +136,6 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	}
 
 	public void switchDreams() {
-		//System.out.print("will switch dreams");
 		Level l1, l2;
 		l1 = playerView1.getLevel();
 		l2 = playerView2.getLevel();

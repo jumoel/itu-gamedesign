@@ -16,7 +16,7 @@ public class PlayerView extends Updateable implements Observer
 	private enum Horizontal { LEFT, RIGHT, MIDDLE }
 	private enum Vertical { TOP, BOTTOM, CENTER }
 	
-	private int width;
+	private int width; public int getWidth() {return width;}
 	private int halfwidth;
 	private int height;
 	private int halfheight;
@@ -39,13 +39,15 @@ public class PlayerView extends Updateable implements Observer
 	private boolean ownPlayerWon = false;
 	private boolean gameOver = false;
 
-	public boolean drawOwnPlayer = true;
-	public boolean drawOtherPlayer = false;
+	protected boolean drawOwnPlayer = true;
+	protected boolean drawOtherPlayer = false;
 	
 	private PGraphics buffer; 
 	
-	public double xbackup;
-	public double ybackup;
+	protected double xbackup;
+	protected double ybackup;
+	
+	protected int cameraOffsetX = 0;
 	
 	private int levelLength;
 	
@@ -231,11 +233,11 @@ public class PlayerView extends Updateable implements Observer
 		
 		// Place the player in the middle
 		xCoordCameraMiddle = pxpos;
-		xCoordCamera = xCoordCameraMiddle - halfwidth;
+		xCoordCamera = xCoordCameraMiddle - halfwidth + cameraOffsetX;
 		yCoordCameraMiddle = pypos;
 		yCoordCamera = yCoordCameraMiddle - halfheight;
 		
-		drawpxpos = halfwidth;
+		drawpxpos = halfwidth - cameraOffsetX;
 		drawpypos = halfheight;
 		
 		if (xCoordCamera < 0)
