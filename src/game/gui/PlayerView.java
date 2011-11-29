@@ -42,6 +42,8 @@ public class PlayerView extends Updateable implements Observer
 	public boolean drawOwnPlayer = true;
 	public boolean drawOtherPlayer = false;
 	
+	private PGraphics buffer; 
+	
 	public double xbackup;
 	public double ybackup;
 	
@@ -87,6 +89,8 @@ public class PlayerView extends Updateable implements Observer
 	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath, GameMaster gameMaster)
 	{	
+		this.buffer = applet.createGraphics(width, height, PConstants.JAVA2D);
+		
 		this.width = width;
 		this.halfwidth = this.width / 2;
 		this.height = height;
@@ -165,8 +169,11 @@ public class PlayerView extends Updateable implements Observer
 		}
 	}
 	
-	public void update(State state, int xpos, int ypos, int deltaT, PGraphics cb)
+	public void update(State state, int xpos, int ypos, int deltaT)
 	{	
+		buffer.beginDraw();
+		buffer.background(255);
+		
 		if (switchHappening) deltaT = 0; // freeze time
 
 		if (ownPlayer == null)
@@ -266,13 +273,13 @@ public class PlayerView extends Updateable implements Observer
 			yCoordCameraMiddle = yCoordCamera + halfheight;
 		}
 		
-		drawpypos = (BunnyHat.PLAYERVIEWTILEHEIGHT * BunnyHat.TILEDIMENSION - drawpypos) + ypos;
+		drawpypos = (BunnyHat.PLAYERVIEWTILEHEIGHT * BunnyHat.TILEDIMENSION - drawpypos);
 		
-		drawLevelGraphics(cb, xpos, ypos);
+		drawLevelGraphics(buffer);
 		
 		if (drawOwnPlayer)
 		{
-			drawImage(ownPlayer.getCurrentTexture(), cb, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+			drawImage(ownPlayer.getCurrentTexture(), buffer, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
 		}
 		
 		if (drawOtherPlayer)
@@ -309,22 +316,25 @@ public class PlayerView extends Updateable implements Observer
 			int drawopypos = drawpypos - ydiff;
 			int drawopxpos = drawpxpos + xdiff;
 			
-			drawImage(otherPlayer.getCurrentTexture(), cb, drawopxpos, drawopypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+			if (drawopypos < (yCoordCamera + this.height))drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.MIDDLE, Vertical.BOTTOM);
 		}
 		
 		if (gameOver)
 		{
-			drawLevelEndScreen(cb, xpos, ypos);	
+			drawLevelEndScreen(buffer);	
 		}
+		
+		buffer.endDraw();
+		processing.image(buffer, xpos, ypos);
 	}
 	
-	private void drawLevelEndScreen(PGraphics graphics, int xpos, int ypos) {
+	private void drawLevelEndScreen(PGraphics graphics) {
 		// draw something cool!
 		graphics.fill(0, 0, 0);
-		graphics.text((ownPlayerWon?"WIN!!!":"LOSE :/\n\npress q -> main screen"), xpos + width / 2, ypos + height / 3, 200, 100);
+		graphics.text((ownPlayerWon?"WIN!!!":"LOSE :/\n\npress q -> main screen"), width / 2, height / 3, 200, 100);
 	}
 	
-	private void drawLevelGraphics(PGraphics graphics, int xpos, int ypos)
+	private void drawLevelGraphics(PGraphics graphics)
 	{	
 		int minimumTileX = xCoordCamera / BunnyHat.TILEDIMENSION;
 		if (minimumTileX < 0)
@@ -364,7 +374,7 @@ public class PlayerView extends Updateable implements Observer
 				
 				if (tile != null)
 				{
-					graphics.image(tile, xcoord+xpos, ycoord+ypos);
+					graphics.image(tile, xcoord, ycoord);
 				}
 			}
 		}
@@ -389,8 +399,8 @@ public class PlayerView extends Updateable implements Observer
 		graphics.line(cameraSecondTileCoord, 0, cameraSecondTileCoord, graphics.height);
 		*/
 		
-		level.collisionDraw(graphics, xpos, ypos);
-		this.ownPlayer.collisionDraw(graphics, xpos, ypos);
+		level.collisionDraw(graphics, 0, 0);
+		this.ownPlayer.collisionDraw(graphics, 0, 0);
 		
 	}
 	

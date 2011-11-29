@@ -123,9 +123,9 @@ public class BunnyHat extends PApplet implements Observer
 
 	public void draw()
 	{
-		PGraphics cb = buffer;
+		/*PGraphics cb = buffer;
 		cb.beginDraw();
-		cb.background(255);
+		cb.background(255);*/
 		
 		lastTimestamp = currentTimestamp;
 		currentTimestamp = millis();
@@ -135,20 +135,20 @@ public class BunnyHat extends PApplet implements Observer
 		
 		switch (currentView) {
 		case INTRO:
-			drawIntroScreen(cb);
+			drawIntroScreen();
 			break;
 		case MENU_MAIN:
-			drawMenuMainScreen(cb);
+			drawMenuMainScreen();
 			break;
 		case GAME:
-			view1.update(inputState, LEFT, VIEW1Y, deltaT, cb);
-			view2.update(inputState, LEFT, VIEW2Y, deltaT, cb);
-			indicator.update(inputState, LEFT, RACEINDICATORY, deltaT, cb);
+			view1.update(inputState, LEFT, VIEW1Y, deltaT);
+			view2.update(inputState, LEFT, VIEW2Y, deltaT);
+			indicator.update(inputState, LEFT, RACEINDICATORY, deltaT);
 			break;
 		}
 		
-		cb.endDraw();
-		image(cb, 0, 0);
+		/*cb.endDraw();
+		image(cb, 0, 0);*/
 		
 		// Print the fps
 		if ((currentTimestamp - lastFpsTime) > 1000)
@@ -169,20 +169,20 @@ public class BunnyHat extends PApplet implements Observer
 		}
 	}
 
-	private void drawMenuMainScreen(PGraphics cb)
-	{
-		// TODO Auto-generated method stub
-		cb.background(255);
-		cb.fill(0);
-		cb.text("press 1 for level 1 and 2 for level 2 .) \n and q to quit this game..", width/2, height/2);
-	}
-
-	private void drawIntroScreen(PGraphics cb)
+	private void drawMenuMainScreen()
 	{
 		// TODO Auto-generated method stub
 		background(255);
-		cb.fill(0);
-		cb.text("d(^_^)b amaaazing intro screen - press space to go on!", width/2, height/2);
+		fill(0);
+		text("press 1 for level 1 and 2 for level 2 .) \n and q to quit this game..", width/2, height/2);
+	}
+
+	private void drawIntroScreen()
+	{
+		// TODO Auto-generated method stub
+		background(255);
+		fill(0);
+		text("d(^_^)b amaaazing intro screen - press space to go on!", width/2, height/2);
 	}
 
 	public static void main(String args[])
