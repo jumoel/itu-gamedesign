@@ -96,8 +96,6 @@ public class Player extends CollisionBox
 		
 		this.processing = applet;
 		
-		
-		
 		xSpeed = ySpeed = yAcceleration = 0.0;
 		
 		this.level = level;

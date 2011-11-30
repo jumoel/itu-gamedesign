@@ -21,6 +21,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	private static boolean awake = false;
 	
 	private final static int SWITCH_DURATION = 2000;
+	private final static int DOOR_CAMERA_MOVE_DURATION = 500;
 	
 	private static PlayerView playerView1, playerView2;
 	
@@ -54,6 +55,65 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		protected void applyValue(int value)
 		{
 			pv.cameraOffsetX = value;
+		}
+		
+	}
+	
+	//shake camera
+	private class ShakeCameraX extends Animator {
+		private PlayerView pv;
+
+		public ShakeCameraX(int from, int to, int stepSize, int timeSpan, PlayerView pv)
+		{
+			super(from, to, stepSize, timeSpan, true);
+			this.pv = pv;
+			super.begin();
+		}
+
+		@Override
+		protected void applyValue(int value)
+		{
+			this.pv.cameraOffsetX = value;
+		}
+		
+	}
+	
+	private class ShakeCameraY extends Animator {
+		private PlayerView pv;
+
+		public ShakeCameraY(int from, int to, int stepSize, int timeSpan, PlayerView pv)
+		{
+			super(from, to, stepSize, timeSpan, true);
+			this.pv = pv;
+			super.begin();
+		}
+
+		@Override
+		protected void applyValue(int value)
+		{
+			this.pv.cameraOffsetY = value;
+		}
+		
+	}
+	
+	private class ShakeCamera extends Animator {
+		Animator shakeX, shakeY;
+
+		public ShakeCamera(PlayerView pv)
+		{
+			super(0, 10, 1000);
+			shakeX = new ShakeCameraX(0, 55, 2, 100, pv);
+			shakeY = new ShakeCameraY(0, 51, 2, 119, pv);
+			super.begin();
+		}
+
+		@Override
+		protected void applyValue(int value)
+		{
+			if (value == 10) {
+				shakeX.finishLoop();
+				shakeY.finishLoop();
+			}
 		}
 		
 	}
@@ -92,17 +152,12 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView1 = pv1;
 		playerView2 = pv2;
 		ourPApplet = papplet;
-		/*int r = BunnyHat.SETTINGS.getValue("gui/colors/tintr");
-		int g = BunnyHat.SETTINGS.getValue("gui/colors/tintg");
-		int b = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
-		
-		tintColor = ourPApplet.color(r, g, b);*/
 		player1switched = player2switched = false;
 	}
 	
 	public void swapPlayer1()
 	{
-		new MoveCamera(0, playerView2.getWidth()/2 - 100, 2, 1000, playerView2);
+		new MoveCamera(0, playerView2.getWidth()/2 - 100, 2, DOOR_CAMERA_MOVE_DURATION, playerView2);
 		
 		playerView1.drawOwnPlayer = false;
 		
@@ -123,6 +178,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	public void resetPlayer1()
 	{
+		new MoveCamera(playerView2.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, playerView2);
+		
 		playerView2.drawOtherPlayer = false;
 		
 		playerView1.getPlayer().ypos = player1ybackup;
@@ -136,6 +193,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	public void swapPlayer2()
 	{
+		new MoveCamera(0, playerView1.getWidth()/2 - 100, 2, DOOR_CAMERA_MOVE_DURATION, playerView1);
+		
 		playerView2.drawOwnPlayer = false;
 		
 		player2backup = playerView2.getLevel();
@@ -155,6 +214,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	public void resetPlayer2()
 	{
+		new MoveCamera(playerView1.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, playerView1);
+		
 		playerView1.drawOtherPlayer = false;
 		
 		playerView2.getPlayer().ypos = player2ybackup;
@@ -171,9 +232,9 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		// show first door
 		if (number == 1) {
-			playerView1.setupDoor();
+			playerView1.showDoor();
 		} else {
-			playerView2.setupDoor();
+			playerView2.showDoor();
 		}
 		
 		//move camera 
@@ -196,9 +257,9 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		// show 2nd door
 		if (number == 1) {
-			playerView2.setupDoor();
+			playerView2.showDoor();
 		} else {
-			playerView1.setupDoor();
+			playerView1.showDoor();
 		}
 		
 	}
@@ -309,10 +370,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 					shouldSpawnDoors = true;
 					break;
 				case SWITCH_PLAYER_1:
-					this.swapPlayer1();
+					if (!(this.player1switched || this.player2switched)) this.swapPlayer1();
 					break;
 				case SWITCH_PLAYER_2:
-					this.swapPlayer2();
+					if (!(this.player1switched || this.player2switched)) this.swapPlayer2();
 					break;
 			}
 		}

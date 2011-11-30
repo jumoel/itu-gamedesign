@@ -53,6 +53,7 @@ public class PlayerView extends Updateable implements Observer
 	protected double ybackup;
 	
 	protected int cameraOffsetX = 0;
+	protected int cameraOffsetY = 0;
 	
 	private int levelLength;
 	
@@ -86,7 +87,12 @@ public class PlayerView extends Updateable implements Observer
 	}
 	
 	// show the next best door
-	protected void setupDoor() {
+	protected void showDoor() {
+		 
+	}
+	
+	//remove all doors
+	protected void blowDoor() {
 		
 	}
 	
@@ -255,10 +261,10 @@ public class PlayerView extends Updateable implements Observer
 		xCoordCameraMiddle = pxpos;
 		xCoordCamera = xCoordCameraMiddle - halfwidth + cameraOffsetX;
 		yCoordCameraMiddle = pypos;
-		yCoordCamera = yCoordCameraMiddle - halfheight;
+		yCoordCamera = yCoordCameraMiddle - halfheight + cameraOffsetY;
 		
 		drawpxpos = halfwidth - cameraOffsetX;
-		drawpypos = halfheight;
+		drawpypos = halfheight - cameraOffsetY;
 		
 		if (xCoordCamera < 0)
 		{
@@ -365,31 +371,47 @@ public class PlayerView extends Updateable implements Observer
 		graphics.text((ownPlayerWon?"WIN!!!":"LOSE :/\n\npress q -> main screen"), width / 2, height / 3, 200, 100);
 	}
 	
-	private void drawLevelGraphics(PGraphics graphics)
-	{	
+	private int getMinimumTileX() {
 		int minimumTileX = xCoordCamera / BunnyHat.TILEDIMENSION;
 		if (minimumTileX < 0)
 		{
 			minimumTileX = 0;
 		}
-		
-		int maximumTileX = (xCoordCamera + this.width) / BunnyHat.TILEDIMENSION;
+		return minimumTileX;
+	}
+	private int getMaximumTileX() {
+		int maximumTileX= (xCoordCamera + this.width) / BunnyHat.TILEDIMENSION;
 		if (maximumTileX > level.levelWidth)
 		{
 			maximumTileX = level.levelWidth;
 		}
-		
+		return maximumTileX;
+	}
+	private int getMinimumTileY() {
 		int minimumTileY = yCoordCamera / BunnyHat.TILEDIMENSION;
 		if (minimumTileY < 0)
 		{
 			minimumTileY = 0;
 		}
-		
+		return minimumTileY;
+	}
+	private int getMaximumTileY() {
 		int maximumTileY = ((yCoordCamera + this.height) / BunnyHat.TILEDIMENSION)+1;
 		if (maximumTileY > level.levelHeight)
 		{
 			maximumTileY = level.levelHeight;
 		}
+		return maximumTileY;
+	}
+	
+	// drawing the level graphics
+	private void drawLevelGraphics(PGraphics graphics)
+	{	
+		int minimumTileX = getMinimumTileX();
+		int maximumTileX = getMaximumTileX();
+		
+		int minimumTileY = getMinimumTileY();
+		int maximumTileY = getMaximumTileY();
 		
 		// Counting y from down towards the sky
 		for (int reversey = minimumTileY; reversey <= maximumTileY; reversey++)
