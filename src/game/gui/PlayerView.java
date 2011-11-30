@@ -44,8 +44,10 @@ public class PlayerView extends Updateable implements Observer
 	
 	private PGraphics buffer; 
 	private PGraphics colorLayer; 
-	protected int colorLayerVisibility; 
-	private int colorLayerColor;
+	protected int colorLayerVisibility = 0;
+	private int[] colorLayerColor;
+	
+	protected double physicsTimeFactor = 1.0;
 	
 	protected double xbackup;
 	protected double ybackup;
@@ -101,12 +103,14 @@ public class PlayerView extends Updateable implements Observer
 	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath, GameMaster gameMaster)
 	{	
 		this.buffer = applet.createGraphics(width, height, PConstants.JAVA2D);
-		this.colorLayer = applet.createGraphics(width, height, PConstants.JAVA2D);
-		int r = BunnyHat.SETTINGS.getValue("gui/colors/tintr");
-		int g = BunnyHat.SETTINGS.getValue("gui/colors/tintg");
-		int b = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
-		this.colorLayerColor = buffer.color(r, g, b);
-		this.colorLayer.background(colorLayerColor, colorLayerVisibility);
+		this.colorLayerColor = new int[3];
+		colorLayerColor[0] = BunnyHat.SETTINGS.getValue("gui/colors/tintr");
+		colorLayerColor[1] = BunnyHat.SETTINGS.getValue("gui/colors/tintg");
+		colorLayerColor[2] = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
+		
+		
+		
+		//this.colorLayer.background(colorLayerColor, colorLayerVisibility);
 		
 		this.width = width;
 		this.halfwidth = this.width / 2;
@@ -191,7 +195,8 @@ public class PlayerView extends Updateable implements Observer
 		buffer.beginDraw();
 		buffer.background(255);
 		
-		if (switchHappening) deltaT = 0; // freeze time
+		//if (switchHappening) deltaT = 0; // freeze time
+		deltaT = (int)(deltaT * this.physicsTimeFactor);
 
 		if (ownPlayer == null)
 		{
@@ -342,8 +347,13 @@ public class PlayerView extends Updateable implements Observer
 		}
 		// put some color on, babe!
 		if (colorLayerVisibility > 0) {
-			colorLayer.background(colorLayerColor, colorLayerVisibility);
-			buffer.image(colorLayer, 0, 0);
+			//colorLayer.beginDraw();
+			//colorLayer.background(colorLayerColor, colorLayerVisibility);
+			//colorLayer.endDraw();
+			//buffer.image(colorLayer, 0, 0);
+			buffer.noStroke();
+			buffer.fill(colorLayerColor[0], colorLayerColor[1], colorLayerColor[2], colorLayerVisibility);
+			buffer.rect(0, 0, width, height);
 		}
 		buffer.endDraw();
 		processing.image(buffer, xpos, ypos);

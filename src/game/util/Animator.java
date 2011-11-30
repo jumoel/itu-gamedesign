@@ -7,14 +7,19 @@ public abstract class Animator implements Runnable
 	private int currentValue;
 	private int stepSize;
 	private int maximumValue;
+	private boolean backwards;
 	
 	public Animator(int from, int to, int stepSize, int timeSpan) {
-		int stepNumber = (to - from)/stepSize;
+		// count backwards or forward?
+		this.backwards =  (from > to);
+		
+		int stepNumber = (backwards?(from - to):(to - from))/stepSize;
 		
 		// setup stuff
 		this.currentValue = from;
 		this.intervalLength = timeSpan / stepNumber;
 		this.maximumValue = to;
+		
 		this.stepSize = stepSize;
 		
 		
@@ -43,8 +48,15 @@ public abstract class Animator implements Runnable
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			this.currentValue += this.stepSize;
-			if (this.currentValue < this.maximumValue) {
+			//direction dependent value change
+			if (backwards) {
+				this.currentValue -= this.stepSize;
+			} else {
+				this.currentValue += this.stepSize;
+			}
+			// end reached?
+			if ((this.currentValue < this.maximumValue && !backwards)
+					|| (this.currentValue > this.maximumValue && backwards)) {
 				this.applyValue(this.currentValue);
 			} else {
 				this.applyValue(this.maximumValue);

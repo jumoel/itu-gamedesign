@@ -20,7 +20,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	private Thread ourThread;
 	private static boolean awake = false;
 	
-	private final static int SWITCH_SLEEP = 500;
+	private final static int SWITCH_DURATION = 2000;
 	
 	private static PlayerView playerView1, playerView2;
 	
@@ -58,16 +58,45 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 	}
 	
+	// make a nice switch transition
+	private class SwitchTransition extends Animator {
+		private PlayerView pv1, pv2;
+
+		public SwitchTransition(int from, int to, int stepSize, int timeSpan, 
+				PlayerView pv1, PlayerView pv2)
+		{
+			super(from, to, stepSize, timeSpan);
+			this.pv1 = pv1; this.pv2 = pv2;
+			super.begin();
+		}
+
+		@Override
+		protected void applyValue(int value)
+		{
+			pv1.colorLayerVisibility = pv2.colorLayerVisibility = value;
+			if (value == 0) {
+				pv1.physicsTimeFactor = pv2.physicsTimeFactor = 1.0;
+			} else if (value > 0 && value < 100) {
+				pv1.physicsTimeFactor = pv2.physicsTimeFactor = 0.5;
+			} else if (value >= 100 && value < 200) {
+				pv1.physicsTimeFactor = pv2.physicsTimeFactor = 0.1;
+			} else {
+				pv1.physicsTimeFactor = pv2.physicsTimeFactor = 0.0;
+			}
+		}
+		
+	}
+	
 	
 	public AmazingSwitchWitch(PlayerView pv1, PlayerView pv2, PApplet papplet) {
 		playerView1 = pv1;
 		playerView2 = pv2;
 		ourPApplet = papplet;
-		int r = BunnyHat.SETTINGS.getValue("gui/colors/tintr");
+		/*int r = BunnyHat.SETTINGS.getValue("gui/colors/tintr");
 		int g = BunnyHat.SETTINGS.getValue("gui/colors/tintg");
 		int b = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
 		
-		tintColor = ourPApplet.color(r, g, b);
+		tintColor = ourPApplet.color(r, g, b);*/
 		player1switched = player2switched = false;
 	}
 	
@@ -181,14 +210,11 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView1.switchPrepare();
 		playerView2.switchPrepare();
 
-		
+		new SwitchTransition(0, 255, 3, SWITCH_DURATION/2, playerView1, playerView2);
 		
 		try
 		{
-			for (int i = 0; i < 255; i += 10) {
-				Thread.currentThread().sleep(SWITCH_SLEEP/25);
-				ourPApplet.tint(tintColor, i);
-			}
+			Thread.currentThread().sleep(SWITCH_DURATION/2);
 		}
 		catch (InterruptedException e)
 		{
@@ -199,12 +225,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView1.switchExecute(l2);
 		playerView2.switchExecute(l1);
 		
+		new SwitchTransition(255, 0, 2, SWITCH_DURATION/2, playerView1, playerView2);
 		try
 		{
-			for (int i = 255; i > 0; i -= 10) {
-				Thread.currentThread().sleep(SWITCH_SLEEP/25);
-				ourPApplet.tint(tintColor, i);
-			}
+			Thread.currentThread().sleep(SWITCH_DURATION/2);
 		}
 		catch (InterruptedException e)
 		{
