@@ -161,7 +161,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		playerView1.drawOwnPlayer = false;
 		
-		player1backup = playerView1.getLevel();
+		//player1backup = playerView1.getLevel();
+		playerView1.getPlayer().setLevel(playerView2.getLevel());
 		
 		player1xbackup = playerView1.getPlayer().xpos;
 		player1ybackup = playerView1.getPlayer().ypos;
@@ -170,7 +171,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 
 		playerView1.getPlayer().xpos = playerView2.getPlayer().xpos;
 		playerView1.getPlayer().ypos = playerView2.getPlayer().ypos;
-		playerView1.setLevel(playerView2.getLevel());
+		//playerView1.setLevel(playerView2.getLevel());
 		
 		playerView2.drawOtherPlayer = true;
 		player1switched = true;
@@ -185,7 +186,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView1.getPlayer().ypos = player1ybackup;
 		playerView1.getPlayer().xpos = player1xbackup;
 		
-		playerView1.setLevel(player1backup);
+		//playerView1.setLevel(player1backup);
+		playerView1.getPlayer().setLevel(playerView1.getLevel());
 		
 		playerView1.drawOwnPlayer = true;
 		player1switched = false;
@@ -197,7 +199,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		playerView2.drawOwnPlayer = false;
 		
-		player2backup = playerView2.getLevel();
+		//player2backup = playerView2.getLevel();
+		playerView2.getPlayer().setLevel(playerView1.getLevel());
 		
 		player2xbackup = playerView2.getPlayer().xpos;
 		player2ybackup = playerView2.getPlayer().ypos;
@@ -206,7 +209,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 
 		playerView2.getPlayer().xpos = playerView1.getPlayer().xpos;
 		playerView2.getPlayer().ypos = playerView1.getPlayer().ypos;
-		playerView2.setLevel(playerView1.getLevel());
+		//playerView2.setLevel(playerView1.getLevel());
 		
 		playerView1.drawOtherPlayer = true;
 		player2switched = true;
@@ -221,7 +224,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView2.getPlayer().ypos = player2ybackup;
 		playerView2.getPlayer().xpos = player2xbackup;
 		
-		playerView2.setLevel(player1backup);
+		//playerView2.setLevel(player1backup);
+		playerView2.getPlayer().setLevel(playerView2.getLevel());
 		
 		playerView2.drawOwnPlayer = true;
 		player2switched = false;
