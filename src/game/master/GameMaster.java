@@ -112,7 +112,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 		
 		// time for some doors?
 		if (!doorsHappening) {
-			//TODO: measure distance, decide
+			
 		} else {
 			//TODO: doors are happening : countdown & stuff
 			

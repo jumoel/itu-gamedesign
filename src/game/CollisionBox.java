@@ -19,7 +19,7 @@ import processing.core.PGraphics;
  */
 public abstract class CollisionBox extends Observable
 {
-	public enum Effects {STOP, BOUNCE, SLOW_DOWN, FINISH}
+	public enum Effects {STOP, BOUNCE, SLOW_DOWN, FINISH, NONE}
 	private Effects collisionEffect = Effects.STOP;
 	
 	private Level collisionLevel;
@@ -68,6 +68,14 @@ public abstract class CollisionBox extends Observable
 		return this.cBox.height;
 	}
 	
+	public double x() {
+		return this.cBox.x;
+	}
+	
+	public double y() {
+		return this.cBox.y;
+	}
+	
 	protected void setGameElement(Object gameElement) {
 		this.gameElement = gameElement;
 	}
@@ -89,7 +97,7 @@ public abstract class CollisionBox extends Observable
 	 * @param x
 	 * @param y
 	 */
-	protected void updatePosition(double x, double y) {
+	public void updatePosition(double x, double y) {
 		cBox.setRect(x, y, cBox.width, cBox.height);
 	}
 	

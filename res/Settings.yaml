@@ -11,7 +11,7 @@ gameplay:
   breakacceleration:
     ground: 1.0
     air: 0.5
-  maxspeed: 2.5
+  maxspeed: 2.0
 debug:
   fps: false
 gamerules:
@@ -36,6 +36,21 @@ gui:
 graphics:
   animations:
     animationpath: animations/
+    doorShow:
+      path: objects/doorappeartemp.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    doorStay:
+      path: objects/doortemp.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    doorBlow:
+      path: objects/doordisappeartemp.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     player1run:
       path: dreamrunevensmaller48x72.png
       framewidth: 48

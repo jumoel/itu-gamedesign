@@ -5,6 +5,8 @@ import java.util.Observable;
 import java.util.Observer;
 
 import game.BunnyHat;
+import game.CollisionBox.Effects;
+import game.Door;
 import game.Player;
 import game.State;
 import game.level.Level;
@@ -57,7 +59,10 @@ public class PlayerView extends Updateable implements Observer
 	
 	private int levelLength;
 	
-	private static int timeSlowingFactor;
+	private int timeSlowingFactor;
+	
+	private Door ownDoor;
+	private boolean drawOwnDoor = false;
 	
 	private Level level; public void setLevel(Level lvl) {level = lvl; ownPlayer.setLevel(lvl);}
 	
@@ -88,12 +93,34 @@ public class PlayerView extends Updateable implements Observer
 	
 	// show the next best door
 	protected void showDoor() {
-		 
+		for (int x = this.getMaximumTileX(); x > this.getMinimumTileX(); x--) {
+			for (int y = this.getMinimumTileX(); y < this.getMaximumTileY(); y++) {
+				if (this.level.getMetaDataAt(x, y) == Level.MetaTiles.DoorSpawnPoint.index()) {
+					this.ownDoor.updatePosition(x, y);
+					System.out.println(x+":"+y);
+					this.level.setDoorAt(x, y, this.ownDoor);
+					this.ownDoor.showDoor();
+					this.drawOwnDoor = true;
+					break;
+				}
+			}
+		}
 	}
 	
 	//remove all doors
 	protected void blowDoor() {
-		
+		this.ownDoor.blowDoor();
+		try
+		{
+			Thread.currentThread().sleep(500);
+		}
+		catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		this.drawOwnDoor = false;
+		this.level.removeDoorAt((int)this.ownDoor.x(), (int)this.ownDoor.y());
 	}
 	
 	protected Player getPlayer() {
@@ -114,6 +141,8 @@ public class PlayerView extends Updateable implements Observer
 		colorLayerColor[1] = BunnyHat.SETTINGS.getValue("gui/colors/tintg");
 		colorLayerColor[2] = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
 		
+		this.ownDoor = new Door(applet, 0,0,2,3);
+		this.ownDoor.setCollisionEffect(Effects.NONE);
 		
 		
 		//this.colorLayer.background(colorLayerColor, colorLayerVisibility);
@@ -305,6 +334,8 @@ public class PlayerView extends Updateable implements Observer
 		
 		drawLevelGraphics(buffer);
 		
+		
+		
 		if (drawOwnPlayer)
 		{
 			drawImage(ownPlayer.getCurrentTexture(), buffer, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
@@ -344,8 +375,10 @@ public class PlayerView extends Updateable implements Observer
 			int drawopypos = drawpypos - ydiff;
 			int drawopxpos = drawpxpos + xdiff;
 			
-			if (drawopypos < (yCoordCamera + this.height))drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+			drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.MIDDLE, Vertical.BOTTOM);	
 		}
+		
+		
 		
 		if (gameOver)
 		{
@@ -428,6 +461,10 @@ public class PlayerView extends Updateable implements Observer
 				if (tile != null)
 				{
 					graphics.image(tile, xcoord, ycoord);
+				}
+				
+				if (drawOwnDoor && ownDoor.x() == x && ownDoor.y() == reversey) {
+					graphics.image(ownDoor.getCurrentTexture(), xcoord, ycoord - BunnyHat.TILEDIMENSION * 2);
 				}
 			}
 		}

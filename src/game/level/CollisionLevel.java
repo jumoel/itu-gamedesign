@@ -40,6 +40,22 @@ public abstract class CollisionLevel
 		}
 	}
 	
+	public void setDoorAt(int x, int y, CollisionBox door) {
+		for (int xOff = 0; xOff < 2; xOff++) {
+			for (int yOff = 0; yOff < 3; yOff++) {
+				setBoxAt(x+xOff, y+yOff, door);
+			}
+		}
+	}
+	
+	public void removeDoorAt(int x, int y) {
+		for (int xOff = 0; xOff < 2; xOff++) {
+			for (int yOff = 0; yOff < 3; yOff++) {
+				setBoxAt(x+xOff, y+yOff, null);
+			}
+		}
+	}
+	
 	public CollisionBox getBoxAt(int x, int y) {
 		int index = levelWidth*y + x;
 		if (index < 0 || index > fixedObjects.length) {

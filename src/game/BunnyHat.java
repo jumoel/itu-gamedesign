@@ -243,17 +243,24 @@ public class BunnyHat extends PApplet implements Observer
 		else if (key == 'q') {
 			gameMaster.stopGame();
 			currentView = Screens.MENU_MAIN;
-		}
-		
-		if (key == 'n')
+		} else if (key == 'n')
 		{
 			switcher.swapPlayer1();
 		}
-		
-		if (key == 'm')
+		else if (key == 'm')
 		{
 			switcher.resetPlayer1();
 		}
+		else if (key == '1')
+		{
+			switcher.setupDoors(1);
+		}
+		else if (key == '2') 
+		{
+			switcher.setupDoors(2);
+		}
+		
+		
 	}
 	
 	private void handleKeyMenuMain() {

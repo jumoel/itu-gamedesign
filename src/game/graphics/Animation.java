@@ -24,8 +24,15 @@ public class Animation
 	private boolean holdAnimations;
 	private int timeOnStop;
 	
+	private boolean loop;
+	
+	
 	public Animation(PApplet p, String settingskey)
 	{
+		this.setupAnimation(p, settingskey);
+	}
+	
+	private void setupAnimation(PApplet p, String settingskey) {
 		int fps = BunnyHat.SETTINGS.getValue(settingskey + "/fps");
 		int width = BunnyHat.SETTINGS.getValue(settingskey + "/framewidth");
 		int height = BunnyHat.SETTINGS.getValue(settingskey + "/frameheight");
@@ -53,6 +60,11 @@ public class Animation
 	
 	public void start()
 	{
+		this.start(true);
+	}
+	
+	public void start(boolean loop) {
+		this.loop = loop;
 		this.isRunning = true;
 		this.startTime = processing.millis();
 	}
@@ -75,6 +87,15 @@ public class Animation
 		int timeindex = diff % 1000;
 		
 		int frame = (timeindex / millisPerFrame) % numberOfFrames;
+		if (!loop) {
+			timeindex = time - startTime;
+			frame = (timeindex / millisPerFrame);
+			if (frame >= numberOfFrames)
+			{
+				frame = numberOfFrames -1;
+				this.isRunning = false;
+			}
+		} 
 		
 		if (frame < 0) frame = 0;
 		if (frame < numberOfFrames)
@@ -92,13 +113,8 @@ public class Animation
 	
 	public void holdAnimation()
 	{
-		
-				this.timeOnStop = this.processing.millis();
-				this.holdAnimations = true;
-		
-		
-		
-		
+		this.timeOnStop = this.processing.millis();
+		this.holdAnimations = true;
 	}
 	
 	public void unholdAnimation() {
