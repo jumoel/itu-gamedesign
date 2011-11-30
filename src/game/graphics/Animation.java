@@ -93,7 +93,7 @@ public class Animation
 			if (frame >= numberOfFrames)
 			{
 				frame = numberOfFrames -1;
-				this.isRunning = false;
+				//this.isRunning = false;
 			}
 		} 
 		

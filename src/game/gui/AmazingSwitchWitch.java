@@ -232,9 +232,9 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		// show first door
 		if (number == 1) {
-			playerView1.showDoor();
+			playerView1.initShowDoor();
 		} else {
-			playerView2.showDoor();
+			playerView2.initShowDoor();
 		}
 		
 		//move camera 
@@ -257,11 +257,16 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		// show 2nd door
 		if (number == 1) {
-			playerView2.showDoor();
+			playerView2.initShowDoor();
 		} else {
-			playerView1.showDoor();
+			playerView1.initShowDoor();
 		}
 		
+	}
+	
+	public void blowDoors() {
+		playerView1.initBlowDoor();
+		playerView2.initBlowDoor();
 	}
 
 	public void switchDreams() {

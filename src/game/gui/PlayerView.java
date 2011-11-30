@@ -63,6 +63,9 @@ public class PlayerView extends Updateable implements Observer
 	
 	private Door ownDoor;
 	private boolean drawOwnDoor = false;
+	private boolean shouldShowDoor = false;
+	private boolean shouldBlowDoor = false;
+	
 	
 	private Level level; public void setLevel(Level lvl) {level = lvl; ownPlayer.setLevel(lvl);}
 	
@@ -74,6 +77,8 @@ public class PlayerView extends Updateable implements Observer
 	
 	//dream switch interaction methods
 	public Level getLevel() {return level;}
+	
+	
 	
 	public void switchPrepare() { 
 		switchHappening = true;
@@ -91,10 +96,29 @@ public class PlayerView extends Updateable implements Observer
 		switchHappening = false;
 	}
 	
+	protected void initShowDoor() {
+		this.shouldShowDoor = true;
+	}
+	
+	protected void initBlowDoor() {
+		this.shouldBlowDoor = true;
+	}
+	
+	
 	// show the next best door
 	protected void showDoor() {
-		for (int x = this.getMaximumTileX(); x > this.getMinimumTileX(); x--) {
-			for (int y = this.getMinimumTileX(); y < this.getMaximumTileY(); y++) {
+		System.out.println("show them the doors - maxX:"+getMaximumTileX()+" minX:"+getMinimumTileX());
+		// Counting y from down towards the sky
+		int minimumTileX = getMinimumTileX();
+		int maximumTileX = getMaximumTileX();
+		
+		int minimumTileY = getMinimumTileY();
+		int maximumTileY = getMaximumTileY();
+		for (int y = minimumTileY; y <= maximumTileY; y++)
+		{
+			// Counting x from left towards right
+			for (int x = minimumTileX; x <= maximumTileX; x++)
+			{		
 				if (this.level.getMetaDataAt(x, y) == Level.MetaTiles.DoorSpawnPoint.index()) {
 					this.ownDoor.updatePosition(x, y);
 					System.out.println(x+":"+y);
@@ -109,18 +133,9 @@ public class PlayerView extends Updateable implements Observer
 	
 	//remove all doors
 	protected void blowDoor() {
-		this.ownDoor.blowDoor();
-		try
-		{
-			Thread.currentThread().sleep(500);
-		}
-		catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		this.drawOwnDoor = false;
 		this.level.removeDoorAt((int)this.ownDoor.x(), (int)this.ownDoor.y());
+		this.ownDoor.blowDoor();
+		//this.drawOwnDoor = false;
 	}
 	
 	protected Player getPlayer() {
@@ -227,6 +242,9 @@ public class PlayerView extends Updateable implements Observer
 	
 	public void update(State state, int xpos, int ypos, int deltaT)
 	{	
+		if (this.shouldShowDoor) {this.showDoor(); this.shouldShowDoor = false;}
+		if (this.shouldBlowDoor) {this.blowDoor(); this.shouldBlowDoor = false;}
+		
 		buffer.beginDraw();
 		buffer.background(255);
 		

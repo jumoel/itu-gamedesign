@@ -259,7 +259,10 @@ public class BunnyHat extends PApplet implements Observer
 		{
 			switcher.setupDoors(2);
 		}
-		
+		else if (key == '3')
+		{
+			switcher.blowDoors();
+		}
 		
 	}
 	

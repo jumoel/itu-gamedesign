@@ -100,8 +100,19 @@ public class Player extends CollisionBox
 		
 		this.level = level;
 		
-		this.xpos = level.spawnX + 5;
-		this.ypos = level.spawnY + 0.5;
+		// determine our position
+		this.xpos = level.spawnX + 5;// in case
+		this.ypos = level.spawnY + 0.5; // there is no spawn point set
+		for (int x = 0; x < level.levelWidth; x++) {
+			for (int y = 0; y < level.levelHeight; y++) {
+				if (level.getMetaDataAt(x, y) == Level.MetaTiles.SpawnPoint.index()) {
+					this.xpos = x; // in case
+					this.ypos = y; // there is a spawn point
+					break;
+				}
+			}
+		}
+		
 		
 		System.out.println(this.xpos + ", " + this.ypos);
 		
