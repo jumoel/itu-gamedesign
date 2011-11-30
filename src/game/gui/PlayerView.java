@@ -72,8 +72,6 @@ public class PlayerView extends Updateable implements Observer
 	// dream switch data
 	private boolean switchHappening = false;
 	
-	// jumping stuff
-	private boolean didJump = false;
 	
 	//dream switch interaction methods
 	public Level getLevel() {return level;}
@@ -145,8 +143,12 @@ public class PlayerView extends Updateable implements Observer
 	
 	public void setOtherPlayerView(PlayerView pv) {
 		this.otherPlayerView = pv;
-		this.ownPlayer.addObserver(pv);
+		//this.ownPlayer.addObserver(pv);
 		this.otherPlayer = pv.getPlayer();
+	}
+	
+	public void setOwnPlayer(Player p) {
+		this.ownPlayer = p;
 	}
 	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath, GameMaster gameMaster)
@@ -176,9 +178,9 @@ public class PlayerView extends Updateable implements Observer
 		this.level = new Level(processing, levelPath);
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
 		
-		this.ownPlayer = new Player(processing, viewNumber, this.level);
+		/*this.ownPlayer = new Player(processing, viewNumber, this.level);
 		this.ownPlayer.addObserver(this);
-		this.ownPlayer.addObserver(gameMaster);
+		this.ownPlayer.addObserver(gameMaster);*/
 		
 		this.playerPosition = 0;
 		
@@ -188,60 +190,9 @@ public class PlayerView extends Updateable implements Observer
 		this.timeSlowingFactor = 1; // normal speed
 	}
 	
-	private void handleInput(State state)
-	{
-		if (switchHappening) return; // no input while a switch is happening
-		
-		boolean jumpbutton = (viewNumber == 1) ?
-				(state.containsKey('w') && state.get('w')) :
-				(state.containsKey('i') && state.get('i'));
-		
-		boolean leftbutton = (viewNumber == 1) ?
-				(state.containsKey('a') && state.get('a')) :
-				(state.containsKey('j') && state.get('j'));
-				
-		boolean rightbutton = (viewNumber == 1) ?
-				(state.containsKey('d') && state.get('d')) :
-				(state.containsKey('l') && state.get('l'));
-				
-		boolean downbutton = (viewNumber == 1) ?
-				(state.containsKey('s') && state.get('s')) :
-				(state.containsKey('k') && state.get('k'));
-
-		// a player should always have to press jump again for another jump
-		if (didJump && !jumpbutton) didJump = false;  
-		// once the game is over, players can not move left / right
-		if (gameOver) leftbutton = rightbutton = false;
-		
-		if (jumpbutton && ownPlayer != null && !didJump)
-		{
-			ownPlayer.jump();
-			this.didJump = true;
-			if (BunnyHat.TWIN_JUMP)
-			{
-				otherPlayer.jump();
-			}
-		}
-		
-		if (leftbutton && ownPlayer != null)
-		{
-			ownPlayer.isMovingSideways = true;
-			ownPlayer.moveLeft();
-		}
-		else if (rightbutton && ownPlayer != null)
-		{
-			ownPlayer.isMovingSideways = true;
-			ownPlayer.moveRight();
-			
-		}
-		
-		if (downbutton && ownPlayer != null)
-		{
-			// Use stuff
-		}
-	}
 	
-	public void update(State state, int xpos, int ypos, int deltaT)
+	
+	public void update(int xpos, int ypos, int deltaT)
 	{	
 		if (this.shouldShowDoor) {this.showDoor(); this.shouldShowDoor = false;}
 		if (this.shouldBlowDoor) {this.blowDoor(); this.shouldBlowDoor = false;}
@@ -259,10 +210,7 @@ public class PlayerView extends Updateable implements Observer
 		
 		ownPlayer.isMovingSideways = false;
 		
-		handleInput(state);
 		
-		// Update the players physics, etc.
-		ownPlayer.update(deltaT);
 		
 		// Draw the player
 		int pxpos, pypos;

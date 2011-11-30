@@ -20,8 +20,10 @@ public class Player extends CollisionBox
 	private PApplet processing;
 	public double xpos, ypos, previous_xpos, previous_ypos;
 	
+	// jumping stuff
 	private boolean isInAir;
 	private boolean isJumping;
+	private boolean didJump = false;
 	
 	public boolean isMovingSideways;
 
@@ -44,6 +46,7 @@ public class Player extends CollisionBox
 	private Animation idleAnimationGun;
 	
 	private Level level;
+	private Player myTwin; public void setTwin(Player twin) {myTwin=twin;}
 
 	private static double GRAVITY = BunnyHat.SETTINGS.getValue("gameplay/gravity");
 	private static double JUMPFORCE = BunnyHat.SETTINGS.getValue("gameplay/jumpforce");
@@ -267,8 +270,10 @@ public class Player extends CollisionBox
 
 	
 	
-	public void update(int deltaT)
+	public void update(State state, int deltaT)
 	{
+		handleInput(state);
+		
 		previous_xpos = xpos;
 		previous_ypos = ypos;
 		double deltaFactor = deltaT / (double)DELTAT_DIVIDENT;
@@ -403,7 +408,58 @@ public class Player extends CollisionBox
 	}
 	
 	
-	
+	private void handleInput(State state)
+	{
+		//if (switchHappening) return; // no input while a switch is happening
+		
+		boolean jumpbutton = (this.myID == 1) ?
+				(state.containsKey('w') && state.get('w')) :
+				(state.containsKey('i') && state.get('i'));
+		
+		boolean leftbutton = (this.myID == 1) ?
+				(state.containsKey('a') && state.get('a')) :
+				(state.containsKey('j') && state.get('j'));
+				
+		boolean rightbutton = (this.myID == 1) ?
+				(state.containsKey('d') && state.get('d')) :
+				(state.containsKey('l') && state.get('l'));
+				
+		boolean downbutton = (this.myID == 1) ?
+				(state.containsKey('s') && state.get('s')) :
+				(state.containsKey('k') && state.get('k'));
+
+		// a player should always have to press jump again for another jump
+		if (didJump && !jumpbutton) didJump = false;  
+		// once the game is over, players can not move left / right
+		//if (gameOver) leftbutton = rightbutton = false;
+		
+		if (jumpbutton && !didJump)
+		{
+			jump();
+			this.didJump = true;
+			if (BunnyHat.TWIN_JUMP)
+			{
+				myTwin.jump();
+			}
+		}
+		
+		if (leftbutton)
+		{
+			isMovingSideways = true;
+			moveLeft();
+		}
+		else if (rightbutton)
+		{
+			isMovingSideways = true;
+			moveRight();
+			
+		}
+		
+		if (downbutton)
+		{
+			// Use stuff
+		}
+	}
 	
 
 	@Override

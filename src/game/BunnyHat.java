@@ -43,9 +43,9 @@ public class BunnyHat extends PApplet implements Observer
 	private static int WINDOWHEIGHT = RACEINDICATORHEIGHT + 2 * PLAYERVIEWHEIGHT;
 	private static int WINDOWWIDTH = PLAYERVIEWTILEWIDTH * TILEDIMENSION;
 	
-	public PlayerView view1;
-	public PlayerView view2;
-	public RaceIndicator indicator;
+	private Player player1, player2;
+	public PlayerView view1, view2, view3;
+	private RaceIndicator indicator;
 	private SoundControl sndCtrl;
 	private Stereophone sndOut;
 	private GameMaster gameMaster;
@@ -141,9 +141,12 @@ public class BunnyHat extends PApplet implements Observer
 			drawMenuMainScreen();
 			break;
 		case GAME:
-			view1.update(inputState, LEFT, VIEW1Y, deltaT);
-			view2.update(inputState, LEFT, VIEW2Y, deltaT);
-			indicator.update(inputState, LEFT, RACEINDICATORY, deltaT);
+			player1.update(inputState, deltaT);
+			player2.update(inputState, deltaT);
+			view1.update(LEFT, VIEW1Y, deltaT);
+			view2.update(LEFT, VIEW2Y, deltaT);
+			view3.update(LEFT + width/2, VIEW2Y, deltaT);
+			indicator.update(LEFT, RACEINDICATORY, deltaT);
 			break;
 		}
 		
@@ -313,17 +316,25 @@ public class BunnyHat extends PApplet implements Observer
 		
 		view1 = new PlayerView(width, PLAYERVIEWHEIGHT, this, 1, 
 				(String)SETTINGS.getValue("levels/level"+level+"/good"), gameMaster);
-		view2 = new PlayerView(width, PLAYERVIEWHEIGHT, this, 2,
+		view2 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);
+		view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
+				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);
+		player1 = new Player(this, 1, view1.getLevel());
+		player2 = new Player(this, 2, view2.getLevel());
+		player1.setTwin(player2);
+		player2.setTwin(player1);
+		view1.setOwnPlayer(player1);
+		view2.setOwnPlayer(player2);
+		view3.setOwnPlayer(player2);
 		view1.setOtherPlayerView(view2);
 		view2.setOtherPlayerView(view1);
+		
 		
 		indicator = new RaceIndicator(width, RACEINDICATORHEIGHT, this);
 
 		sndCtrl.startListening();
 
-		//setup and run game master
-		gameMaster.startGame();
 
 		// setup our special workers
 		switcher = new AmazingSwitchWitch(view1, view2, this);
@@ -331,9 +342,16 @@ public class BunnyHat extends PApplet implements Observer
 
 		// setup communication
 		gameMaster.addObserver(switcher); // listen for level switch message
+		player1.addObserver(view1);
+		player2.addObserver(view2);
+		player1.addObserver(gameMaster);
+		player2.addObserver(gameMaster);
 		
 		//switcher.addObserver(view1);
 		//switcher.addObserver(view2);
+
+		//setup and run game master
+		gameMaster.startGame();
 	}
 
 	@Override

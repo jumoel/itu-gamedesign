@@ -24,7 +24,7 @@ public class RaceIndicator extends Updateable
 		this.triangleHeight = 10;
 	}
 	
-	public void update(State state, int xpos, int ypos, int deltaT)
+	public void update(int xpos, int ypos, int deltaT)
 	{
 		processing.noStroke();
 		processing.fill(processing.color(255, 0, 0, 255));
