@@ -240,6 +240,10 @@ public abstract class CollisionBox extends Observable
 		return new Line2D.Double(cBox.x, cBox.y + cBox.height, cBox.x + cBox.width, cBox.y + cBox.height);
 	}
 	
+	public void removeCollisionGroundPath() {
+		this.collisionGroundPath = null;
+	}
+	
 	/**
 	 * informs about being bounced by another box
 	 */

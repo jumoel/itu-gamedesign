@@ -83,14 +83,14 @@ public class BunnyHat extends PApplet implements Observer
 		sndCtrl = new SoundControl(this);
 		
 		
-		size(WINDOWWIDTH, WINDOWHEIGHT);
-		//size(1024, 768);
+		//size(WINDOWWIDTH, WINDOWHEIGHT);
+		size(1024, 768);
 		background(0);
 		
 		frameRate(2000);
 		
 		//setup buffers 
-		buffer = createGraphics(this.width, this.height, PConstants.JAVA2D);
+		//buffer = createGraphics(this.width, this.height, PConstants.JAVA2D);
 		
 		//setup statistics
 		currentTimestamp = millis();
@@ -311,14 +311,14 @@ public class BunnyHat extends PApplet implements Observer
 		//setup game master
 		gameMaster = new GameMaster(this);
 		
-		view1 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 1, 
+		view1 = new PlayerView(width, PLAYERVIEWHEIGHT, this, 1, 
 				(String)SETTINGS.getValue("levels/level"+level+"/good"), gameMaster);
-		view2 = new PlayerView(WINDOWWIDTH, PLAYERVIEWHEIGHT, this, 2,
+		view2 = new PlayerView(width, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);
 		view1.setOtherPlayerView(view2);
 		view2.setOtherPlayerView(view1);
 		
-		indicator = new RaceIndicator(WINDOWWIDTH, RACEINDICATORHEIGHT, this);
+		indicator = new RaceIndicator(width, RACEINDICATORHEIGHT, this);
 
 		sndCtrl.startListening();
 

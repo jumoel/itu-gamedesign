@@ -88,6 +88,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	public void switchExecute(Level lvl) {
 		setLevel(lvl);
+		ownPlayer.removeCollisionGroundPath();
 		//TODO: transfer player to same distance above ground
 	}
 	
@@ -321,7 +322,7 @@ public class PlayerView extends Updateable implements Observer
 			xCoordCameraMiddle = halfwidth;
 		}
 		
-		int maxCameraPosX = (level.levelWidth - BunnyHat.PLAYERVIEWTILEWIDTH) * BunnyHat.TILEDIMENSION;
+		int maxCameraPosX = level.levelWidth * BunnyHat.TILEDIMENSION - width;
 		
 		if (xCoordCamera > maxCameraPosX)
 		{
@@ -339,7 +340,7 @@ public class PlayerView extends Updateable implements Observer
 			yCoordCameraMiddle = halfheight;
 		}
 		
-		int maxCameraPosY = (level.levelHeight - BunnyHat.PLAYERVIEWTILEHEIGHT) * BunnyHat.TILEDIMENSION;
+		int maxCameraPosY = level.levelHeight * BunnyHat.TILEDIMENSION - height;
 		if (yCoordCamera > maxCameraPosY)
 		{
 			int diff = yCoordCamera - maxCameraPosY;
@@ -348,7 +349,7 @@ public class PlayerView extends Updateable implements Observer
 			yCoordCameraMiddle = yCoordCamera + halfheight;
 		}
 		
-		drawpypos = (BunnyHat.PLAYERVIEWTILEHEIGHT * BunnyHat.TILEDIMENSION - drawpypos);
+		drawpypos = height - drawpypos;
 		
 		drawLevelGraphics(buffer);
 		
