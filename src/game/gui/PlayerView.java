@@ -43,6 +43,9 @@ public class PlayerView extends Updateable implements Observer
 	protected boolean drawOtherPlayer = false;
 	
 	private PGraphics buffer; 
+	private PGraphics colorLayer; 
+	protected int colorLayerVisibility; 
+	private int colorLayerColor;
 	
 	protected double xbackup;
 	protected double ybackup;
@@ -63,6 +66,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	//dream switch interaction methods
 	public Level getLevel() {return level;}
+	
 	public void switchPrepare() { 
 		switchHappening = true;
 		ownPlayer.holdAnimation();
@@ -79,6 +83,11 @@ public class PlayerView extends Updateable implements Observer
 		switchHappening = false;
 	}
 	
+	// show the next best door
+	protected void setupDoor() {
+		
+	}
+	
 	protected Player getPlayer() {
 		return this.ownPlayer;
 	}
@@ -92,6 +101,12 @@ public class PlayerView extends Updateable implements Observer
 	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath, GameMaster gameMaster)
 	{	
 		this.buffer = applet.createGraphics(width, height, PConstants.JAVA2D);
+		this.colorLayer = applet.createGraphics(width, height, PConstants.JAVA2D);
+		int r = BunnyHat.SETTINGS.getValue("gui/colors/tintr");
+		int g = BunnyHat.SETTINGS.getValue("gui/colors/tintg");
+		int b = BunnyHat.SETTINGS.getValue("gui/colors/tintb");
+		this.colorLayerColor = buffer.color(r, g, b);
+		this.colorLayer.background(colorLayerColor, colorLayerVisibility);
 		
 		this.width = width;
 		this.halfwidth = this.width / 2;
@@ -325,7 +340,11 @@ public class PlayerView extends Updateable implements Observer
 		{
 			drawLevelEndScreen(buffer);	
 		}
-		
+		// put some color on, babe!
+		if (colorLayerVisibility > 0) {
+			colorLayer.background(colorLayerColor, colorLayerVisibility);
+			buffer.image(colorLayer, 0, 0);
+		}
 		buffer.endDraw();
 		processing.image(buffer, xpos, ypos);
 	}

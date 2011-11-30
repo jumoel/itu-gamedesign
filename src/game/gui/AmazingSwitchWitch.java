@@ -26,6 +26,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	private static boolean shouldSwitchDreams = false;
 	private static boolean shouldSwitchPlayerBack = false;
+	private static boolean shouldSpawnDoors = false;
+	private static int doorSpawnDarling = -1;
 	
 	private PApplet ourPApplet;
 	
@@ -134,6 +136,43 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView2.drawOwnPlayer = true;
 		player2switched = false;
 	}
+	
+	public void setupDoors(int number) {
+		int cameraMoveDuration = 1000;
+		
+		// show first door
+		if (number == 1) {
+			playerView1.setupDoor();
+		} else {
+			playerView2.setupDoor();
+		}
+		
+		//move camera 
+		if (number == 1) {
+			new MoveCamera(0, playerView2.getWidth()/2 - 100, 2, cameraMoveDuration, playerView2);
+		} else {
+			new MoveCamera(0, playerView1.getWidth()/2 - 100, 2, cameraMoveDuration, playerView1);
+		}
+		
+		// wait till the camera is moved
+		try
+		{
+			Thread.currentThread().sleep(cameraMoveDuration);
+		}
+		catch (InterruptedException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		// show 2nd door
+		if (number == 1) {
+			playerView2.setupDoor();
+		} else {
+			playerView1.setupDoor();
+		}
+		
+	}
 
 	public void switchDreams() {
 		Level l1, l2;
@@ -204,6 +243,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 			{
 				if (shouldSwitchDreams) {switchDreams(); shouldSwitchDreams = false;}
 				if (shouldSwitchPlayerBack) {switchPlayerBack(); shouldSwitchPlayerBack = false;}
+				if (shouldSpawnDoors) {setupDoors(doorSpawnDarling); shouldSpawnDoors = false;}
 				
 				Thread.currentThread().sleep(200);
 			}
@@ -235,6 +275,14 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 					break;
 				case DOORS_SPAWN_STOP:
 					shouldSwitchPlayerBack = true;
+					break;
+				case DOORS_SPAWN_START_PLAYER_1:
+					doorSpawnDarling = 1;
+					shouldSpawnDoors = true;
+					break;
+				case DOORS_SPAWN_START_PLAYER_2:
+					doorSpawnDarling = 2;
+					shouldSpawnDoors = true;
 					break;
 				case SWITCH_PLAYER_1:
 					this.swapPlayer1();
