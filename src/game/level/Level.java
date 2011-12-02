@@ -1,6 +1,12 @@
 package game.level;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+
 import game.BunnyHat;
+import game.creatures.Creature;
 import processing.core.*;
 import util.BImage;
 import util.BString;
@@ -14,6 +20,7 @@ import org.w3c.dom.Document;
 public class Level extends CollisionLevel
 {
 	public enum Layer {FOREGROUND, BACKGROUND}
+	public enum DreamStyle {GOOD, BAD}
 	
 	public enum MetaTiles
 	{
@@ -41,6 +48,7 @@ public class Level extends CollisionLevel
 	private int levelData[];
 	private int levelDataForeground[];
 	private int metaData[];
+	private ArrayList creaturesAndObjects;
 	
 	public String levelName;
 	
@@ -65,6 +73,8 @@ public class Level extends CollisionLevel
 		
 		// setup collision level
 		this.collisionSetup();
+		
+		creaturesAndObjects = new ArrayList();
 	}
 	
 	public int getLevelDataAt(int x, int y)
@@ -118,6 +128,37 @@ public class Level extends CollisionLevel
 		{
 			return tiles[leveldata - 1];
 		}
+	}
+	
+	public void updateCreaturesAndObjects() {
+		Iterator cnos = creaturesAndObjects.iterator();
+		while (cnos.hasNext()) {
+			Creature currentCreature = (Creature)cnos.next();
+			currentCreature.update();
+		}
+	}
+	
+	public void drawCreaturesAndObjects(int x, int y, int width, int height, PGraphics graphics) {
+		Iterator cnos = creaturesAndObjects.iterator();
+		while (cnos.hasNext()) {
+			Creature currentCreature = (Creature)cnos.next();
+			if (currentCreature.destroyed) {
+				creaturesAndObjects.remove(currentCreature);
+			} else {
+			
+				//int lvlHpx = levelHeight * BunnyHat.TILEDIMENSION;
+				if (currentCreature.x()+currentCreature.collisionBoxWidth() > x && currentCreature.x() < x + width 
+						&& currentCreature.y() + currentCreature.collisionBoxHeight() > y && currentCreature.y() < y + height) {
+					int drawx = (int)(currentCreature.x() * BunnyHat.TILEDIMENSION - x);
+					int drawy = (int)(currentCreature.y() * BunnyHat.TILEDIMENSION - y);
+					graphics.image(currentCreature.getCurrentTexture(), drawx, drawy);
+				}
+			}
+		}
+	}
+	
+	public void addCreature(Creature c) {
+		creaturesAndObjects.add(c);
 	}
 	
 	

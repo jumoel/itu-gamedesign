@@ -17,84 +17,18 @@ import game.level.Level;
 public abstract class Creature extends CollisionBox
 {
 	
-	private PApplet processing;
-	private Animation idleAnimation;
-	private Animation interactAnimation;
-	private Animation walkAnimation;
-	public int creatureNumber;
+	public boolean destroyed = false; 
 	
-	public int xPos;
-	public int yPos;
-	public int lastXPos;
-	public int lastYPos;
-	private int MOVESPEED = BunnyHat.SETTINGS.getValue("gameplay/creatures/speed");
-	private boolean moveRight = false;
 	
-	/*
-	 * effect types
-	 * effect 1:
-	 * effect 2:
-	 * 
-	 */
-	private int effectType;
 	
-	public Creature(PApplet applet, int creatureNumber, int effect, Level level){
-		super(level.spawnX + 0.5, level.spawnY + 0.5, 2, 3);
-		super.setLevel(level);
-		super.setGameElement(this);
-		
-		this.processing = applet;
-
-		this.idleAnimation = new Animation(processing, "graphics/animations/creature" + creatureNumber + "idle");
-		this.interactAnimation = new Animation(processing, "graphics/animations/creature" + creatureNumber + "interact");
-		this.walkAnimation = new Animation(processing, "graphics/animations/creature" + creatureNumber + "walk");
-		
-		this.idleAnimation.start();
-
+	public Creature(double x, double y, double width, double height){
+		super(x, y, width, height);
 	}
 	
-	/* Called when players collides with creatures from PlayerView */
-	public void contact(Player player){
-	
-		walkAnimation.stop();
-		interactAnimation.start();
+	public abstract void update();
+		
 
-		switch(effectType){
-			
-			case 1:
-				player.xSpeed = -player.xSpeed;
-				
-				break;
-			case 2:
-				
-				break;
-				
-			default:
-				
-				break;
-		}
-	}
-	
-	/* creature moves */
-	public void update(){
-		lastXPos = xPos;
-		/*
-		 * Implement collision with walls
-		 */
+	public abstract PImage getCurrentTexture();
 		
-		if (moveRight){
-			xPos = xPos + MOVESPEED;
-		} else {
-			xPos = xPos - MOVESPEED;
-		}
-		
-		
-		 	
-		
-	}
-		
-	
-	
-	
-	
+
 }

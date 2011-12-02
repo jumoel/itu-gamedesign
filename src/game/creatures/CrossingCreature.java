@@ -15,9 +15,9 @@ import processing.core.PApplet;
 public abstract class CrossingCreature extends Creature
 {
 
-	public CrossingCreature(PApplet applet, int creatureNumber, int effect, Level level)
+	public CrossingCreature(double x, double y, double width, double height)
 	{
-		super(applet, creatureNumber, effect, level);
+		super(x, y, width, height);
 		// TODO Auto-generated constructor stub
 	}
 

@@ -7,6 +7,7 @@ import game.gui.AmazingSwitchWitch;
 import game.level.Level;
 import game.sound.Stereophone;
 import game.creatures.Creature;
+import game.creatures.StandardCreature;
 import processing.core.*;
 import util.BImage;
 import util.BMath;
@@ -385,9 +386,9 @@ public class Player extends CollisionBox
 				map.put("IFUCKINGWON", myID);
 				this.notifyObservers(map);
 				Stereophone.playSound("310", "playerwon", 10000);
-			} else if (gameElement instanceof Creature) {
+			} else if (gameElement instanceof StandardCreature) {
 				// player hit a creature
-				((Creature) gameElement).contact(this);
+				((StandardCreature) gameElement).contact(this);
 			} else if (gameElement instanceof Door)
 			{
 				this.setChanged();

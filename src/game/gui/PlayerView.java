@@ -235,6 +235,8 @@ public class PlayerView extends Updateable implements Observer
 		if (this.shouldShowDoor) {this.showDoor(this.shouldBeCloseBy); this.shouldShowDoor = false;}
 		if (this.shouldBlowDoor) {this.blowDoor(); this.shouldBlowDoor = false;}
 		
+		level.updateCreaturesAndObjects();
+		
 		buffer.beginDraw();
 		buffer.background(255);
 		
@@ -339,7 +341,8 @@ public class PlayerView extends Updateable implements Observer
 		
 		drawLevelGraphics(buffer, Level.Layer.BACKGROUND);
 		
-		
+		level.drawCreaturesAndObjects(xCoordCamera, yCoordCamera, 
+				xCoordCamera + width, yCoordCamera + height, buffer);
 		
 		if (drawOwnPlayer)
 		{
@@ -442,7 +445,9 @@ public class PlayerView extends Updateable implements Observer
 		return maximumTileY;
 	}
 	
-	
+	private void drawObjectsAndCreatures() {
+		
+	}
 	
 	// drawing the level graphics
 	private void drawLevelGraphics(PGraphics graphics, Level.Layer layer)
