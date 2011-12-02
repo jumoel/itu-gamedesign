@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import game.BunnyHat;
-import game.creatures.Creature;
+import game.creatures.GameElement;
 import processing.core.*;
 import util.BImage;
 import util.BString;
@@ -133,7 +133,7 @@ public class Level extends CollisionLevel
 	public void updateCreaturesAndObjects() {
 		Iterator cnos = creaturesAndObjects.iterator();
 		while (cnos.hasNext()) {
-			Creature currentCreature = (Creature)cnos.next();
+			GameElement currentCreature = (GameElement)cnos.next();
 			currentCreature.update();
 		}
 	}
@@ -141,7 +141,7 @@ public class Level extends CollisionLevel
 	public void drawCreaturesAndObjects(int x, int y, int width, int height, PGraphics graphics) {
 		Iterator cnos = creaturesAndObjects.iterator();
 		while (cnos.hasNext()) {
-			Creature currentCreature = (Creature)cnos.next();
+			GameElement currentCreature = (GameElement)cnos.next();
 			if (currentCreature.destroyed) {
 				creaturesAndObjects.remove(currentCreature);
 			} else {
@@ -157,7 +157,7 @@ public class Level extends CollisionLevel
 		}
 	}
 	
-	public void addCreature(Creature c) {
+	public void addCreature(GameElement c) {
 		creaturesAndObjects.add(c);
 	}
 	

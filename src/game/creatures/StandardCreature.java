@@ -8,7 +8,7 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
-public class StandardCreature extends Creature
+public class StandardCreature extends GameElement
 {
 	private PApplet processing;
 	private Animation idleAnimation;

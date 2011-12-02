@@ -12,10 +12,10 @@ import processing.core.PApplet;
  * @author samuelwalz
  *
  */
-public abstract class CrossingCreature extends Creature
+public abstract class CrossingGameElement extends GameElement
 {
 
-	public CrossingCreature(double x, double y, double width, double height)
+	public CrossingGameElement(double x, double y, double width, double height)
 	{
 		super(x, y, width, height);
 		// TODO Auto-generated constructor stub

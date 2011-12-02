@@ -14,14 +14,14 @@ import game.level.Level;
  * @author samuelwalz
  *
  */
-public abstract class Creature extends CollisionBox
+public abstract class GameElement extends CollisionBox
 {
 	
 	public boolean destroyed = false; 
 	
 	
 	
-	public Creature(double x, double y, double width, double height){
+	public GameElement(double x, double y, double width, double height){
 		super(x, y, width, height);
 	}
 	

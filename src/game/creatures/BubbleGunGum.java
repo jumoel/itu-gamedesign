@@ -5,7 +5,7 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
-public class BubbleGunGum extends Creature
+public class BubbleGunGum extends GameElement
 {
 
 	public BubbleGunGum(double x, double y, double xSpeed, double ySpeed)
