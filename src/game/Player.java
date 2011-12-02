@@ -66,6 +66,13 @@ public class Player extends CollisionBox
 	//sound stuff
 	private boolean soundHitBottomPlayed = false;
 
+	public void giveWeapon() {
+		this.unarmed = false;
+	}
+	public void takeWeapon() {
+		this.unarmed = true;
+	}
+	
 	public void holdAnimation() {
 		this.walkAnimation.holdAnimation();
 		this.jumpAnimation.holdAnimation();

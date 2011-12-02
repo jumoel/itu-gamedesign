@@ -186,6 +186,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		//pvSource.getPlayer().xpos = pvTarget.getPlayer().xpos;
 		//pvSource.getPlayer().ypos = pvTarget.getPlayer().ypos;
 		//playerView1.setLevel(playerView2.getLevel());
+		pvSource.getPlayer().giveWeapon();
 		
 		pvTarget.drawOtherPlayer = true;
 		
@@ -207,6 +208,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		//playerView1.setLevel(player1backup);
 		pvSource.getPlayer().setLevel(pvSource.getLevel());
 		
+		pvSource.getPlayer().takeWeapon();
 		pvSource.drawOwnPlayer = true;
 		playerSwitched = -1;
 	}
@@ -227,13 +229,13 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	}
 	
 	public void setupDoors(int number) {
-		int cameraMoveDuration = 1000;
+		int cameraMoveDuration = 500;
 		
 		// show first door
 		if (number == 1) {
-			playerView1.initShowDoor();
+			playerView1.initShowDoor(true);
 		} else {
-			playerView2.initShowDoor();
+			playerView2.initShowDoor(true);
 		}
 		
 		//move camera 

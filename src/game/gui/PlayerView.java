@@ -65,6 +65,7 @@ public class PlayerView extends Updateable implements Observer
 	private boolean drawOwnDoor = false;
 	private boolean shouldShowDoor = false;
 	private boolean shouldBlowDoor = false;
+	private boolean shouldBeCloseBy = false;
 	
 	
 	private Level level; public void setLevel(Level lvl) {level = lvl; ownPlayer.setLevel(lvl);}
@@ -96,6 +97,10 @@ public class PlayerView extends Updateable implements Observer
 	}
 	
 	protected void initShowDoor() {
+		this.initShowDoor(false);
+	}
+	protected void initShowDoor(boolean closeBy) {
+		this.shouldBeCloseBy = closeBy;
 		this.shouldShowDoor = true;
 	}
 	
@@ -110,28 +115,56 @@ public class PlayerView extends Updateable implements Observer
 	
 	
 	// show the next best door
-	protected void showDoor() {
+	protected void showDoor(boolean closeBy) {
 		System.out.println("show them the doors - maxX:"+getMaximumTileX()+" minX:"+getMinimumTileX());
 		// Counting y from down towards the sky
-		int minimumTileX = getMinimumTileX();
+		int minimumTileX = (int)ownPlayer.xpos + 1;
 		int maximumTileX = getMaximumTileX();
+		int tileSpanX = maximumTileX - minimumTileX;
 		
 		int minimumTileY = getMinimumTileY();
 		int maximumTileY = getMaximumTileY();
-		for (int y = minimumTileY; y <= maximumTileY; y++)
+		
+		boolean doorFound = false;
+		int doorX, doorY ;
+		doorX = doorY = 0;
+		double doorDistance = -1;
+		for (int x = minimumTileX; x <= maximumTileX; x++)
 		{
-			// Counting x from left towards right
-			for (int x = minimumTileX; x <= maximumTileX; x++)
+			for (int y = minimumTileY; y <= maximumTileY; y++)
 			{		
 				if (this.level.getMetaDataAt(x, y) == Level.MetaTiles.DoorSpawnPoint.index()) {
-					this.ownDoor.updatePosition(x, y);
-					System.out.println(x+":"+y);
-					this.level.setDoorAt(x, y, this.ownDoor);
-					this.ownDoor.showDoor();
-					this.drawOwnDoor = true;
-					break;
+					doorFound = true;
+					double pxDist = ownPlayer.xpos - x;
+					double pyDist = ownPlayer.ypos - y;
+					double distanceToPlayer = Math.sqrt(Math.pow(pxDist, 2) + Math.pow(pyDist, 2));
+					boolean useNewValues = false;
+					if (doorDistance == -1) {
+						useNewValues = true;
+					} else if (closeBy) {
+						if (distanceToPlayer < doorDistance) {
+							useNewValues = true;
+						}
+					} else {
+						if (distanceToPlayer > doorDistance) {
+							useNewValues = true;
+						}
+					}
+					
+					if (useNewValues) {
+						doorDistance = distanceToPlayer;
+						doorX = x;
+						doorY = y;
+					}
 				}
 			}
+		}
+		if (doorFound) {
+			this.ownDoor.updatePosition(doorX, doorY);
+			//System.out.println(actualX+":"+y);
+			this.level.setDoorAt(doorX, doorY, this.ownDoor);
+			this.ownDoor.showDoor();
+			this.drawOwnDoor = true;
 		}
 	}
 	
@@ -199,7 +232,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	public void update(int xpos, int ypos, int deltaT)
 	{	
-		if (this.shouldShowDoor) {this.showDoor(); this.shouldShowDoor = false;}
+		if (this.shouldShowDoor) {this.showDoor(this.shouldBeCloseBy); this.shouldShowDoor = false;}
 		if (this.shouldBlowDoor) {this.blowDoor(); this.shouldBlowDoor = false;}
 		
 		buffer.beginDraw();
