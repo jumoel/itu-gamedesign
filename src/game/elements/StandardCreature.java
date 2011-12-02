@@ -1,4 +1,4 @@
-package game.creatures;
+package game.elements;
 
 import game.BunnyHat;
 import game.Player;

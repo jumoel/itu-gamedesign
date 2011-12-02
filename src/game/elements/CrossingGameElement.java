@@ -1,4 +1,4 @@
-package game.creatures;
+package game.elements;
 
 import game.level.Level;
 import processing.core.PApplet;

@@ -1,4 +1,4 @@
-package game.creatures;
+package game.elements;
 import processing.core.*;
 import game.BunnyHat;
 import game.CollisionBox;

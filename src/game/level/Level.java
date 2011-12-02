@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import game.BunnyHat;
-import game.creatures.GameElement;
+import game.elements.GameElement;
 import processing.core.*;
 import util.BImage;
 import util.BString;

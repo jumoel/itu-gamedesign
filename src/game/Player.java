@@ -2,12 +2,12 @@ package game;
 import java.util.HashMap;
 
 
+import game.elements.GameElement;
+import game.elements.StandardCreature;
 import game.graphics.Animation;
 import game.gui.AmazingSwitchWitch;
 import game.level.Level;
 import game.sound.Stereophone;
-import game.creatures.GameElement;
-import game.creatures.StandardCreature;
 import processing.core.*;
 import util.BImage;
 import util.BMath;
