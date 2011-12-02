@@ -13,6 +13,8 @@ import org.w3c.dom.Document;
 
 public class Level extends CollisionLevel
 {
+	public enum Layer {FOREGROUND, BACKGROUND}
+	
 	public enum MetaTiles
 	{
 		Obstacle(1),
@@ -37,6 +39,7 @@ public class Level extends CollisionLevel
 	
 	private PImage tiles[];
 	private int levelData[];
+	private int levelDataForeground[];
 	private int metaData[];
 	
 	public String levelName;
@@ -66,16 +69,26 @@ public class Level extends CollisionLevel
 	
 	public int getLevelDataAt(int x, int y)
 	{
+		return getLevelDataAt(x, y, Layer.BACKGROUND);
+	}
+	
+	public int getLevelDataAt(int x, int y, Layer l) {
 		int index = levelWidth*y + x;
+		int tileNo = 0;
 		
 		if (index >= 0 && index < levelData.length)
 		{
-			return levelData[index];
+			switch (l) {
+			case FOREGROUND:
+				tileNo = levelDataForeground[index];
+				break;
+			case BACKGROUND:
+				tileNo = levelData[index];
+				break;
+			}
 		}
-		else
-		{
-			return 0;
-		}
+		
+		return tileNo;
 	}
 	
 	public int getMetaDataAt(int x, int y)
@@ -93,9 +106,9 @@ public class Level extends CollisionLevel
 		}
 	}
 	
-	public PImage getLevelImageAt(int x, int y)
+	public PImage getLevelImageAt(int x, int y, Layer l)
 	{
-		int leveldata = getLevelDataAt(x, y);
+		int leveldata = getLevelDataAt(x, y, l);
 		
 		if (leveldata == 0)
 		{
@@ -130,6 +143,7 @@ public class Level extends CollisionLevel
 			XPathExpression levelHeightXPath = xpath.compile("/map[1]//layer[@name='Graphics']/@height");
 			XPathExpression levelDataXpath = xpath.compile("/map[1]//layer[@name='Graphics']/data/text()");
 			XPathExpression metaDataXpath = xpath.compile("/map[1]//layer[@name='Meta']/data/text()");
+			XPathExpression levelDataForegroundXpath = xpath.compile("/map[1]//layer[@name='Foreground']/data/text()");
 			XPathExpression metaDataFirstGid = xpath.compile("/map[1]//tileset[@name='Meta']/@firstgid");
 			
 			
@@ -156,6 +170,7 @@ public class Level extends CollisionLevel
 			
 			String levelDataRaw = (String) levelDataXpath.evaluate(doc, XPathConstants.STRING);
 			String metaDataRaw = (String) metaDataXpath.evaluate(doc, XPathConstants.STRING);
+			String levelDataForegroundRaw = (String) levelDataForegroundXpath.evaluate(doc, XPathConstants.STRING);
 			
 			// Convert the loaded strings to a int arrays
 			String metaDataStrings[] = BString.join(metaDataRaw.split("\n"), "").split(",");
@@ -178,11 +193,19 @@ public class Level extends CollisionLevel
 			}
 			
 			String levelDataStrings[] = BString.join(levelDataRaw.split("\n"), "").split(",");
-			levelData = new int[metaDataStrings.length];
+			levelData = new int[levelDataStrings.length];
 			
 			for (int i = 0; i < levelDataStrings.length; i++)
 			{
 				levelData[i] = Integer.parseInt(levelDataStrings[i]);
+			}
+			
+			String levelDataForegroundStrings[] = BString.join(levelDataForegroundRaw.split("\n"), "").split(",");
+			levelDataForeground = new int[levelDataForegroundStrings.length];
+			
+			for (int i = 0; i < levelDataForegroundStrings.length; i++)
+			{
+				levelDataForeground[i] = Integer.parseInt(levelDataForegroundStrings[i]);
 			}
 		}
 		catch (Exception e)

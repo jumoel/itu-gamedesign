@@ -99,6 +99,11 @@ public class PlayerView extends Updateable implements Observer
 		this.shouldShowDoor = true;
 	}
 	
+	protected void setDoorPosition(Player p) {
+		p.xpos = this.ownDoor.x();
+		p.ypos = this.ownDoor.y();
+	}
+	
 	protected void initBlowDoor() {
 		this.shouldBlowDoor = true;
 	}
@@ -299,7 +304,7 @@ public class PlayerView extends Updateable implements Observer
 		
 		drawpypos = height - drawpypos;
 		
-		drawLevelGraphics(buffer);
+		drawLevelGraphics(buffer, Level.Layer.BACKGROUND);
 		
 		
 		
@@ -345,7 +350,7 @@ public class PlayerView extends Updateable implements Observer
 			drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.MIDDLE, Vertical.BOTTOM);	
 		}
 		
-		
+		drawLevelGraphics(buffer, Level.Layer.FOREGROUND);
 		
 		if (gameOver)
 		{
@@ -404,14 +409,18 @@ public class PlayerView extends Updateable implements Observer
 		return maximumTileY;
 	}
 	
+	
+	
 	// drawing the level graphics
-	private void drawLevelGraphics(PGraphics graphics)
+	private void drawLevelGraphics(PGraphics graphics, Level.Layer layer)
 	{	
 		int minimumTileX = getMinimumTileX();
 		int maximumTileX = getMaximumTileX();
 		
 		int minimumTileY = getMinimumTileY();
 		int maximumTileY = getMaximumTileY();
+		
+		int yWindowOffset = height % BunnyHat.TILEDIMENSION;
 		
 		// Counting y from down towards the sky
 		for (int reversey = minimumTileY; reversey <= maximumTileY; reversey++)
@@ -420,17 +429,17 @@ public class PlayerView extends Updateable implements Observer
 			for (int x = minimumTileX; x <= maximumTileX; x++)
 			{
 				int y = level.levelHeight - reversey;
-				PImage tile = level.getLevelImageAt(x, y);
+				PImage tile = level.getLevelImageAt(x, y, layer);
 				
 				int xcoord = x * BunnyHat.TILEDIMENSION - xCoordCamera;
-				int ycoord = (BunnyHat.PLAYERVIEWTILEHEIGHT - reversey) * BunnyHat.TILEDIMENSION + yCoordCamera;
+				int ycoord = (BunnyHat.PLAYERVIEWTILEHEIGHT - reversey) * BunnyHat.TILEDIMENSION + yCoordCamera + yWindowOffset;
 				
 				if (tile != null)
 				{
 					graphics.image(tile, xcoord, ycoord);
 				}
 				
-				if (drawOwnDoor && ownDoor.x() == x && ownDoor.y() == reversey) {
+				if (drawOwnDoor && ownDoor.x() == x && ownDoor.y() == reversey && layer == Level.Layer.BACKGROUND) {
 					graphics.image(ownDoor.getCurrentTexture(), xcoord, ycoord - BunnyHat.TILEDIMENSION * 2);
 				}
 			}

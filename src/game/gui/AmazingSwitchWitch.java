@@ -35,9 +35,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	private int tintColor;
 	
 	private Level player1backup, player2backup;
-	private double player1xbackup, player1ybackup;
+	private double playerBackupX, playerBackupY;
 	private double player2xbackup, player2ybackup;
 	private boolean player1switched, player2switched;
+	private int playerSwitched = -1;
 	
 	// animate camera position
 	private class MoveCamera extends Animator {
@@ -157,78 +158,72 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	public void swapPlayer1()
 	{
-		new MoveCamera(0, playerView2.getWidth()/2 - 100, 2, DOOR_CAMERA_MOVE_DURATION, playerView2);
+		tunnelTwin(1);
+	}
+	
+	private void tunnelTwin(int number) {
+		playerSwitched = number;
 		
-		playerView1.drawOwnPlayer = false;
+		PlayerView pvSource = (number == 1 ? playerView1 : playerView2);
+		PlayerView pvTarget = (pvSource == playerView1 ? playerView2 : playerView1);
+		
+		
+		
+		//new MoveCamera(0, pvTarget.getWidth()/2 - 100, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
+		
+		pvSource.drawOwnPlayer = false;
 		
 		//player1backup = playerView1.getLevel();
-		playerView1.getPlayer().setLevel(playerView2.getLevel());
+		pvSource.getPlayer().setLevel(pvTarget.getLevel());
 		
-		player1xbackup = playerView1.getPlayer().xpos;
-		player1ybackup = playerView1.getPlayer().ypos;
-		playerView1.xbackup = player1xbackup;
-		playerView1.ybackup = player1ybackup;
+		playerBackupX = pvSource.getPlayer().xpos;
+		playerBackupY = pvSource.getPlayer().ypos;
+		pvSource.xbackup = playerBackupX;
+		pvSource.ybackup = playerBackupY;
 
-		playerView1.getPlayer().xpos = playerView2.getPlayer().xpos;
-		playerView1.getPlayer().ypos = playerView2.getPlayer().ypos;
+		pvTarget.setDoorPosition(pvSource.getPlayer());
+		pvSource.getPlayer().removeCollisionGroundPath();
+		//pvSource.getPlayer().xpos = pvTarget.getPlayer().xpos;
+		//pvSource.getPlayer().ypos = pvTarget.getPlayer().ypos;
 		//playerView1.setLevel(playerView2.getLevel());
 		
-		playerView2.drawOtherPlayer = true;
-		player1switched = true;
+		pvTarget.drawOtherPlayer = true;
+		
+	}
+	
+	private void untunnelTwin() {
+		if (this.playerSwitched == -1) return;
+		
+		PlayerView pvSource = (playerSwitched == 1 ? playerView1 : playerView2);
+		PlayerView pvTarget = (pvSource == playerView1 ? playerView2 : playerView1);
+		
+		new MoveCamera(pvTarget.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
+		
+		pvTarget.drawOtherPlayer = false;
+		
+		pvSource.getPlayer().ypos = playerBackupY;
+		pvSource.getPlayer().xpos = playerBackupX;
+		
+		//playerView1.setLevel(player1backup);
+		pvSource.getPlayer().setLevel(pvSource.getLevel());
+		
+		pvSource.drawOwnPlayer = true;
+		playerSwitched = -1;
 	}
 	
 	public void resetPlayer1()
 	{
-		new MoveCamera(playerView2.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, playerView2);
-		
-		playerView2.drawOtherPlayer = false;
-		
-		playerView1.getPlayer().ypos = player1ybackup;
-		playerView1.getPlayer().xpos = player1xbackup;
-		
-		//playerView1.setLevel(player1backup);
-		playerView1.getPlayer().setLevel(playerView1.getLevel());
-		
-		playerView1.drawOwnPlayer = true;
-		player1switched = false;
+		untunnelTwin();
 	}
 	
 	public void swapPlayer2()
 	{
-		new MoveCamera(0, playerView1.getWidth()/2 - 100, 2, DOOR_CAMERA_MOVE_DURATION, playerView1);
-		
-		playerView2.drawOwnPlayer = false;
-		
-		//player2backup = playerView2.getLevel();
-		playerView2.getPlayer().setLevel(playerView1.getLevel());
-		
-		player2xbackup = playerView2.getPlayer().xpos;
-		player2ybackup = playerView2.getPlayer().ypos;
-		playerView2.xbackup = player2xbackup;
-		playerView2.ybackup = player2ybackup;
-
-		playerView2.getPlayer().xpos = playerView1.getPlayer().xpos;
-		playerView2.getPlayer().ypos = playerView1.getPlayer().ypos;
-		//playerView2.setLevel(playerView1.getLevel());
-		
-		playerView1.drawOtherPlayer = true;
-		player2switched = true;
+		tunnelTwin(2);
 	}
 	
 	public void resetPlayer2()
 	{
-		new MoveCamera(playerView1.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, playerView1);
-		
-		playerView1.drawOtherPlayer = false;
-		
-		playerView2.getPlayer().ypos = player2ybackup;
-		playerView2.getPlayer().xpos = player2xbackup;
-		
-		//playerView2.setLevel(player1backup);
-		playerView2.getPlayer().setLevel(playerView2.getLevel());
-		
-		playerView2.drawOwnPlayer = true;
-		player2switched = false;
+		untunnelTwin();
 	}
 	
 	public void setupDoors(int number) {
@@ -336,7 +331,11 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 			try
 			{
 				if (shouldSwitchDreams) {switchDreams(); shouldSwitchDreams = false;}
-				if (shouldSwitchPlayerBack) {switchPlayerBack(); shouldSwitchPlayerBack = false;}
+				if (shouldSwitchPlayerBack) {
+					this.blowDoors();
+					this.untunnelTwin();
+					shouldSwitchPlayerBack = false;
+				}
 				if (shouldSpawnDoors) {setupDoors(doorSpawnDarling); shouldSpawnDoors = false;}
 				
 				Thread.currentThread().sleep(200);
@@ -379,10 +378,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 					shouldSpawnDoors = true;
 					break;
 				case SWITCH_PLAYER_1:
-					if (!(this.player1switched || this.player2switched)) this.swapPlayer1();
+					if (this.playerSwitched == -1) this.tunnelTwin(1);
 					break;
 				case SWITCH_PLAYER_2:
-					if (!(this.player1switched || this.player2switched)) this.swapPlayer2();
+					if (this.playerSwitched == -1) this.tunnelTwin(2);
 					break;
 			}
 		}

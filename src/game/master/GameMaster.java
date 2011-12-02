@@ -1,6 +1,7 @@
 package game.master;
 
 import game.BunnyHat;
+import game.Player;
 import game.sound.Stereophone;
 
 import java.util.HashMap;
@@ -28,8 +29,9 @@ public class GameMaster extends Observable implements Observer, Runnable
 	private final static double SWITCH_TIME_VARIATION = BunnyHat.SETTINGS.getValue("gamerules/switch/timeVariation");
 	private final static int SWITCH_ALERT_PHASE_DURATION = BunnyHat.SETTINGS.getValue("gamerules/switch/alertPhaseDuration");
 	
-	private final static double DOORS_PLAYER_MIN_DISTANCE = BunnyHat.SETTINGS.getValue("gamerules/doors/playerMinDistance");
+	private final static double DOORS_PLAYER_MIN_BEHIND_DISTANCE = BunnyHat.SETTINGS.getValue("gamerules/doors/playerMinBehindDistance");
 	private final static int DOORS_DURATION = BunnyHat.SETTINGS.getValue("gamerules/doors/doorDuration");
+	private final static int DOORS_MIN_BEHIND_TIME = BunnyHat.SETTINGS.getValue("gamerules/doors/playerMinBehindTime");
 	
 	private final static boolean SHOW_FPS = false;
 	private PApplet ourPApplet;
@@ -48,14 +50,19 @@ public class GameMaster extends Observable implements Observer, Runnable
 	private int winner = -1; public int getWinner() {return winner;};
 	
 	//players
-	private class PlayerStats {
-		
-	}
-	PlayerStats statsP1, statsP2;
+	Player player1, player2;
+	private int playerFarAhead = -1;
+	private int leadingTime = 0;
+	private int showDoors = -1;
 	
 	
 	public GameMaster(PApplet papplet){
 		ourPApplet = papplet;
+	}
+	
+	public void setTwins(Player p1, Player p2) {
+		player1 = p1;
+		player2 = p2;
 	}
 	
 	private static int getNewTimeTillNextSwitch() {
@@ -68,7 +75,6 @@ public class GameMaster extends Observable implements Observer, Runnable
 	 * Yay! Let's play a game!
 	 */
 	public void startGame() {
-		msTillNextSwitch = getNewTimeTillNextSwitch();
 		runGame = true;
 		ourThread = new Thread(this);
 		ourThread.start();
@@ -89,7 +95,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 	 */
 	private void makeDecisions(int msSinceLastDecisions) {
 		// time for a switch?
-		msTillNextSwitch -= msSinceLastDecisions;
+		if (!doorsHappening) msTillNextSwitch -= msSinceLastDecisions; // stop countdown for doors
 		if (msTillNextSwitch < 0) { // yes, it is time
 			switchHappening = true;
 			this.setChanged();
@@ -98,24 +104,72 @@ public class GameMaster extends Observable implements Observer, Runnable
 			this.notifyObservers(GameMaster.MSG.SWITCH_DREAMS);
 			msTillNextSwitch = this.getNewTimeTillNextSwitch();
 			switchAlertStarted = false;
-			//TODO: switch dreams, stop alert
-			return;
+			//return;
 		} else if (msTillNextSwitch < SWITCH_ALERT_PHASE_DURATION
 				&& !switchAlertStarted) { // time to warn the players
 			switchAlertStarted = true;
 			this.setChanged();
 			this.notifyObservers(GameMaster.MSG.SWITCH_ALERT_START);
 			Stereophone.playSound("302", "switchwarning", 1000);
-			// TODO: start alert
-		}
-		
+		} else { switchHappening = false;}
 		
 		// time for some doors?
-		if (!doorsHappening) {
+		if (!doorsHappening && !switchAlertStarted && !switchHappening) {
+			// player behind?
+			double playerDistance = player1.xpos - player2.xpos;
+			if (playerDistance > this.DOORS_PLAYER_MIN_BEHIND_DISTANCE) {
+				// player1 further ahead
+				this.playerFarAhead = 1;
+				//System.out.println("player1 is leading");
+			} else if (playerDistance < this.DOORS_PLAYER_MIN_BEHIND_DISTANCE * -1) {
+				// player 2 is further ahead
+				this.playerFarAhead = 2;
+			} else {
+				this.playerFarAhead = -1; // nobody far ahead
+			}
 			
-		} else {
-			//TODO: doors are happening : countdown & stuff
+			switch (playerFarAhead) {
+				case 1:
+					this.leadingTime += msSinceLastDecisions;
+					break;
+				case 2:
+					this.leadingTime -= msSinceLastDecisions;
+					break;
+			}
 			
+			if (leadingTime > this.DOORS_MIN_BEHIND_TIME) {
+				// twin 1 leaded to long
+				doorsHappening = true;
+				showDoors = 2; // twin 2 gets a door
+				this.msTillDoorsEnd = this.DOORS_DURATION;
+				this.leadingTime = 0;
+			} else if (leadingTime < this.DOORS_MIN_BEHIND_TIME*-1) {
+				// twin 2 leaded to long
+				doorsHappening = true;
+				showDoors = 1; // twin 1 gets a door
+				this.msTillDoorsEnd = this.DOORS_DURATION;
+				this.leadingTime = 0;
+			}
+		}
+		
+		if (doorsHappening) {
+			this.msTillDoorsEnd -= msSinceLastDecisions; // door countdown
+			if (showDoors != -1) {
+				this.setChanged();
+				switch (showDoors) {
+					case 1:
+						this.notifyObservers(MSG.DOORS_SPAWN_START_PLAYER_1);
+						break;
+					case 2:
+						this.notifyObservers(MSG.DOORS_SPAWN_START_PLAYER_2);
+						break;
+				}
+				this.showDoors = -1;
+			} else if (this.msTillDoorsEnd <= 0) {
+				doorsHappening = false;
+				this.setChanged();
+				this.notifyObservers(MSG.DOORS_SPAWN_STOP);
+			} 
 		}
 	}
 	
@@ -126,6 +180,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 		int lastFpsTime = 0;
 		int fps = 0;
 		int timeStepSize = 100;
+		msTillNextSwitch = getNewTimeTillNextSwitch();
 		while (runGame) {
 			try
 			{

@@ -144,9 +144,9 @@ public class BunnyHat extends PApplet implements Observer
 			player1.update(inputState, deltaT);
 			player2.update(inputState, deltaT);
 			view1.update(LEFT, VIEW1Y, deltaT);
-			view2.update(LEFT, VIEW2Y, deltaT);
-			view3.update(LEFT + width/2, VIEW2Y, deltaT);
-			indicator.update(LEFT, RACEINDICATORY, deltaT);
+			view2.update(LEFT, (height-RACEINDICATORHEIGHT)/2+RACEINDICATORHEIGHT, deltaT);
+			//view3.update(LEFT + width/2, VIEW2Y, deltaT);
+			indicator.update(LEFT, (height-RACEINDICATORHEIGHT)/2, deltaT);
 			break;
 		}
 		
@@ -314,21 +314,22 @@ public class BunnyHat extends PApplet implements Observer
 		//setup game master
 		gameMaster = new GameMaster(this);
 		
-		view1 = new PlayerView(width, PLAYERVIEWHEIGHT, this, 1, 
+		view1 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 1, 
 				(String)SETTINGS.getValue("levels/level"+level+"/good"), gameMaster);
-		view2 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
+		view2 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);
-		view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
-				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);
+		/*view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
+				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);*/
 		player1 = new Player(this, 1, view1.getLevel());
 		player2 = new Player(this, 2, view2.getLevel());
 		player1.setTwin(player2);
 		player2.setTwin(player1);
 		view1.setOwnPlayer(player1);
 		view2.setOwnPlayer(player2);
-		view3.setOwnPlayer(player2);
+		//view3.setOwnPlayer(player2);
 		view1.setOtherPlayerView(view2);
 		view2.setOtherPlayerView(view1);
+		gameMaster.setTwins(player1, player2);
 		
 		
 		indicator = new RaceIndicator(width, RACEINDICATORHEIGHT, this);
