@@ -1,5 +1,6 @@
 package game;
 
+import game.elements.BubbleGunGum;
 import game.level.Level;
 
 import java.awt.Polygon;
@@ -25,6 +26,9 @@ public abstract class CollisionBox extends Observable
 	private Level collisionLevel;
 	
 	private Object gameElement;
+	public Object getGameElement() {
+		return gameElement;
+	}
 	
 	private CollisionBox currentCollisionPartner;
 	
@@ -36,7 +40,8 @@ public abstract class CollisionBox extends Observable
 	protected double getNewY() {return newY;}
 	protected double getNewXSpeed() {return newXSpeed;}
 	protected double getNewYSpeed() {return newYSpeed;}
-	protected Object getBouncePartner() {return collidingGameElement;}
+	protected Object getBouncePartner() { return collidingGameElement; }
+	protected void resetBouncePartner() {collidingGameElement = null; }
 	
 	/**
 	 * Describing the path, a object can move along while being on ground
@@ -46,7 +51,7 @@ public abstract class CollisionBox extends Observable
 	/**
 	 * collision box for this object
 	 */
-	private Rectangle2D.Double cBox;
+	private Rectangle2D.Double cBox; public Rectangle2D.Double getCBox() {return cBox;}
 	
 	/**
 	 * 
@@ -134,7 +139,7 @@ public abstract class CollisionBox extends Observable
 		
 		//determine points
 		int x0, y0, x1, y1, fx0, fy0, fx1, fy1;
-		x0 = (int)(cBox.x + 0.3); x1 = (int)(cBox.x + cBox.width - 0.3);
+		x0 = (int)(cBox.x + 0.2); x1 = (int)(cBox.x + cBox.width - 0.2);
 		y0 = (int)(cBox.y + 1); y1 = (int)(cBox.y + cBox.height);
 		fx0 = (int)x; fy0 = (int)y + 1;
 		fx1 = (int)(x + cBox.width); fy1 = (int)(y + cBox.height);
@@ -151,6 +156,13 @@ public abstract class CollisionBox extends Observable
 					collision = true;
 					updateCollisionPartners(collider);
 					break;
+				}else {
+					collider = collisionLevel.getCollider(this);
+					if (collider != null) {
+						collision = true;
+						updateCollisionPartners(collider);
+						break;
+					}
 				}
 			}
 		} else if (xDistance < 0) {
@@ -159,18 +171,25 @@ public abstract class CollisionBox extends Observable
 				if (collider != null) {
 					if (collider.getCollisionEffect() == Effects.STOP) {
 						newXSpeed = 0;
-						newX = fx0+1;
+						newX = fx0+collider.collisionBoxWidth();
 					}
 					collision = true;
 					updateCollisionPartners(collider);
 					//System.out.println("newX:"+newX+" x:"+x);
 					break;
+				}else {
+					collider = collisionLevel.getCollider(this);
+					if (collider != null) {
+						collision = true;
+						updateCollisionPartners(collider);
+						break;
+					}
 				}
 			}
 		}
 		if (collisionGroundPath != null) {
 			double xLeftEnd = newX;
-			double xRightEnd = newX + 2;
+			double xRightEnd = newX + this.cBox.width;
 			if (collisionGroundPath.x1 > xRightEnd
 					|| collisionGroundPath.x2 < xLeftEnd) {
 				collisionGroundPath = null; // we fell of an edge : no path anymore
@@ -192,6 +211,13 @@ public abstract class CollisionBox extends Observable
 					collision = true;
 					updateCollisionPartners(collider);
 					break;
+				} else {
+					collider = collisionLevel.getCollider(this);
+					if (collider != null) {
+						collision = true;
+						updateCollisionPartners(collider);
+						break;
+					}
 				}
 			}
 		} else if (yDistance < 0) {
@@ -204,7 +230,7 @@ public abstract class CollisionBox extends Observable
 			} else {
 				//System.out.print("in air\n");
 				for (int curX = x0; curX <= x1; curX++) {
-					collider = collisionLevel.getBoxAt(curX, fy0);
+					collider = collisionLevel.getBoxAt(curX, fy0); 
 					if (collider != null) {
 						// hit feet
 						if (collider.getCollisionEffect() == Effects.STOP) {
@@ -219,6 +245,13 @@ public abstract class CollisionBox extends Observable
 						collision = true;
 						updateCollisionPartners(collider);
 						break;
+					} else {
+						collider = collisionLevel.getCollider(this);
+						if (collider != null) {
+							collision = true;
+							updateCollisionPartners(collider);
+							break;
+						}
 					}
 				}
 			}

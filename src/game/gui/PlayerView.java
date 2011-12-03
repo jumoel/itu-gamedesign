@@ -186,6 +186,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	public void setOwnPlayer(Player p) {
 		this.ownPlayer = p;
+		level.setPlayer(p);
 	}
 	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath, GameMaster gameMaster)

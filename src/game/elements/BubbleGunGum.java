@@ -1,5 +1,6 @@
 package game.elements;
 
+import game.Player;
 import game.graphics.Animation;
 import game.level.Level;
 import processing.core.PApplet;
@@ -12,13 +13,14 @@ public class BubbleGunGum extends GameElement
 	private PApplet processing;
 	public enum BallColor {GIRL, BOY};
 	private int startTime;
-	private static int TIME_TO_LIVE = 2000;
+	private static int TIME_TO_LIVE = 200000;
 	
 	public BubbleGunGum(double x, double y, double xSpeed, double ySpeed, 
 			PApplet processing, BallColor ballColor)
 	{
 		super(x, y, 24/7.0, 24/7.0);
 		super.setCollisionEffect(Effects.NONE);
+		super.setGameElement(this);
 		
 		this.processing = processing;
 		this.xSpeed = xSpeed;
@@ -57,6 +59,8 @@ public class BubbleGunGum extends GameElement
 	public void update(int deltaT) {
 		super.update(deltaT);
 		if (processing.millis() - this.startTime > TIME_TO_LIVE) {
+			this.destroyed = true;
+		} else if (this.getBouncePartner() instanceof Player) {
 			this.destroyed = true;
 		}
 	}

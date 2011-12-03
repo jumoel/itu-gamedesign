@@ -1,5 +1,7 @@
 package game.level;
 
+import java.awt.geom.Rectangle2D;
+
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import game.CollisionBox;
@@ -7,6 +9,7 @@ import game.CollisionBox.Effects;
 import game.Door;
 import game.FinishLine;
 import game.Obstacle;
+import game.Player;
 
 public abstract class CollisionLevel
 {
@@ -14,6 +17,8 @@ public abstract class CollisionLevel
 	
 	public int levelWidth;
 	public int levelHeight;
+	
+	protected Player ownPlayer; public void setPlayer(Player pl){this.ownPlayer = pl;}
 	
 	
 	private CollisionBox[] fixedObjects;
@@ -82,4 +87,6 @@ public abstract class CollisionLevel
 	
 	// all that has to implemented by the level
 	public abstract int getMetaDataAt(int x, int y);
+	
+	public abstract CollisionBox getCollider(CollisionBox cBox);
 }

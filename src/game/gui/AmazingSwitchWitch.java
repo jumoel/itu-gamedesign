@@ -265,6 +265,11 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	}
 	
 	public void blowDoors() {
+		PlayerView pvSource = (doorSpawnDarling == 1 ? playerView1 : playerView2);
+		PlayerView pvTarget = (pvSource == playerView1 ? playerView2 : playerView1);
+		
+		new MoveCamera(pvTarget.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
+		
 		playerView1.initBlowDoor();
 		playerView2.initBlowDoor();
 	}

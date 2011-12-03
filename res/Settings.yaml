@@ -13,6 +13,7 @@ gameplay:
     air: 0.5
   maxspeed: 2.0
   gumspeed: 3.0
+  gumstucktime: 7000
 debug:
   fps: false
 gamerules:
@@ -98,6 +99,21 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+    player1win:
+      path: dreamwin48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    player1lose:
+      path: dreamlose48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    player1stuck:
+      path: dreamstuck48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     player2run:
       path: dreamrungirlevensmaller48x72.png
       framewidth: 48
@@ -130,6 +146,21 @@ graphics:
       fps: 27
     player2shot:
       path: dreamfiregirlgun48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    player2win:
+      path: dreamwingirl48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    player2lose:
+      path: dreamlosegirl48x72.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    player2stuck:
+      path: dreamstuckgirl48x72.png
       framewidth: 48
       frameheight: 72
       fps: 27

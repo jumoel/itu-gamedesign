@@ -47,26 +47,28 @@ public class Player extends GameElement
 	private Animation walkAnimationGun;
 	private Animation jumpAnimationGun;
 	private Animation idleAnimationGun;
+	private Animation winAnimation;
+	private Animation loseAnimation;
+	private Animation stuckToTheGroundAnimation;
 	
 	private Level level;
 	private Player myTwin; public void setTwin(Player twin) {myTwin=twin;}
 
-	private static double GRAVITY = BunnyHat.SETTINGS.getValue("gameplay/gravity");
 	private static double JUMPFORCE = BunnyHat.SETTINGS.getValue("gameplay/jumpforce");
 
 	private static double MOVEACCEL_GROUND = BunnyHat.SETTINGS.getValue("gameplay/moveacceleration/ground");
 	private static double MOVEACCEL_AIR = BunnyHat.SETTINGS.getValue("gameplay/moveacceleration/air");
 	
-	private static double BREAKACCEL_GROUND = BunnyHat.SETTINGS.getValue("gameplay/breakacceleration/ground");
-	private static double BREAKACCEL_AIR = BunnyHat.SETTINGS.getValue("gameplay/breakacceleration/air");
-	
-	private static double MAXSPEED = BunnyHat.SETTINGS.getValue("gameplay/maxspeed");
-	
+	// gum stuff
 	private static double GUMSPEED = BunnyHat.SETTINGS.getValue("gameplay/gumspeed");
+	private static int GUM_STUCK_TIME = BunnyHat.SETTINGS.getValue("gameplay/gumstucktime");
 	
 	private static double CLAMPTOZERO = BunnyHat.SETTINGS.getValue("gameplay/clamptozero");
 	
-	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
+	private int theWinner = -1;
+	
+	private boolean stuckToTheGround = false;
+	private int stuckToTheGroundStartTime;
 	
 	//sound stuff
 	private boolean soundHitBottomPlayed = false;
@@ -143,6 +145,9 @@ public class Player extends GameElement
 		this.walkAnimationGun = new Animation(processing, "graphics/animations/player" + playerNumber + "runGun");
 		this.idleAnimationGun = new Animation(processing, "graphics/animations/player" + playerNumber + "idleGun");
 		this.jumpAnimationGun = new Animation(processing, "graphics/animations/player" + playerNumber + "jumpGun");
+		this.winAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "win");
+		this.loseAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "lose");
+		this.stuckToTheGroundAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "stuck");
 		
 		this.idleAnimation.start();
 		
@@ -167,6 +172,15 @@ public class Player extends GameElement
 		{
 			ret = unarmed?idleAnimation.getCurrentImage(time):idleAnimationGun.getCurrentImage(time);
 		}
+		else if (winAnimation.isRunning()) {
+			ret = winAnimation.getCurrentImage(time);
+		}
+		else if (loseAnimation.isRunning()) {
+			ret = loseAnimation.getCurrentImage(time);
+		}
+		else if (stuckToTheGroundAnimation.isRunning()) {
+			ret = stuckToTheGroundAnimation.getCurrentImage(time);
+		}
 		else
 		{
 			idleAnimation.start();
@@ -183,6 +197,8 @@ public class Player extends GameElement
 	
 	public void jump()
 	{
+		if (stuckToTheGround) return;
+		
 		if (!isJumping)
 		{
 			ySpeed = JUMPFORCE;
@@ -191,6 +207,7 @@ public class Player extends GameElement
 	
 	public void moveLeft()
 	{
+		if (stuckToTheGround) return;
 		cannotMoveRight = false;
 		
 		facing = Facing.LEFT;
@@ -213,6 +230,7 @@ public class Player extends GameElement
 	
 	public void moveRight()
 	{
+		if (stuckToTheGround) return;
 		cannotMoveLeft = false;
 		
 		facing = Facing.RIGHT;
@@ -247,6 +265,8 @@ public class Player extends GameElement
 	{
 		boolean hasXSpeed = Math.abs(xSpeed) > CLAMPTOZERO;
 		
+		
+		
 		if (isInAir)
 		{
 			idleAnimation.stop();
@@ -260,12 +280,43 @@ public class Player extends GameElement
 				jumpAnimationGun.start();
 			}
 		}
+		else if (theWinner != -1) {
+			idleAnimation.stop();
+			walkAnimation.stop();
+			jumpAnimation.stop();
+			idleAnimationGun.stop();
+			walkAnimationGun.stop();
+			jumpAnimationGun.stop();
+			stuckToTheGroundAnimation.stop();
+			if (theWinner == myID) {
+				if (winAnimation.isStopped()) {
+					winAnimation.start();
+				}
+			} else {
+				if (loseAnimation.isStopped()) {
+					loseAnimation.start();
+				}
+			}
+		}
+		else if (stuckToTheGround) {
+			idleAnimation.stop();
+			walkAnimation.stop();
+			jumpAnimation.stop();
+			idleAnimationGun.stop();
+			walkAnimationGun.stop();
+			jumpAnimationGun.stop();
+			
+			if (stuckToTheGroundAnimation.isStopped()) {
+				stuckToTheGroundAnimation.start();
+			}
+		}
 		else if (hasXSpeed)
 		{
 			idleAnimation.stop();
 			jumpAnimation.stop();
 			idleAnimationGun.stop();
 			jumpAnimationGun.stop();
+			stuckToTheGroundAnimation.stop();
 			
 			if (walkAnimation.isStopped())
 			{
@@ -279,6 +330,7 @@ public class Player extends GameElement
 			walkAnimation.stop();
 			jumpAnimationGun.stop();
 			walkAnimationGun.stop();
+			stuckToTheGroundAnimation.stop();
 			
 			if (idleAnimation.isStopped())
 			{
@@ -292,40 +344,51 @@ public class Player extends GameElement
 	
 	public void update(State state, int deltaT)
 	{
-		handleInput(state);
+		if (theWinner == -1) handleInput(state);
 		super.update(deltaT);
 		controlAnimations();
 		
-			if (ySpeed == 0) {
-				isJumping = false;
-				if (! this.soundHitBottomPlayed) {
-					Stereophone.playSound("001", "player_hitground", 100);
-					this.soundHitBottomPlayed = true;
-				}
-			} else {
-				this.soundHitBottomPlayed = false;
+		if (stuckToTheGround) {
+			if (processing.millis() - this.stuckToTheGroundStartTime >= this.GUM_STUCK_TIME) {
+				stuckToTheGround = false;
 			}
-			//isInAir = isJumping = this.getNewIsJumping();
-			
-			// any interesting collision partners?
-			Object gameElement = this.getBouncePartner();
-			if (gameElement instanceof FinishLine) {
-				// we won!!!
-				this.setChanged();
-				HashMap map = new HashMap();
-				map.put("IFUCKINGWON", myID);
-				this.notifyObservers(map);
-				Stereophone.playSound("310", "playerwon", 10000);
-			} else if (gameElement instanceof StandardCreature) {
-				// player hit a creature
-				//((StandardCreature) gameElement).contact(this); creature is informed via collision box
-			} else if (gameElement instanceof Door)
-			{
-				this.setChanged();
-				HashMap map = new HashMap();
-				map.put("OHDOORTAKEMEAWAY", myID);
-				this.notifyObservers(map);
+		}
+		
+		if (ySpeed == 0) {
+			isJumping = false;
+			if (! this.soundHitBottomPlayed) {
+				Stereophone.playSound("001", "player_hitground", 100);
+				this.soundHitBottomPlayed = true;
 			}
+		} else {
+			this.soundHitBottomPlayed = false;
+		}
+		//isInAir = isJumping = this.getNewIsJumping();
+		
+		// any interesting collision partners?
+		Object gameElement = this.getBouncePartner();
+		if (gameElement instanceof FinishLine) {
+			// we won!!!
+			this.setChanged();
+			HashMap map = new HashMap();
+			map.put("IFUCKINGWON", myID);
+			this.notifyObservers(map);
+			this.myTwin.theWinner = this.theWinner = myID;
+			Stereophone.playSound("310", "playerwon", 10000);
+		} else if (gameElement instanceof StandardCreature) {
+			// player hit a creature
+			//((StandardCreature) gameElement).contact(this); creature is informed via collision box
+		} else if (gameElement instanceof Door)
+		{
+			this.setChanged();
+			HashMap map = new HashMap();
+			map.put("OHDOORTAKEMEAWAY", myID);
+			this.notifyObservers(map);
+		} else if (unarmed && gameElement instanceof BubbleGunGum) {
+			this.stuckToTheGroundStartTime = processing.millis();
+			this.stuckToTheGround = true;
+			this.resetBouncePartner();
+		}
 			
 
 		

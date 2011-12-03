@@ -1,11 +1,14 @@
 package game.level;
 
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 import game.BunnyHat;
+import game.CollisionBox;
+import game.Player;
 import game.elements.GameElement;
 import processing.core.*;
 import util.BImage;
@@ -128,6 +131,21 @@ public class Level extends CollisionLevel
 		{
 			return tiles[leveldata - 1];
 		}
+	}
+	
+	public CollisionBox getCollider(CollisionBox box) {
+		CollisionBox ret = null;
+		Iterator cnos = creaturesAndObjects.iterator();
+		while (cnos.hasNext()) {
+			CollisionBox currentCBox = (CollisionBox)cnos.next();
+			if (currentCBox != box && box.getCBox().intersects(currentCBox.getCBox())) {
+				return currentCBox;
+			}
+		}
+		if (box.getGameElement() != ownPlayer && ownPlayer.getCBox().intersects(box.getCBox())) {
+			return ownPlayer;
+		}
+		return ret;
 	}
 	
 	public void updateCreaturesAndObjects(int deltaT) {
