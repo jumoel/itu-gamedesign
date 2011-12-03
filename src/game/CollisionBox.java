@@ -34,8 +34,9 @@ public abstract class CollisionBox extends Observable
 	
 	private Object collidingGameElement;
 	private double newX, newY, newXSpeed, newYSpeed;
-	private boolean newIsJumping;
+	private boolean newIsJumping, newIsInAir;
 	protected boolean getNewIsJumping() {return newIsJumping;}
+	protected boolean getNewIsInAir() {return newIsInAir;}
 	protected double getNewX() {return newX;}
 	protected double getNewY() {return newY;}
 	protected double getNewXSpeed() {return newXSpeed;}
@@ -127,7 +128,7 @@ public abstract class CollisionBox extends Observable
 	 */
 	protected boolean isColliding (double x, double y, double xSpeed, double ySpeed) {
 		boolean collision = false;
-		newIsJumping = true;
+		newIsInAir = newIsJumping = true;
 		newX = x; newY = y; newXSpeed = xSpeed; newYSpeed = ySpeed;
 		
 		
@@ -139,10 +140,10 @@ public abstract class CollisionBox extends Observable
 		
 		//determine points
 		int x0, y0, x1, y1, fx0, fy0, fx1, fy1;
-		x0 = (int)(cBox.x + 0.2); x1 = (int)(cBox.x + cBox.width - 0.2);
+		x0 = (int)(cBox.x + 0.1); x1 = (int)(cBox.x + cBox.width - 0.1);
 		y0 = (int)(cBox.y + 1); y1 = (int)(cBox.y + cBox.height);
 		fx0 = (int)x; fy0 = (int)y + 1;
-		fx1 = (int)(x + cBox.width); fy1 = (int)(y + cBox.height);
+		fx1 = (int)(x + cBox.width); fy1 = (int)(y + 1 + cBox.height);
 		
 		CollisionBox collider;
 		if (xDistance > 0) {
@@ -151,41 +152,33 @@ public abstract class CollisionBox extends Observable
 				if (collider != null) {
 					if (collider.getCollisionEffect() == Effects.STOP) {
 						newXSpeed = 0;
-						newX = fx1-this.cBox.width;
+						newX = collider.x()-this.cBox.width;
 					}
 					collision = true;
 					updateCollisionPartners(collider);
 					break;
-				}else {
-					collider = collisionLevel.getCollider(this);
-					if (collider != null) {
-						collision = true;
-						updateCollisionPartners(collider);
-						break;
-					}
 				}
+					
+				
 			}
+			
 		} else if (xDistance < 0) {
 			for (int curY = y0; curY <= y1; curY++) {
 				collider = collisionLevel.getBoxAt(fx0, curY);
 				if (collider != null) {
 					if (collider.getCollisionEffect() == Effects.STOP) {
 						newXSpeed = 0;
-						newX = fx0+collider.collisionBoxWidth();
+						newX = collider.x()+collider.collisionBoxWidth();
 					}
 					collision = true;
 					updateCollisionPartners(collider);
 					//System.out.println("newX:"+newX+" x:"+x);
 					break;
-				}else {
-					collider = collisionLevel.getCollider(this);
-					if (collider != null) {
-						collision = true;
-						updateCollisionPartners(collider);
-						break;
-					}
 				}
+				
+				
 			}
+			
 		}
 		if (collisionGroundPath != null) {
 			double xLeftEnd = newX;
@@ -205,19 +198,11 @@ public abstract class CollisionBox extends Observable
 				if (collider != null) {
 					if (collider.getCollisionEffect() == Effects.STOP) {
 						newYSpeed = -0.01;
-						newY = fy1-this.cBox.height;
+						newY = collider.y()-this.cBox.height;
 					}
-					newIsJumping=true;
 					collision = true;
 					updateCollisionPartners(collider);
 					break;
-				} else {
-					collider = collisionLevel.getCollider(this);
-					if (collider != null) {
-						collision = true;
-						updateCollisionPartners(collider);
-						break;
-					}
 				}
 			}
 		} else if (yDistance < 0) {
@@ -225,6 +210,7 @@ public abstract class CollisionBox extends Observable
 				newYSpeed = 0;
 				newY = cBox.y;
 				newIsJumping = false;
+				newIsInAir = false;
 				collision = true;
 				//System.out.print("onground \n");
 			} else {
@@ -236,7 +222,8 @@ public abstract class CollisionBox extends Observable
 						if (collider.getCollisionEffect() == Effects.STOP) {
 							newYSpeed = 0;
 							newY = fy0;
-							newIsJumping = true;
+							newIsInAir = false;
+							//newIsJumping = true;
 							this.collisionGroundPath = collider.getHeadline();
 						} else if (collider.getCollisionEffect() == Effects.BOUNCE) {
 							newYSpeed = -ySpeed;
@@ -245,18 +232,17 @@ public abstract class CollisionBox extends Observable
 						collision = true;
 						updateCollisionPartners(collider);
 						break;
-					} else {
-						collider = collisionLevel.getCollider(this);
-						if (collider != null) {
-							collision = true;
-							updateCollisionPartners(collider);
-							break;
-						}
-					}
+					} 
 				}
 			}
 		}
 		
+		
+		collider = collisionLevel.getCollider(this);
+		if (collider != null) {
+			collision = true;
+			updateCollisionPartners(collider);
+		}
 		
 		
 		return collision;

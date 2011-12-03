@@ -12,7 +12,7 @@ gameplay:
     ground: 1.0
     air: 0.5
   maxspeed: 2.0
-  gumspeed: 3.0
+  gumspeed: 1.0
   gumstucktime: 7000
 debug:
   fps: false

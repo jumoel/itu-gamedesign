@@ -137,7 +137,7 @@ public class Player extends GameElement
 		//isMovingSideways = false;
 		cannotMoveLeft = false;
 
-		unarmed = true;
+		unarmed = false;
 		
 		this.walkAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "run");
 		this.idleAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "idle");
@@ -253,7 +253,8 @@ public class Player extends GameElement
 	
 	public void fireGum() {
 		double gumSpeedX = xSpeed + (this.facing == Player.Facing.RIGHT?this.GUMSPEED:-this.GUMSPEED);
-		BubbleGunGum gum = new BubbleGunGum(xpos+1.0, ypos+0.5, gumSpeedX, ySpeed*0.1+0.5, 
+		double gumX = (this.facing == Player.Facing.LEFT?xpos-0.1:xpos+2.1);
+		BubbleGunGum gum = new BubbleGunGum(gumX, ypos+0.5, gumSpeedX, ySpeed*0.1, 
 				processing, (this.myID == 1 ? BallColor.GIRL : BallColor.BOY));
 		gum.setLevel(level);
 		

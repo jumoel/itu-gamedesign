@@ -1,5 +1,6 @@
 package game.elements;
 
+import game.Obstacle;
 import game.Player;
 import game.graphics.Animation;
 import game.level.Level;
@@ -14,18 +15,19 @@ public class BubbleGunGum extends GameElement
 	public enum BallColor {GIRL, BOY};
 	private int startTime;
 	private static int TIME_TO_LIVE = 200000;
+	private double oldSpeed;
 	
 	public BubbleGunGum(double x, double y, double xSpeed, double ySpeed, 
 			PApplet processing, BallColor ballColor)
 	{
-		super(x, y, 24/7.0, 24/7.0);
+		super(x, y, 7/24, 7/24);
 		super.setCollisionEffect(Effects.NONE);
 		super.setGameElement(this);
 		
 		this.processing = processing;
-		this.xSpeed = xSpeed;
+		this.oldSpeed = this.xSpeed = xSpeed;
 		this.ySpeed = ySpeed;
-		this.gravityFactor = 0.1;
+		this.gravityFactor = 0.02;
 		this.breakAccelAirFactor = 0.0;
 		
 		this.startTime = processing.millis();
@@ -61,7 +63,11 @@ public class BubbleGunGum extends GameElement
 		if (processing.millis() - this.startTime > TIME_TO_LIVE) {
 			this.destroyed = true;
 		} else if (this.getBouncePartner() instanceof Player) {
-			this.destroyed = true;
+			//this.destroyed = true;
+		} else if (this.getBouncePartner() instanceof Obstacle) {
+			if (xSpeed == 0 && ySpeed != 0) {
+				this.xSpeed = -this.oldSpeed;
+			}
 		}
 	}
 
