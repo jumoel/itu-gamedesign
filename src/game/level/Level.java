@@ -140,20 +140,31 @@ public class Level extends CollisionLevel
 	
 	public void drawCreaturesAndObjects(int x, int y, int width, int height, PGraphics graphics) {
 		Iterator cnos = creaturesAndObjects.iterator();
+		GameElement toBeDestroyed = null;
 		while (cnos.hasNext()) {
 			GameElement currentCreature = (GameElement)cnos.next();
 			if (currentCreature.destroyed) {
-				creaturesAndObjects.remove(currentCreature);
+				toBeDestroyed = currentCreature;
 			} else {
-			
+				//System.out.println("want to draw creature");
+				int xcoord = (int)(currentCreature.x() * BunnyHat.TILEDIMENSION - x);
+				int ycoord = (int)((height - currentCreature.y() * BunnyHat.TILEDIMENSION));
+				//int drawx = (int)(currentCreature.x() * BunnyHat.TILEDIMENSION - x);
+				//int drawy = (int)(((height - currentCreature.y()) * BunnyHat.TILEDIMENSION) + y);
+				//System.out.println("draw at " + xcoord +":"+ycoord +" with x:"+ x +" ,y:"+y +", pos:"+currentCreature.x()+":"+currentCreature.y());
 				//int lvlHpx = levelHeight * BunnyHat.TILEDIMENSION;
-				if (currentCreature.x()+currentCreature.collisionBoxWidth() > x && currentCreature.x() < x + width 
-						&& currentCreature.y() + currentCreature.collisionBoxHeight() > y && currentCreature.y() < y + height) {
-					int drawx = (int)(currentCreature.x() * BunnyHat.TILEDIMENSION - x);
-					int drawy = (int)(currentCreature.y() * BunnyHat.TILEDIMENSION - y);
-					graphics.image(currentCreature.getCurrentTexture(), drawx, drawy);
+				if (xcoord+currentCreature.collisionBoxWidth() > 0 && xcoord <  width 
+						&& ycoord + currentCreature.collisionBoxHeight() > 0 && ycoord <  height) {
+					//int drawx = (int)(currentCreature.x() * BunnyHat.TILEDIMENSION - x);
+					//int drawy = (int)(currentCreature.y() * BunnyHat.TILEDIMENSION - y);
+					PImage image = currentCreature.getCurrentTexture();
+					
+					graphics.image(image, xcoord, ycoord-image.height);
 				}
 			}
+		}
+		if (toBeDestroyed != null) {
+			creaturesAndObjects.remove(toBeDestroyed);
 		}
 	}
 	

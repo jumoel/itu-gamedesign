@@ -2,6 +2,8 @@ package game;
 import java.util.HashMap;
 
 
+import game.elements.BubbleGunGum;
+import game.elements.BubbleGunGum.BallColor;
 import game.elements.GameElement; 
 import game.elements.StandardCreature;
 import game.graphics.Animation;
@@ -126,7 +128,7 @@ public class Player extends GameElement
 			}
 		}
 		
-		
+		this.setCollisionEffect(Effects.NONE);
 		System.out.println(this.xpos + ", " + this.ypos);
 		
 		isJumping = true;
@@ -232,7 +234,12 @@ public class Player extends GameElement
 	}
 	
 	public void fireGum() {
+		double gumSpeedX = xSpeed + (this.facing == Player.Facing.RIGHT?this.GUMSPEED:-this.GUMSPEED);
+		BubbleGunGum gum = new BubbleGunGum(xpos+1.0, ypos+0.5, gumSpeedX, ySpeed*0.1+0.5, 
+				processing, (this.myID == 1 ? BallColor.GIRL : BallColor.BOY));
+		gum.setLevel(level);
 		
+		this.level.addCreature(gum);
 	}
 	
 	
@@ -370,16 +377,19 @@ public class Player extends GameElement
 		{
 			moveLeft();
 		}
-		else if (rightbutton)
+		
+		if (rightbutton)
 		{
 			moveRight();
 			
 		}
-		else if (downbutton)
+		
+		if (downbutton)
 		{
 			// Use stuff
 		}
-		else if (shootbutton) {
+		
+		if (shootbutton && !unarmed) {
 			state.put('.', false);
 			fireGum();
 		}

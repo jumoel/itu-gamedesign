@@ -40,6 +40,8 @@ public abstract class GameElement extends CollisionBox
 	protected double xpos, ypos, previous_xpos, previous_ypos;
 	protected double yAcceleration;
 	protected boolean isInAir;
+	protected double gravityFactor = 1.0;
+	protected double breakAccelAirFactor = 1.0;
 	
 	public void setPos(double x, double y) {
 		this.xpos = x;
@@ -49,6 +51,8 @@ public abstract class GameElement extends CollisionBox
 	
 	public GameElement(double x, double y, double width, double height){
 		super(x, y, width, height);
+		this.xpos = x;
+		this.ypos = y;
 		this.xSpeed = 0.0;
 		this.ySpeed = 0.0;
 	}
@@ -71,7 +75,7 @@ public abstract class GameElement extends CollisionBox
 			double breakAmount = 0;
 			if (isInAir)
 			{
-				breakAmount = BREAKACCEL_AIR * deltaFactor;
+				breakAmount = BREAKACCEL_AIR * deltaFactor * breakAccelAirFactor;
 			}
 			else
 			{
@@ -98,7 +102,7 @@ public abstract class GameElement extends CollisionBox
 		// Y
 		//if (isInAir)
 		//{
-			yAcceleration = GRAVITY;
+			yAcceleration = GRAVITY * gravityFactor;
 			//ypos = ypos + ySpeed * deltaFactor + 0.5 * yAcceleration * Math.pow(deltaFactor, 2);
 			ySpeed += yAcceleration * deltaFactor;
 			ypos += ySpeed * deltaFactor;// + yAcceleration;
@@ -135,8 +139,8 @@ public abstract class GameElement extends CollisionBox
 		
 
 		
-		if (this.isColliding(xpos - this.collisionBoxWidth()/2, ypos, xSpeed, ySpeed)) {
-			xpos = this.getNewX() + this.collisionBoxWidth()/2; ypos = this.getNewY();
+		if (this.isColliding(xpos, ypos, xSpeed, ySpeed)) {
+			xpos = this.getNewX(); ypos = this.getNewY();
 			xSpeed = this.getNewXSpeed(); ySpeed = this.getNewYSpeed();
 			if (ySpeed == 0) {
 				isInAir = false;
@@ -158,7 +162,7 @@ public abstract class GameElement extends CollisionBox
 		
 	
 		// update the position of the characters collision box
-		this.updatePosition(xpos-1, ypos);
+		this.updatePosition(xpos, ypos);
 	}
 		
 

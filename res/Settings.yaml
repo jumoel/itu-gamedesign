@@ -53,6 +53,16 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+    bubbleGumGirl:
+      path: objects/gumballpink7x7.png
+      framewidth: 7
+      frameheight: 7
+      fps: 27
+    bubbleGumBoy:
+      path: objects/gumballblue7x7.png
+      framewidth: 7
+      frameheight: 7
+      fps: 27
     player1run:
       path: dreamrunevensmaller48x72.png
       framewidth: 48

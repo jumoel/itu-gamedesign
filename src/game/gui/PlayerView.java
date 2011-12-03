@@ -457,7 +457,7 @@ public class PlayerView extends Updateable implements Observer
 		int minimumTileY = getMinimumTileY();
 		int maximumTileY = getMaximumTileY();
 		
-		int yWindowOffset = height % BunnyHat.TILEDIMENSION;
+		
 		
 		// Counting y from down towards the sky
 		for (int reversey = minimumTileY; reversey <= maximumTileY; reversey++)
@@ -469,7 +469,7 @@ public class PlayerView extends Updateable implements Observer
 				PImage tile = level.getLevelImageAt(x, y, layer);
 				
 				int xcoord = x * BunnyHat.TILEDIMENSION - xCoordCamera;
-				int ycoord = (BunnyHat.PLAYERVIEWTILEHEIGHT - reversey) * BunnyHat.TILEDIMENSION + yCoordCamera + yWindowOffset;
+				int ycoord = (height - reversey * BunnyHat.TILEDIMENSION)  + yCoordCamera;
 				
 				if (tile != null)
 				{

@@ -1,5 +1,6 @@
 package game.elements;
 
+import game.graphics.Animation;
 import game.level.Level;
 import processing.core.PApplet;
 import processing.core.PGraphics;
@@ -7,20 +8,42 @@ import processing.core.PImage;
 
 public class BubbleGunGum extends GameElement
 {
+	private Animation ballAnimation;
+	private PApplet processing;
+	public enum BallColor {GIRL, BOY};
+	private int startTime;
+	private static int TIME_TO_LIVE = 2000;
 	
-	
-	public BubbleGunGum(double x, double y, double xSpeed, double ySpeed)
+	public BubbleGunGum(double x, double y, double xSpeed, double ySpeed, 
+			PApplet processing, BallColor ballColor)
 	{
-		super(x, y, 1, 1);
+		super(x, y, 24/7.0, 24/7.0);
 		super.setCollisionEffect(Effects.NONE);
-		// TODO Auto-generated constructor stub
+		
+		this.processing = processing;
+		this.xSpeed = xSpeed;
+		this.ySpeed = ySpeed;
+		this.gravityFactor = 0.1;
+		this.breakAccelAirFactor = 0.0;
+		
+		this.startTime = processing.millis();
+		
+		switch (ballColor) {
+			case GIRL:
+				ballAnimation = new Animation(processing, "graphics/animations/bubbleGumGirl");
+				break;
+			case BOY:
+				ballAnimation = new Animation(processing, "graphics/animations/bubbleGumBoy");
+				break;
+		}
+		ballAnimation.start();
 	}
 
 	@Override
 	public PImage getCurrentTexture()
 	{
-		// TODO Auto-generated method stub
-		return null;
+		int time = processing.millis();
+		return ballAnimation.getCurrentImage(time);
 	}
 
 	@Override
@@ -28,6 +51,14 @@ public class BubbleGunGum extends GameElement
 	{
 		// TODO Auto-generated method stub
 
+	}
+	
+	@Override
+	public void update(int deltaT) {
+		super.update(deltaT);
+		if (processing.millis() - this.startTime > TIME_TO_LIVE) {
+			this.destroyed = true;
+		}
 	}
 
 
