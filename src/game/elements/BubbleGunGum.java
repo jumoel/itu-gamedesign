@@ -7,10 +7,12 @@ import processing.core.PImage;
 
 public class BubbleGunGum extends GameElement
 {
-
+	
+	
 	public BubbleGunGum(double x, double y, double xSpeed, double ySpeed)
 	{
 		super(x, y, 1, 1);
+		super.setCollisionEffect(Effects.NONE);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -28,11 +30,5 @@ public class BubbleGunGum extends GameElement
 
 	}
 
-	@Override
-	public void update()
-	{
-		// TODO Auto-generated method stub
-		
-	}
 
 }

@@ -50,7 +50,7 @@ public class BGeometry
 		int tiledimension = BunnyHat.TILEDIMENSION;
 		
 		return RectanglesOverlap(
-				player.xpos, (int) player.ypos - playertexture.height / 2,
+				player.x(), (int) player.y() - playertexture.height / 2,
 				playertexture.width, playertexture.height,
 				
 				x + tiledimension / 2.0, y + tiledimension / 2.0,

@@ -105,8 +105,7 @@ public class PlayerView extends Updateable implements Observer
 	}
 	
 	protected void setDoorPosition(Player p) {
-		p.xpos = this.ownDoor.x();
-		p.ypos = this.ownDoor.y();
+		p.setPos(ownDoor.x(), ownDoor.y());
 	}
 	
 	protected void initBlowDoor() {
@@ -118,7 +117,7 @@ public class PlayerView extends Updateable implements Observer
 	protected void showDoor(boolean closeBy) {
 		System.out.println("show them the doors - maxX:"+getMaximumTileX()+" minX:"+getMinimumTileX());
 		// Counting y from down towards the sky
-		int minimumTileX = (int)ownPlayer.xpos + 1;
+		int minimumTileX = (int)ownPlayer.x() + 1;
 		int maximumTileX = getMaximumTileX();
 		int tileSpanX = maximumTileX - minimumTileX;
 		
@@ -135,8 +134,8 @@ public class PlayerView extends Updateable implements Observer
 			{		
 				if (this.level.getMetaDataAt(x, y) == Level.MetaTiles.DoorSpawnPoint.index()) {
 					doorFound = true;
-					double pxDist = ownPlayer.xpos - x;
-					double pyDist = ownPlayer.ypos - y;
+					double pxDist = ownPlayer.x() - x;
+					double pyDist = ownPlayer.y() - y;
 					double distanceToPlayer = Math.sqrt(Math.pow(pxDist, 2) + Math.pow(pyDist, 2));
 					boolean useNewValues = false;
 					if (doorDistance == -1) {
@@ -235,7 +234,7 @@ public class PlayerView extends Updateable implements Observer
 		if (this.shouldShowDoor) {this.showDoor(this.shouldBeCloseBy); this.shouldShowDoor = false;}
 		if (this.shouldBlowDoor) {this.blowDoor(); this.shouldBlowDoor = false;}
 		
-		level.updateCreaturesAndObjects();
+		level.updateCreaturesAndObjects(deltaT);
 		
 		buffer.beginDraw();
 		buffer.background(255);
@@ -248,7 +247,7 @@ public class PlayerView extends Updateable implements Observer
 			return;
 		}
 		
-		ownPlayer.isMovingSideways = false;
+		//ownPlayer.isMovingSideways = false;
 		
 		
 		
@@ -257,8 +256,8 @@ public class PlayerView extends Updateable implements Observer
 		
 		if (drawOwnPlayer)
 		{
-			pxpos = (int) (ownPlayer.xpos * BunnyHat.TILEDIMENSION);
-			pypos = (int) (ownPlayer.ypos * BunnyHat.TILEDIMENSION);
+			pxpos = (int) (ownPlayer.x() * BunnyHat.TILEDIMENSION);
+			pypos = (int) (ownPlayer.y() * BunnyHat.TILEDIMENSION);
 		}
 		else
 		{
@@ -346,13 +345,13 @@ public class PlayerView extends Updateable implements Observer
 		
 		if (drawOwnPlayer)
 		{
-			drawImage(ownPlayer.getCurrentTexture(), buffer, drawpxpos, drawpypos, Horizontal.MIDDLE, Vertical.BOTTOM);
+			drawImage(ownPlayer.getCurrentTexture(), buffer, drawpxpos, drawpypos, Horizontal.LEFT, Vertical.BOTTOM);
 		}
 		
 		if (drawOtherPlayer)
 		{
-			int opxpos = (int) (otherPlayer.xpos * BunnyHat.TILEDIMENSION);
-			int opypos = (int) (otherPlayer.ypos * BunnyHat.TILEDIMENSION);
+			int opxpos = (int) (otherPlayer.x() * BunnyHat.TILEDIMENSION);
+			int opypos = (int) (otherPlayer.y() * BunnyHat.TILEDIMENSION);
 			
 			if (opxpos < 0)
 			{
@@ -383,7 +382,7 @@ public class PlayerView extends Updateable implements Observer
 			int drawopypos = drawpypos - ydiff;
 			int drawopxpos = drawpxpos + xdiff;
 			
-			drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.MIDDLE, Vertical.BOTTOM);	
+			drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.LEFT, Vertical.BOTTOM);	
 		}
 		
 		drawLevelGraphics(buffer, Level.Layer.FOREGROUND);

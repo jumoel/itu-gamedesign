@@ -12,6 +12,7 @@ gameplay:
     ground: 1.0
     air: 0.5
   maxspeed: 2.0
+  gumspeed: 3.0
 debug:
   fps: false
 gamerules:
@@ -123,7 +124,7 @@ graphics:
       frameheight: 72
       fps: 27
 levels:
-  level1:
+  level1: 
     good: levels/test_24.tmx
     bad: levels/test_24.tmx
   level2:

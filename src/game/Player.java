@@ -2,7 +2,7 @@ package game;
 import java.util.HashMap;
 
 
-import game.elements.GameElement;
+import game.elements.GameElement; 
 import game.elements.StandardCreature;
 import game.graphics.Animation;
 import game.gui.AmazingSwitchWitch;
@@ -13,27 +13,27 @@ import util.BImage;
 import util.BMath;
 import util.BPoint;
 
-public class Player extends CollisionBox
+public class Player extends GameElement
 {
 	private enum Facing { LEFT, RIGHT };
 	private int myID;
 	
 	private PApplet processing;
-	public double xpos, ypos, previous_xpos, previous_ypos;
+	//public double xpos, ypos, previous_xpos, previous_ypos;
 	
 	// jumping stuff
-	private boolean isInAir;
+	//private boolean isInAir;
 	private boolean isJumping;
 	private boolean didJump = false;
 	
-	public boolean isMovingSideways;
+	//public boolean isMovingSideways;
 
 	public boolean cannotMoveLeft;
 	public boolean cannotMoveRight;
 	
-	private double yAcceleration;
-	public double ySpeed;
-	public double xSpeed;
+	//private double yAcceleration;
+	//public double ySpeed;
+	//public double xSpeed;
 	
 	private Facing facing;
 
@@ -59,6 +59,8 @@ public class Player extends CollisionBox
 	private static double BREAKACCEL_AIR = BunnyHat.SETTINGS.getValue("gameplay/breakacceleration/air");
 	
 	private static double MAXSPEED = BunnyHat.SETTINGS.getValue("gameplay/maxspeed");
+	
+	private static double GUMSPEED = BunnyHat.SETTINGS.getValue("gameplay/gumspeed");
 	
 	private static double CLAMPTOZERO = BunnyHat.SETTINGS.getValue("gameplay/clamptozero");
 	
@@ -127,9 +129,8 @@ public class Player extends CollisionBox
 		
 		System.out.println(this.xpos + ", " + this.ypos);
 		
-		isInAir = true;
 		isJumping = true;
-		isMovingSideways = false;
+		//isMovingSideways = false;
 		cannotMoveLeft = false;
 
 		unarmed = true;
@@ -230,6 +231,10 @@ public class Player extends CollisionBox
 		}
 	}
 	
+	public void fireGum() {
+		
+	}
+	
 	
 	private void controlAnimations()
 	{
@@ -248,7 +253,7 @@ public class Player extends CollisionBox
 				jumpAnimationGun.start();
 			}
 		}
-		else if (hasXSpeed || isMovingSideways)
+		else if (hasXSpeed)
 		{
 			idleAnimation.stop();
 			jumpAnimation.stop();
@@ -281,99 +286,17 @@ public class Player extends CollisionBox
 	public void update(State state, int deltaT)
 	{
 		handleInput(state);
-		
-		previous_xpos = xpos;
-		previous_ypos = ypos;
-		double deltaFactor = deltaT / (double)DELTAT_DIVIDENT;
-		
-		// X
-		boolean hasXSpeed = Math.abs(xSpeed) > CLAMPTOZERO;
-		
+		super.update(deltaT);
 		controlAnimations();
 		
-		if (hasXSpeed)
-		{
-			double xSignum = Math.signum(xSpeed);
-			
-			if (!isMovingSideways)
-			{
-				double absXSpeed = Math.abs(xSpeed);
-				double breakAmount = 0;
-				if (isInAir)
-				{
-					breakAmount = BREAKACCEL_AIR * deltaFactor;
-				}
-				else
-				{
-					breakAmount = BREAKACCEL_GROUND * deltaFactor;
-				}
-				if (absXSpeed > breakAmount) {
-					xSpeed = (absXSpeed - breakAmount) * xSignum;
-				} else {
-					xSpeed = 0.0;
-				}
-			}
-			
-			xSpeed = BMath.clamp(xSpeed, 0, xSignum * MAXSPEED);
-		}
-		else
-		{	
-			xSpeed = 0;
-		}
-		
-		xpos = xpos + xSpeed * deltaFactor;
-		
-		
-		
-		// Y
-		//if (isInAir)
-		//{
-			yAcceleration = GRAVITY;
-			//ypos = ypos + ySpeed * deltaFactor + 0.5 * yAcceleration * Math.pow(deltaFactor, 2);
-			ySpeed += yAcceleration * deltaFactor;
-			ypos += ySpeed * deltaFactor;// + yAcceleration;
-			//System.out.println("ySpeed:"+ySpeed+" yPos:"+ypos+" deltaT:"+deltaT+" deltaFactor:"+deltaFactor);
-		/*}
-		else
-		{
-			yAcceleration = 0.0;
-			ypos = ypos + ySpeed * deltaFactor;
-		}*/
-		
-		
-		
-		
-		
-		
-		
-		
-		if(deltaT > 84) {
-			System.out.println("high deltaT: "+ deltaT);
-		}
-		
-		//make sure, ypos and xpos did not travel to far for one frame 
-		// once they travel too far, they can cross a collision box  - and we surely do not want that!
-		double yDiff = ypos - previous_ypos;
-		double xDiff = xpos - previous_xpos;
-		double maxDistance = 0.9;
-		if (Math.abs(yDiff)>=maxDistance) {
-			ypos = previous_ypos + maxDistance * Math.signum(yDiff);
-		}
-		if (Math.abs(xDiff)>=maxDistance) {
-			xpos = previous_xpos + maxDistance * Math.signum(xDiff);
-		}
-		
-
-		
-		if (this.isColliding(xpos - this.collisionBoxWidth()/2, ypos, xSpeed, ySpeed)) {
-			xpos = this.getNewX() + this.collisionBoxWidth()/2; ypos = this.getNewY();
-			xSpeed = this.getNewXSpeed(); ySpeed = this.getNewYSpeed();
 			if (ySpeed == 0) {
-				isInAir = isJumping = false;
+				isJumping = false;
 				if (! this.soundHitBottomPlayed) {
 					Stereophone.playSound("001", "player_hitground", 100);
 					this.soundHitBottomPlayed = true;
 				}
+			} else {
+				this.soundHitBottomPlayed = false;
 			}
 			//isInAir = isJumping = this.getNewIsJumping();
 			
@@ -388,7 +311,7 @@ public class Player extends CollisionBox
 				Stereophone.playSound("310", "playerwon", 10000);
 			} else if (gameElement instanceof StandardCreature) {
 				// player hit a creature
-				((StandardCreature) gameElement).contact(this);
+				//((StandardCreature) gameElement).contact(this); creature is informed via collision box
 			} else if (gameElement instanceof Door)
 			{
 				this.setChanged();
@@ -398,20 +321,10 @@ public class Player extends CollisionBox
 			}
 			
 
-		} else {
-			this.soundHitBottomPlayed = false;
-		}
+		
 		
 		if (ySpeed != 0) isInAir = isJumping = true;
 		
-		
-		
-			
-		
-		
-	
-		// update the position of the characters collision box
-		this.updatePosition(xpos-1, ypos);
 		
 	}
 	
@@ -435,6 +348,8 @@ public class Player extends CollisionBox
 		boolean downbutton = (this.myID == 1) ?
 				(state.containsKey('s') && state.get('s')) :
 				(state.containsKey('k') && state.get('k'));
+				
+		boolean shootbutton = state.containsKey('.') && state.get('.');
 
 		// a player should always have to press jump again for another jump
 		if (didJump && !jumpbutton) didJump = false;  
@@ -453,20 +368,22 @@ public class Player extends CollisionBox
 		
 		if (leftbutton)
 		{
-			isMovingSideways = true;
 			moveLeft();
 		}
 		else if (rightbutton)
 		{
-			isMovingSideways = true;
 			moveRight();
 			
 		}
-		
-		if (downbutton)
+		else if (downbutton)
 		{
 			// Use stuff
 		}
+		else if (shootbutton) {
+			state.put('.', false);
+			fireGum();
+		}
+		
 	}
 	
 

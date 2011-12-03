@@ -17,6 +17,12 @@ import fullscreen.*;
 public class BunnyHat extends PApplet implements Observer
 {
 	
+	private class LevelSource {
+		String goodTileFile, badTileFile;
+		String[] goodbackgroundImages, badBackgroundImages;
+	}
+	private LevelSource[] levelSources;
+	
 	
 	public static Settings SETTINGS = new Settings();
 	
@@ -110,7 +116,8 @@ public class BunnyHat extends PApplet implements Observer
 		sndOut.printSounds();
 		
 		
-		
+		// get levels
+		// TODO
 		
 		
 		//attempt to get a full screen mode - not working - null pointer exception 		
@@ -247,6 +254,9 @@ public class BunnyHat extends PApplet implements Observer
 			gameMaster.stopGame();
 			currentView = Screens.MENU_MAIN;
 		}
+		else if (keyCode == ALT || keyCode == CONTROL) {
+			inputState.put('.', true);
+		}
 		
 	}
 	
@@ -279,10 +289,13 @@ public class BunnyHat extends PApplet implements Observer
 		case GAME:
 			if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i')) {
 				//nothing for the moment
-			} else if (TWIN_JUMP_SPACEBAR && key == ' ') {
+			} 
+			else if (TWIN_JUMP_SPACEBAR && key == ' ') {
 				inputState.put('w', false);
 				inputState.put('i', false);
-			} else {
+			}
+			else 
+			{
 				inputState.put(key, false);
 			}
 			break;

@@ -116,7 +116,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 		// time for some doors?
 		if (!doorsHappening && !switchAlertStarted && !switchHappening) {
 			// player behind?
-			double playerDistance = player1.xpos - player2.xpos;
+			double playerDistance = player1.x() - player2.x();
 			if (playerDistance > this.DOORS_PLAYER_MIN_BEHIND_DISTANCE) {
 				// player1 further ahead
 				this.playerFarAhead = 1;

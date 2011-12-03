@@ -176,8 +176,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		//player1backup = playerView1.getLevel();
 		pvSource.getPlayer().setLevel(pvTarget.getLevel());
 		
-		playerBackupX = pvSource.getPlayer().xpos;
-		playerBackupY = pvSource.getPlayer().ypos;
+		playerBackupX = pvSource.getPlayer().x();
+		playerBackupY = pvSource.getPlayer().y();
 		pvSource.xbackup = playerBackupX;
 		pvSource.ybackup = playerBackupY;
 
@@ -202,8 +202,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		pvTarget.drawOtherPlayer = false;
 		
-		pvSource.getPlayer().ypos = playerBackupY;
-		pvSource.getPlayer().xpos = playerBackupX;
+		pvSource.getPlayer().setPos(playerBackupX, playerBackupY);
 		
 		//playerView1.setLevel(player1backup);
 		pvSource.getPlayer().setLevel(pvSource.getLevel());

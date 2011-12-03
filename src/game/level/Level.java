@@ -130,11 +130,11 @@ public class Level extends CollisionLevel
 		}
 	}
 	
-	public void updateCreaturesAndObjects() {
+	public void updateCreaturesAndObjects(int deltaT) {
 		Iterator cnos = creaturesAndObjects.iterator();
 		while (cnos.hasNext()) {
 			GameElement currentCreature = (GameElement)cnos.next();
-			currentCreature.update();
+			currentCreature.update(deltaT);
 		}
 	}
 	
