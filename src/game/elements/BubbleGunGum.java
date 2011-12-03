@@ -20,15 +20,16 @@ public class BubbleGunGum extends GameElement
 	public BubbleGunGum(double x, double y, double xSpeed, double ySpeed, 
 			PApplet processing, BallColor ballColor)
 	{
-		super(x, y, 7/24, 7/24);
+		super(x, y, 7/24.0, 7/24.0);
 		super.setCollisionEffect(Effects.NONE);
 		super.setGameElement(this);
 		
 		this.processing = processing;
 		this.oldSpeed = this.xSpeed = xSpeed;
 		this.ySpeed = ySpeed;
-		this.gravityFactor = 0.02;
+		this.gravityFactor = 0.08;
 		this.breakAccelAirFactor = 0.0;
+		this.breakAccelGroundFactor = 0.2;
 		
 		this.startTime = processing.millis();
 		
@@ -63,7 +64,7 @@ public class BubbleGunGum extends GameElement
 		if (processing.millis() - this.startTime > TIME_TO_LIVE) {
 			this.destroyed = true;
 		} else if (this.getBouncePartner() instanceof Player) {
-			//this.destroyed = true;
+			this.destroyed = true;
 		} else if (this.getBouncePartner() instanceof Obstacle) {
 			if (xSpeed == 0 && ySpeed != 0) {
 				this.xSpeed = -this.oldSpeed;

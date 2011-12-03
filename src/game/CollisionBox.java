@@ -86,7 +86,7 @@ public abstract class CollisionBox extends Observable
 		this.gameElement = gameElement;
 	}
 	
-	protected void setLevel(Level lvl) {
+	public void setLevel(Level lvl) {
 		collisionLevel = lvl;
 	}
 	
@@ -141,18 +141,20 @@ public abstract class CollisionBox extends Observable
 		//determine points
 		int x0, y0, x1, y1, fx0, fy0, fx1, fy1;
 		x0 = (int)(cBox.x + 0.1); x1 = (int)(cBox.x + cBox.width - 0.1);
-		y0 = (int)(cBox.y + 1); y1 = (int)(cBox.y + cBox.height);
+		y0 = (int)(cBox.y+1.1); y1 = (int)(cBox.y + cBox.height+0.9);
 		fx0 = (int)x; fy0 = (int)y + 1;
 		fx1 = (int)(x + cBox.width); fy1 = (int)(y + 1 + cBox.height);
 		
-		CollisionBox collider;
+		CollisionBox collider = null;
 		if (xDistance > 0) {
 			for (int curY = y0; curY <= y1; curY++) {
+				//System.out.println(curY);
 				collider = collisionLevel.getBoxAt(fx1, curY);
 				if (collider != null) {
 					if (collider.getCollisionEffect() == Effects.STOP) {
 						newXSpeed = 0;
 						newX = collider.x()-this.cBox.width;
+						//System.out.println("new x:"+newX);
 					}
 					collision = true;
 					updateCollisionPartners(collider);
@@ -238,10 +240,12 @@ public abstract class CollisionBox extends Observable
 		}
 		
 		
-		collider = collisionLevel.getCollider(this);
-		if (collider != null) {
-			collision = true;
-			updateCollisionPartners(collider);
+		if (collider == null) {
+			collider = collisionLevel.getCollider(this);
+			if (collider != null) {
+				collision = true;
+				updateCollisionPartners(collider);
+			}
 		}
 		
 		

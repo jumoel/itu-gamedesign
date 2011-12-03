@@ -42,6 +42,7 @@ public abstract class GameElement extends CollisionBox
 	protected boolean isInAir;
 	protected double gravityFactor = 1.0;
 	protected double breakAccelAirFactor = 1.0;
+	protected double breakAccelGroundFactor = 1.0;
 	
 	public void setPos(double x, double y) {
 		this.xpos = x;
@@ -79,7 +80,7 @@ public abstract class GameElement extends CollisionBox
 			}
 			else
 			{
-				breakAmount = BREAKACCEL_GROUND * deltaFactor;
+				breakAmount = BREAKACCEL_GROUND * deltaFactor * breakAccelGroundFactor;
 			}
 			if (absXSpeed > breakAmount) {
 				xSpeed = (absXSpeed - breakAmount) * xSignum;
@@ -99,20 +100,12 @@ public abstract class GameElement extends CollisionBox
 		
 		
 		
-		// Y
-		//if (isInAir)
-		//{
-			yAcceleration = GRAVITY * gravityFactor;
-			//ypos = ypos + ySpeed * deltaFactor + 0.5 * yAcceleration * Math.pow(deltaFactor, 2);
-			ySpeed += yAcceleration * deltaFactor;
-			ypos += ySpeed * deltaFactor;// + yAcceleration;
-			//System.out.println("ySpeed:"+ySpeed+" yPos:"+ypos+" deltaT:"+deltaT+" deltaFactor:"+deltaFactor);
-		/*}
-		else
-		{
-			yAcceleration = 0.0;
-			ypos = ypos + ySpeed * deltaFactor;
-		}*/
+		
+		yAcceleration = GRAVITY * gravityFactor;
+	
+		ySpeed += yAcceleration * deltaFactor;
+		ypos += ySpeed * deltaFactor;// + yAcceleration;
+		
 		
 		
 		
@@ -145,9 +138,7 @@ public abstract class GameElement extends CollisionBox
 			if (ySpeed == 0) {
 				isInAir = false;
 			}
-			//isInAir = isJumping = this.getNewIsJumping();
 			
-			// any interesting collision partners?
 			
 			
 

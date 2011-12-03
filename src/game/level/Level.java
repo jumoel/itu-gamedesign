@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import game.BunnyHat;
 import game.CollisionBox;
 import game.Player;
+import game.elements.BubbleGunGum;
 import game.elements.GameElement;
 import processing.core.*;
 import util.BImage;
@@ -142,7 +143,7 @@ public class Level extends CollisionLevel
 				return currentCBox;
 			}
 		}
-		if (box.getGameElement() != ownPlayer && ownPlayer.getCBox().intersects(box.getCBox())) {
+		if (box.getGameElement() != ownPlayer  && ownPlayer.getCBox().intersects(box.getCBox())) {
 			return ownPlayer;
 		}
 		return ret;

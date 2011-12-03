@@ -137,7 +137,7 @@ public class Player extends GameElement
 		//isMovingSideways = false;
 		cannotMoveLeft = false;
 
-		unarmed = false;
+		unarmed = true;
 		
 		this.walkAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "run");
 		this.idleAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "idle");
@@ -253,8 +253,8 @@ public class Player extends GameElement
 	
 	public void fireGum() {
 		double gumSpeedX = xSpeed + (this.facing == Player.Facing.RIGHT?this.GUMSPEED:-this.GUMSPEED);
-		double gumX = (this.facing == Player.Facing.LEFT?xpos-0.1:xpos+2.1);
-		BubbleGunGum gum = new BubbleGunGum(gumX, ypos+0.5, gumSpeedX, ySpeed*0.1, 
+		double gumX = (this.facing == Player.Facing.LEFT?xpos-0.2-7/24.0:xpos+2.2);
+		BubbleGunGum gum = new BubbleGunGum(gumX, ypos+0.7, gumSpeedX, ySpeed*0.1+0.2, 
 				processing, (this.myID == 1 ? BallColor.GIRL : BallColor.BOY));
 		gum.setLevel(level);
 		
@@ -379,8 +379,7 @@ public class Player extends GameElement
 		} else if (gameElement instanceof StandardCreature) {
 			// player hit a creature
 			//((StandardCreature) gameElement).contact(this); creature is informed via collision box
-		} else if (gameElement instanceof Door)
-		{
+		} else if (gameElement instanceof Door) {
 			this.setChanged();
 			HashMap map = new HashMap();
 			map.put("OHDOORTAKEMEAWAY", myID);

@@ -9,6 +9,9 @@ import game.CollisionBox.Effects;
 import game.Door;
 import game.Player;
 import game.State;
+import game.elements.BubbleGunGum;
+import game.elements.BubbleGunGum.BallColor;
+import game.elements.GameElement;
 import game.level.Level;
 import game.master.GameMaster;
 import processing.core.*;
@@ -215,6 +218,11 @@ public class PlayerView extends Updateable implements Observer
 		
 		this.level = new Level(processing, levelPath);
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
+		
+		/*GameElement creat = new BubbleGunGum(10, 10, 0, 0, processing, BallColor.BOY);
+		creat.setLevel(level);
+		this.level.addCreature(creat);*/
+		
 		
 		/*this.ownPlayer = new Player(processing, viewNumber, this.level);
 		this.ownPlayer.addObserver(this);
