@@ -1,4 +1,6 @@
 package game;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
@@ -19,10 +21,11 @@ public class BunnyHat extends PApplet implements Observer
 {
 	
 	private class LevelSource {
-		String goodTileFile, badTileFile;
-		String[] goodbackgroundImages, badBackgroundImages;
+		String goodLevelFile, badLevelFile;
+		ArrayList goodBackgroundImages, badBackgroundImages;
+		String previewImage; 
 	}
-	private LevelSource[] levelSources;
+	private ArrayList levelSources;
 	
 	
 	public static Settings SETTINGS = new Settings();
@@ -118,7 +121,35 @@ public class BunnyHat extends PApplet implements Observer
 		
 		
 		// get levels
-		// TODO
+		levelSources = new ArrayList();
+		File levelDirRoot = new File("levels/");
+		File[] levelDirs = levelDirRoot.listFiles();
+		for (int i = 0; i < levelDirs.length; i++) {
+			if (levelDirs[i].isDirectory() && levelDirs[i].getName().startsWith("lvl")) {
+				File levelDir = new File(levelDirs[i].getPath());
+				File[] files = levelDir.listFiles();
+				LevelSource lvlSrc = new LevelSource();
+				lvlSrc.badBackgroundImages = new ArrayList();
+				lvlSrc.goodBackgroundImages = new ArrayList();
+				for (int e = 0; e < files.length; e++) {
+					String name = files[e].getName();
+					if (name.endsWith("ad.tmx")) {
+						lvlSrc.badLevelFile = files[e].getPath();
+					} else if (name.endsWith("od.tmx")) {
+						lvlSrc.goodLevelFile = files[e].getPath();
+					} else if (name.contentEquals("preview.png")) {
+						lvlSrc.previewImage = files[e].getPath();
+					} else if (name.endsWith(".png")) {
+						if (name.startsWith("good")) {
+							lvlSrc.goodBackgroundImages.add(files[e].getPath());
+						} else if (name.startsWith("bad")) {
+							lvlSrc.badBackgroundImages.add(files[e].getPath());
+						}
+					}
+				}
+				levelSources.add(lvlSrc);
+			}
+		}
 		
 		
 		//attempt to get a full screen mode - not working - null pointer exception 		
@@ -185,15 +216,19 @@ public class BunnyHat extends PApplet implements Observer
 		// TODO Auto-generated method stub
 		background(255);
 		fill(0);
-		text("press 1 for level 1 and 2 for level 2 .) \n and q to quit this game..", width/2, height/2);
+		int currentY = height/2;
+		for (int i = 0; i < levelSources.size(); i++) {
+			text("press "+i+" for level "+i, width/2, currentY);
+			currentY += 15;
+		}
+		text("and q to quit this game..", width/2, currentY);
 	}
 
 	private void drawIntroScreen()
 	{
-		// TODO Auto-generated method stub
-		background(255);
-		fill(0);
-		text("d(^_^)b amaaazing intro screen - press space to go on!", width/2, height/2);
+		PImage b = loadImage("menu/TitleScreen1024x768.png");
+		image(b, 0, 0);
+		//text("d(^_^)b amaaazing intro screen - press space to go on!", width/2, height/2);
 	}
 
 	public static void main(String args[])
@@ -262,26 +297,26 @@ public class BunnyHat extends PApplet implements Observer
 	}
 	
 	private void handleKeyMenuMain() {
-		switch (key) {
-			case '1':
-				setupGame(1);
+		if (keyCode >= 48 && keyCode <= 57) {
+			int levelNo = keyCode - 48;
+			if (levelNo < levelSources.size()) {
+				setupGame(levelNo);
 				currentView = Screens.GAME;
-				break;
-			case '2':
-				setupGame(2);
-				currentView = Screens.GAME;
-				break;
-			case 'q':
-				exit();
-				break;
-				
+			}
+		} else {
+			switch (key) {
+				case 'q':
+					exit();
+					break;
+					
+			}
 		}
 	}
 	
 	private void handleKeyIntro() {
-		if (key == ' ') {
+		//if (key == ' ') {
 			currentView = Screens.MENU_MAIN;
-		}
+		//}
 	}
 
 	public void keyReleased()
@@ -309,10 +344,12 @@ public class BunnyHat extends PApplet implements Observer
 		//setup game master
 		gameMaster = new GameMaster(this);
 		
+		LevelSource lvlSrc = (LevelSource) levelSources.get(level);
+		
 		view1 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 1, 
-				(String)SETTINGS.getValue("levels/level"+level+"/good"), gameMaster, DreamStyle.GOOD);
+				lvlSrc.goodLevelFile, gameMaster, DreamStyle.GOOD);
 		view2 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 2,
-				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster, DreamStyle.BAD);
+				lvlSrc.badLevelFile, gameMaster, DreamStyle.BAD);
 		/*view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);*/
 		player1 = new Player(this, 1, view1.getLevel());

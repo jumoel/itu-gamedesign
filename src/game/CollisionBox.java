@@ -255,7 +255,6 @@ public abstract class CollisionBox extends Observable
 							- (collider.x() + collider.collisionBoxWidth()/2);
 					double yDiff = (this.y() + this.collisionBoxHeight()/2) 
 							- (collider.y() + this.collisionBoxHeight()/2);
-					//System.out.println(xDiff+":"+yDiff);
 					boolean topOrBottomHit = (Math.abs(yDiff) >=Math.abs(xDiff));
 					boolean rightHit = xDiff < 0;
 					boolean topHit = yDiff > 0;

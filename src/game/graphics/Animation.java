@@ -84,12 +84,11 @@ public class Animation
 		if (holdAnimations) time = this.timeOnStop;
 		
 		int diff = time - startTime;
-		int timeindex = diff % 1000;
 		
-		int frame = (timeindex / millisPerFrame) % numberOfFrames;
+		int frame = (diff / millisPerFrame) % numberOfFrames;
 		if (!loop) {
-			timeindex = time - startTime;
-			frame = (timeindex / millisPerFrame);
+			
+			frame = (diff / millisPerFrame);
 			if (frame >= numberOfFrames)
 			{
 				frame = numberOfFrames -1;
@@ -105,7 +104,7 @@ public class Animation
 		else
 		{
 			System.out.println("Frame: " + frame + ". Number of frames: " + numberOfFrames);
-			System.out.println("Diff: " + diff + ". Timeindex: " + timeindex + ". Millis per frame: " + millisPerFrame);
+			System.out.println("Diff: " + diff + ". Millis per frame: " + millisPerFrame);
 			return null;
 		}
 	}
