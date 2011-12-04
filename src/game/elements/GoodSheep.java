@@ -15,6 +15,7 @@ public class GoodSheep extends GameElement
 	public GoodSheep(double x, double y, double width, double height, PApplet processing)
 	{
 		super(x, y, width, height);
+		super.setCollisionEffect(Effects.GOOD_SHEEP_BOUNCE);
 		this.processing = processing;
 		this.goodSheepAnimation = new Animation(processing, "graphics/animations/goodSheep");
 		this.goodSheepAnimation.start();

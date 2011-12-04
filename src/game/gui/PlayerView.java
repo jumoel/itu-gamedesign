@@ -122,7 +122,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	// show the next best door
 	protected void showDoor(boolean closeBy) {
-		System.out.println("show them the doors - maxX:"+getMaximumTileX()+" minX:"+getMinimumTileX());
+		//System.out.println("show them the doors - maxX:"+getMaximumTileX()+" minX:"+getMinimumTileX());
 		// Counting y from down towards the sky
 		int minimumTileX = (int)ownPlayer.x() + 1;
 		int maximumTileX = getMaximumTileX();
@@ -239,7 +239,7 @@ public class PlayerView extends Updateable implements Observer
 	public void insertGameElements() {
 		for (int x = 0; x < level.levelWidth; x++) {
 			for (int y = 0; y < level.levelHeight; y++) {
-				if (this.level.getMetaDataAt(x, y) > 1) {System.out.println(this.level.getMetaDataAt(x, y));}
+				//if (this.level.getMetaDataAt(x, y) > 1) {System.out.println(this.level.getMetaDataAt(x, y));}
 				if (this.level.getMetaDataAt(x, y) == Level.MetaTiles.Sheep.index() && level.dream == DreamStyle.GOOD) {
 					GoodSheep goodSheep = new GoodSheep(x, y, 3, 3, processing);
 					BadSheep badSheep = new BadSheep(x, y, 3, 3, processing, goodSheep);

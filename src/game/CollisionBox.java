@@ -1,6 +1,7 @@
 package game;
 
 import game.elements.BubbleGunGum;
+import game.elements.GameElement;
 import game.level.Level;
 
 import java.awt.Polygon;
@@ -20,7 +21,8 @@ import processing.core.PGraphics;
  */
 public abstract class CollisionBox extends Observable
 {
-	public enum Effects {STOP, BOUNCE, SLOW_DOWN, FINISH, NONE}
+	public enum Effects {STOP, BOUNCE, SLOW_DOWN, FINISH, NONE,
+		GOOD_SHEEP_BOUNCE, BAD_SHEEP_BOUNCE}
 	private Effects collisionEffect = Effects.STOP;
 	
 	private Level collisionLevel;
@@ -239,12 +241,51 @@ public abstract class CollisionBox extends Observable
 			}
 		}
 		
+		CollisionBox hardCollider = collider; // backup the hard stuff
+		
 		
 		if (collider == null) {
 			collider = collisionLevel.getCollider(this);
 			if (collider != null) {
 				collision = true;
 				updateCollisionPartners(collider);
+				
+				if (collider.getCollisionEffect() != Effects.NONE) {
+					double xDiff = (this.x() + this.collisionBoxWidth()/2) 
+							- (collider.x() + collider.collisionBoxWidth()/2);
+					double yDiff = (this.y() + this.collisionBoxHeight()/2) 
+							- (collider.y() + this.collisionBoxHeight()/2);
+					//System.out.println(xDiff+":"+yDiff);
+					boolean topOrBottomHit = (Math.abs(yDiff) >=Math.abs(xDiff));
+					boolean rightHit = xDiff < 0;
+					boolean topHit = yDiff > 0;
+					switch (collider.getCollisionEffect()) {
+						case BOUNCE:
+							if (topOrBottomHit) {
+								newYSpeed = -ySpeed;
+								newY = collider.y() + collider.collisionBoxHeight();
+							} else {
+								newXSpeed = -xSpeed;
+								if (rightHit) {
+									newX = collider.x() - this.collisionBoxWidth();
+								} else {
+									newX = collider.x() + collider.collisionBoxWidth();
+								}
+							}
+							break;
+						case GOOD_SHEEP_BOUNCE:
+							if (topOrBottomHit) {
+								newYSpeed = -ySpeed * 1.5;
+								newXSpeed = xSpeed * 1.5;
+								newY = collider.y() + collider.collisionBoxHeight();
+							}
+							break;
+						case BAD_SHEEP_BOUNCE:
+							newYSpeed = 2;
+							newXSpeed = -6;
+							break;
+					}
+				}
 			}
 		}
 		

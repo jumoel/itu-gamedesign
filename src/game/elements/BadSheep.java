@@ -17,6 +17,7 @@ public class BadSheep extends CrossingGameElement
 			PApplet processing, GoodSheep twinElement)
 	{
 		super(x, y, width, height, twinElement);
+		super.setCollisionEffect(Effects.BAD_SHEEP_BOUNCE);
 		this.processing = processing;
 		this.badSheepAnimation = new Animation(processing, "graphics/animations/badSheep");
 		this.badSheepAnimation.start();
