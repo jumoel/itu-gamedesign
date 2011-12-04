@@ -22,6 +22,8 @@ import game.sound.Stereophone;
  */
 public abstract class GameElement extends CollisionBox
 {
+	protected enum Facing { LEFT, RIGHT };
+	
 	private static double GRAVITY = BunnyHat.SETTINGS.getValue("gameplay/gravity");
 	private static double JUMPFORCE = BunnyHat.SETTINGS.getValue("gameplay/jumpforce");
 	
@@ -33,6 +35,7 @@ public abstract class GameElement extends CollisionBox
 	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
 	private static double CLAMPTOZERO = BunnyHat.SETTINGS.getValue("gameplay/clamptozero");
 
+	protected Facing facing;
 	
 	public boolean destroyed = false; 
 	
@@ -56,6 +59,7 @@ public abstract class GameElement extends CollisionBox
 		this.ypos = y;
 		this.xSpeed = 0.0;
 		this.ySpeed = 0.0;
+		this.facing = Facing.LEFT;
 	}
 	
 	// calculating movement
@@ -147,7 +151,8 @@ public abstract class GameElement extends CollisionBox
 		if (ySpeed != 0) isInAir = true;
 		
 		
-		
+		if (xSpeed > 0) this.facing = Facing.RIGHT;
+		else if (xSpeed < 0) this.facing = Facing.LEFT;
 			
 		
 		

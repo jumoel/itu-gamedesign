@@ -4,21 +4,22 @@ import game.level.Level;
 import processing.core.PApplet;
 
 /**
- * Crossing Creature
- * this kind of creature has a representation in both dreams
+ * Crossing GameElement
+ * this kind of element is moving in x-axis like it's twinElement in the other level
  * 
- * this one is to use in most cases
- * 
- * @author samuelwalz
+ * @author Samuel Walz <samuel.walz@gmail.com>
  *
  */
 public abstract class CrossingGameElement extends GameElement
 {
+	protected GameElement myTwinElement;
 
-	public CrossingGameElement(double x, double y, double width, double height)
+	public CrossingGameElement(double x, double y, double width, double height,
+			GameElement twinElement)
 	{
 		super(x, y, width, height);
-		// TODO Auto-generated constructor stub
+		this.myTwinElement = twinElement;
 	}
-
+	
+	
 }

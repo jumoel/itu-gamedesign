@@ -17,7 +17,7 @@ import util.BPoint;
 
 public class Player extends GameElement
 {
-	private enum Facing { LEFT, RIGHT };
+	//private enum Facing { LEFT, RIGHT };
 	private int myID;
 	
 	private PApplet processing;
@@ -37,7 +37,7 @@ public class Player extends GameElement
 	//public double ySpeed;
 	//public double xSpeed;
 	
-	private Facing facing;
+	//private Facing facing;
 
 	private boolean unarmed;
 	

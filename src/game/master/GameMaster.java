@@ -235,9 +235,6 @@ public class GameMaster extends Observable implements Observer, Runnable
 			HashMap map = (HashMap)arg1;
 			if (map.containsKey("IFUCKINGWON") && !gameOver) {
 				this.gameOver = true;
-				/*if (((Integer)map.get("IFUCKINGWON"))==this.viewNumber) {
-					this.ownPlayerWon = true;
-				}*/
 			} else if (map.containsKey("OHDOORTAKEMEAWAY") && !gameOver) {
 				if ((Integer)map.get("OHDOORTAKEMEAWAY") == 1) {
 					this.setChanged();

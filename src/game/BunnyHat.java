@@ -7,6 +7,7 @@ import game.gui.AmazingSwitchWitch;
 import game.gui.PlayerView;
 import game.gui.RaceIndicator;
 import game.level.Level;
+import game.level.Level.DreamStyle;
 import game.master.GameMaster;
 import game.sound.Stereophone;
 import game.control.SoundControl;
@@ -309,9 +310,9 @@ public class BunnyHat extends PApplet implements Observer
 		gameMaster = new GameMaster(this);
 		
 		view1 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 1, 
-				(String)SETTINGS.getValue("levels/level"+level+"/good"), gameMaster);
+				(String)SETTINGS.getValue("levels/level"+level+"/good"), gameMaster, DreamStyle.GOOD);
 		view2 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 2,
-				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);
+				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster, DreamStyle.BAD);
 		/*view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);*/
 		player1 = new Player(this, 1, view1.getLevel());
@@ -324,6 +325,8 @@ public class BunnyHat extends PApplet implements Observer
 		view1.setOtherPlayerView(view2);
 		view2.setOtherPlayerView(view1);
 		gameMaster.setTwins(player1, player2);
+		view1.insertGameElements();
+		view2.insertGameElements();
 		
 		
 		indicator = new RaceIndicator(width, RACEINDICATORHEIGHT, this);

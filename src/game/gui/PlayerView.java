@@ -9,10 +9,14 @@ import game.CollisionBox.Effects;
 import game.Door;
 import game.Player;
 import game.State;
+import game.elements.BadSheep;
 import game.elements.BubbleGunGum;
 import game.elements.BubbleGunGum.BallColor;
 import game.elements.GameElement;
+import game.elements.GoodSheep;
 import game.level.Level;
+import game.level.Level.DreamStyle;
+import game.level.Level.MetaTiles;
 import game.master.GameMaster;
 import processing.core.*;
 
@@ -192,7 +196,7 @@ public class PlayerView extends Updateable implements Observer
 		level.setPlayer(p);
 	}
 	
-	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath, GameMaster gameMaster)
+	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath, GameMaster gameMaster, DreamStyle style)
 	{	
 		this.buffer = applet.createGraphics(width, height, PConstants.JAVA2D);
 		this.colorLayerColor = new int[3];
@@ -216,12 +220,8 @@ public class PlayerView extends Updateable implements Observer
 		
 		this.viewNumber = viewNumber;
 		
-		this.level = new Level(processing, levelPath);
+		this.level = new Level(processing, levelPath, style);
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
-		
-		/*GameElement creat = new BubbleGunGum(10, 10, 0, 0, processing, BallColor.BOY);
-		creat.setLevel(level);
-		this.level.addCreature(creat);*/
 		
 		
 		/*this.ownPlayer = new Player(processing, viewNumber, this.level);
@@ -234,6 +234,21 @@ public class PlayerView extends Updateable implements Observer
 		this.xCoordCameraMiddle = xCoordCamera + halfwidth;
 		
 		this.timeSlowingFactor = 1; // normal speed
+	}
+	
+	public void insertGameElements() {
+		for (int x = 0; x < level.levelWidth; x++) {
+			for (int y = 0; y < level.levelHeight; y++) {
+				if (this.level.getMetaDataAt(x, y) > 1) {System.out.println(this.level.getMetaDataAt(x, y));}
+				if (this.level.getMetaDataAt(x, y) == Level.MetaTiles.Sheep.index() && level.dream == DreamStyle.GOOD) {
+					GoodSheep goodSheep = new GoodSheep(x, y, 3, 3, processing);
+					BadSheep badSheep = new BadSheep(x, y, 3, 3, processing, goodSheep);
+					
+					this.otherPlayerView.level.addCreature(badSheep);
+					this.level.addCreature(goodSheep);
+				}
+			}
+		}
 	}
 	
 	

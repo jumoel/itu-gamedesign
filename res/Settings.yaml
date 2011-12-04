@@ -164,6 +164,16 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+    goodSheep:
+      path: creatures/sheep.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    badSheep:
+      path: creatures/badsheep.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
 levels:
   level1: 
     good: levels/test_24.tmx

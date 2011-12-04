@@ -11,6 +11,7 @@ import game.CollisionBox;
 import game.Player;
 import game.elements.BubbleGunGum;
 import game.elements.GameElement;
+import game.elements.GoodSheep;
 import processing.core.*;
 import util.BImage;
 import util.BString;
@@ -31,7 +32,8 @@ public class Level extends CollisionLevel
 		Obstacle(1),
 		SpawnPoint(2),
 		FinishLine(3),
-		DoorSpawnPoint(4);
+		DoorSpawnPoint(4),
+		Sheep(5);
 		
 		private final int index;
 		
@@ -55,6 +57,7 @@ public class Level extends CollisionLevel
 	private ArrayList creaturesAndObjects;
 	
 	public String levelName;
+	public DreamStyle dream;
 	
 	public int spawnX;
 	public int spawnY;
@@ -66,11 +69,12 @@ public class Level extends CollisionLevel
 	private PApplet processing;
 	
 	
-	public Level (PApplet p, String levelName)
+	public Level (PApplet p, String levelName, DreamStyle style)
 	{
 		super(p);
 		this.processing = p;
 		this.levelName = levelName;
+		this.dream = style;
 		
 		loadXML();
 		tiles = BImage.cutImageSprite(processing, processing.loadImage("levels/" + imageFile), BunnyHat.TILEDIMENSION, BunnyHat.TILEDIMENSION);
@@ -188,6 +192,7 @@ public class Level extends CollisionLevel
 	}
 	
 	public void addCreature(GameElement c) {
+		c.setLevel(this);
 		creaturesAndObjects.add(c);
 	}
 	
