@@ -273,15 +273,19 @@ public abstract class CollisionBox extends Observable
 							}
 							break;
 						case GOOD_SHEEP_BOUNCE:
-							if (topOrBottomHit) {
-								newYSpeed = -ySpeed * 1.5;
-								newXSpeed = xSpeed * 1.5;
-								newY = collider.y() + collider.collisionBoxHeight();
+							if (gameElement instanceof Player) {
+								if (topOrBottomHit) {
+									newYSpeed = Math.abs(ySpeed) * 1.5;
+									newXSpeed = xSpeed * 1.5;
+									newY = collider.y() + collider.collisionBoxHeight();
+								}
 							}
 							break;
 						case BAD_SHEEP_BOUNCE:
-							newYSpeed = 2;
-							newXSpeed = -6;
+							if (gameElement instanceof Player) {
+								newYSpeed = 2;
+								newXSpeed = -6;
+							}
 							break;
 					}
 				}

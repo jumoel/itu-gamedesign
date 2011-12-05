@@ -243,6 +243,9 @@ public class GameMaster extends Observable implements Observer, Runnable
 					this.setChanged();
 					this.notifyObservers(MSG.SWITCH_PLAYER_2);
 				}
+			} else if (map.containsKey("IGOTGUMMED") && !gameOver) {
+				// player got hit by gum: finish doors
+				this.msTillDoorsEnd = 0;
 			}
 		}
 		

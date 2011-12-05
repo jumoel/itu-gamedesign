@@ -191,11 +191,11 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		
 		
-		//new MoveCamera(0, pvTarget.getWidth()/2 - 100, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
+		
 		
 		pvSource.drawOwnPlayer = false;
 		
-		//player1backup = playerView1.getLevel();
+		
 		pvSource.getLevel().removeElement(pvSource.getPlayer());
 		pvTarget.getLevel().addElement(pvSource.getPlayer());
 		pvSource.getPlayer().setLevel(pvTarget.getLevel());
@@ -207,9 +207,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 
 		pvTarget.setDoorPosition(pvSource.getPlayer());
 		pvSource.getPlayer().removeCollisionGroundPath();
-		//pvSource.getPlayer().xpos = pvTarget.getPlayer().xpos;
-		//pvSource.getPlayer().ypos = pvTarget.getPlayer().ypos;
-		//playerView1.setLevel(playerView2.getLevel());
+		
 		pvSource.getPlayer().giveWeapon();
 		
 		pvTarget.drawOtherPlayer = true;
@@ -223,13 +221,12 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		PlayerView pvSource = (playerSwitched == 1 ? playerView1 : playerView2);
 		PlayerView pvTarget = (pvSource == playerView1 ? playerView2 : playerView1);
 		
-		//new MoveCamera(pvTarget.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
 		
 		pvTarget.drawOtherPlayer = false;
 		
 		pvSource.getPlayer().setPos(playerBackupX, playerBackupY);
 		
-		//playerView1.setLevel(player1backup);
+		
 		pvTarget.getLevel().removeElement(pvSource.getPlayer());
 		pvSource.getLevel().addElement(pvSource.getPlayer());
 		pvSource.getPlayer().setLevel(pvSource.getLevel());
@@ -282,9 +279,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	}
 
 	public void switchDreams() {
-		/*Level l1, l2;
-		l1 = playerView1.getLevel();
-		l2 = playerView2.getLevel();*/
+		
 		playerView1.initSwitchPrepare();
 		playerView2.initSwitchPrepare();
 

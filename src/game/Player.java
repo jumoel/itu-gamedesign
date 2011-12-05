@@ -59,7 +59,7 @@ public class Player extends GameElement
 
 	private static double MOVEACCEL_GROUND = BunnyHat.SETTINGS.getValue("gameplay/moveacceleration/ground");
 	private static double MOVEACCEL_AIR = BunnyHat.SETTINGS.getValue("gameplay/moveacceleration/air");
-	
+	private static double MAXSPEED = BunnyHat.SETTINGS.getValue("gameplay/maxspeed");
 	// gum stuff
 	private static double GUMSPEED = BunnyHat.SETTINGS.getValue("gameplay/gumspeed");
 	private static int GUM_STUCK_TIME = BunnyHat.SETTINGS.getValue("gameplay/gumstucktime");
@@ -351,6 +351,10 @@ public class Player extends GameElement
 	{
 		if (theWinner == -1) handleInput(state);
 		super.update(deltaT);
+		
+		double xSignum = Math.signum(xSpeed);
+		xSpeed = BMath.clamp(xSpeed, 0, xSignum * MAXSPEED);
+		
 		controlAnimations();
 		
 		if (stuckToTheGround) {
@@ -392,6 +396,10 @@ public class Player extends GameElement
 			this.stuckToTheGroundStartTime = processing.millis();
 			this.stuckToTheGround = true;
 			this.resetBouncePartner();
+			this.setChanged();
+			HashMap map = new HashMap();
+			map.put("IGOTGUMMED", myID);
+			this.notifyObservers(map);
 		}
 			
 
@@ -458,6 +466,7 @@ public class Player extends GameElement
 		
 		if (shootbutton && !unarmed && !didFire) {
 			didFire = true;
+			state.put('.', false);
 			fireGum();
 		}
 		

@@ -28,7 +28,7 @@ public class BubbleGunGum extends GameElement
 		this.oldSpeed = this.xSpeed = xSpeed;
 		this.ySpeed = ySpeed;
 		this.gravityFactor = 0.08;
-		this.breakAccelAirFactor = 0.0;
+		this.breakAccelAirFactor = 0.1;
 		this.breakAccelGroundFactor = 0.2;
 		
 		this.startTime = processing.millis();

@@ -30,7 +30,8 @@ public abstract class GameElement extends CollisionBox
 	private static double BREAKACCEL_GROUND = BunnyHat.SETTINGS.getValue("gameplay/breakacceleration/ground");
 	private static double BREAKACCEL_AIR = BunnyHat.SETTINGS.getValue("gameplay/breakacceleration/air");
 	
-	private static double MAXSPEED = BunnyHat.SETTINGS.getValue("gameplay/maxspeed");
+	private static double MAX_Y_SPEED = BunnyHat.SETTINGS.getValue("gameplay/maxYspeed");
+	private static double MAX_X_SPEED = BunnyHat.SETTINGS.getValue("gameplay/maxXspeed");
 	
 	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
 	private static double CLAMPTOZERO = BunnyHat.SETTINGS.getValue("gameplay/clamptozero");
@@ -96,7 +97,7 @@ public abstract class GameElement extends CollisionBox
 			}
 			
 			
-			xSpeed = BMath.clamp(xSpeed, 0, xSignum * MAXSPEED);
+			xSpeed = BMath.clamp(xSpeed, 0, xSignum * MAX_X_SPEED);
 		}
 		else
 		{	
@@ -109,8 +110,11 @@ public abstract class GameElement extends CollisionBox
 		
 		
 		yAcceleration = GRAVITY * gravityFactor;
-	
+		
 		ySpeed += yAcceleration * deltaFactor;
+		double ySignum = Math.signum(ySpeed);
+		ySpeed = BMath.clamp(ySpeed, 0, ySignum * MAX_Y_SPEED);
+		
 		ypos += ySpeed * deltaFactor;// + yAcceleration;
 		
 		
