@@ -147,6 +147,14 @@ public abstract class CollisionBox extends Observable
 		fx0 = (int)x; fy0 = (int)y + 1;
 		fx1 = (int)(x + cBox.width); fy1 = (int)(y + 1 + cBox.height);
 		
+		// anti inside stuff
+		while (collisionLevel.getBoxAt((int)cBox.x, (int)(cBox.y+1.1)) != null
+				|| collisionLevel.getBoxAt((int)cBox.x+1, (int)(cBox.y+1.1)) != null) {
+			System.out.println("correct");
+			collision = true;
+			cBox.y = newY += 1;
+		}
+		
 		CollisionBox collider = null;
 		if (xDistance > 0) {
 			for (int curY = y0; curY <= y1; curY++) {
