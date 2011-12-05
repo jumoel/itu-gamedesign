@@ -105,8 +105,8 @@ public class Level extends CollisionLevel
 						twinDream.addElement(badSheep);
 						this.addElement(goodSheep);
 					} else {
-						twinDream.addElement(goodSheep);
-						this.addElement(badSheep);
+						//twinDream.addElement(goodSheep);
+						//this.addElement(badSheep);
 					}
 				}
 			}
