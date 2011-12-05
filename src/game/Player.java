@@ -67,6 +67,7 @@ public class Player extends GameElement
 	private static double CLAMPTOZERO = BunnyHat.SETTINGS.getValue("gameplay/clamptozero");
 	
 	private int theWinner = -1;
+	public boolean tookTheDoor = false;
 	
 	private boolean stuckToTheGround = false;
 	private int stuckToTheGroundStartTime;
@@ -401,7 +402,9 @@ public class Player extends GameElement
 		} else if (gameElement instanceof StandardCreature) {
 			// player hit a creature
 			//((StandardCreature) gameElement).contact(this); creature is informed via collision box
-		} else if (gameElement instanceof Door) {
+		} else if (gameElement instanceof Door 
+				&& !this.myTwin.tookTheDoor) { // only one twin can use the door
+			
 			this.setChanged();
 			HashMap map = new HashMap();
 			map.put("OHDOORTAKEMEAWAY", myID);

@@ -71,6 +71,7 @@ public class PlayerView extends Updateable implements Observer
 	private int timeSlowingFactor;
 	
 	private Door ownDoor;
+	private boolean doorEnabled = false;
 	private boolean drawOwnDoor = false;
 	private boolean shouldShowDoor = false;
 	private boolean shouldBlowDoor = false;
@@ -136,10 +137,19 @@ public class PlayerView extends Updateable implements Observer
 	// show the next best door
 	private void prepareDoor() {
 		boolean closeBy = this.shouldBeCloseBy;
+		if (this.prepareDoor(closeBy)) {
+			this.setChanged();
+			HashMap map = new HashMap();
+			map.put("foundDoor", this.viewNumber);
+			this.notifyObservers(map);
+		}
+	}
+	private boolean prepareDoor(boolean closeBy) {
+		
 		//System.out.println("show them the doors - maxX:"+getMaximumTileX()+" minX:"+getMinimumTileX());
 		// Counting y from down towards the sky
 		int minimumTileX = (int)ownPlayer.x() + 1;
-		int maximumTileX = getMaximumTileX();
+		int maximumTileX = getMaximumTileX() + width/2/BunnyHat.TILEDIMENSION;
 		int tileSpanX = maximumTileX - minimumTileX;
 		
 		int minimumTileY = getMinimumTileY();
@@ -181,38 +191,38 @@ public class PlayerView extends Updateable implements Observer
 		}
 		if (doorFound) {
 			this.ownDoor.updatePosition(doorX, doorY);
-			this.setChanged();
-			HashMap map = new HashMap();
-			map.put("foundDoor", this.viewNumber);
-			this.notifyObservers(map);
+			return true;
 		}
+		return false;
 	}
+	
 	
 	private void showDoor() {
 		this.level.setDoorAt((int)this.ownDoor.x(), (int)this.ownDoor.y(), this.ownDoor);
 		this.ownDoor.showDoor();
 		this.drawOwnDoor = true;
+		this.doorEnabled = true;
 	}
 	
 	//remove all doors
 	private void blowDoor() {
 		this.level.removeDoorAt((int)this.ownDoor.x(), (int)this.ownDoor.y());
 		this.ownDoor.blowDoor();
+		this.doorEnabled = false;
+		this.untunnelTwin();
+		this.ownPlayer.tookTheDoor = false;
 		//this.drawOwnDoor = false;
 	}
 	
 	//tunnel stuff
 	private void tunnelTwin() {
-		if (!drawOwnPlayer) return;
-		
-		this.drawOwnPlayer = false;
+		ownPlayer.tookTheDoor = true;
+		drawOwnPlayer = false;
 		
 		level.removeElement(ownPlayer);
 		otherPlayerView.getLevel().addElement(ownPlayer);
 		ownPlayer.setLevel(otherPlayerView.getLevel());
 		
-		//playerBackupX = pvSource.getPlayer().x();
-		//playerBackupY = pvSource.getPlayer().y();
 		xbackup = getPlayer().x();
 		ybackup = getPlayer().y();
 
@@ -223,7 +233,9 @@ public class PlayerView extends Updateable implements Observer
 		
 		otherPlayerView.drawOtherPlayer = true;
 	}
+	
 	private void untunnelTwin() {
+		if (!ownPlayer.tookTheDoor) return;
 		
 		otherPlayerView.drawOtherPlayer = false;
 		
@@ -236,6 +248,7 @@ public class PlayerView extends Updateable implements Observer
 		
 		ownPlayer.takeWeapon();
 		drawOwnPlayer = true;
+		//ownPlayer.tookTheDoor = false;
 		
 	}
 	
@@ -312,8 +325,11 @@ public class PlayerView extends Updateable implements Observer
 		if (this.shouldExecuteSwitch) {this.switchExecute(); this.shouldExecuteSwitch = false;}
 		if (this.shouldFinishSwitch) {this.switchFinish(); this.shouldFinishSwitch = false;}
 		if (this.shouldTunnelTwin) {this.tunnelTwin(); this.shouldTunnelTwin = false;}
-		if (this.shouldUntunnelTwin) {this.untunnelTwin(); this.shouldUntunnelTwin = false;}
+		if (this.shouldUntunnelTwin ) {this.untunnelTwin(); this.shouldUntunnelTwin = false;}
 		
+		//if (this.doorEnabled) {
+		//	this.prepareDoor();
+		//}
 		
 		buffer.beginDraw();
 		buffer.background(255);
@@ -376,9 +392,10 @@ public class PlayerView extends Updateable implements Observer
 		int otherXPos, otherYPos;
 		if (!drawOwnPlayer) {
 		} else if (this.drawOtherPlayer) {
+			//System.out.println("derandere!");
 			this.cameraOffsetX = (int)(((otherPlayer.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((otherPlayer.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
-			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth())/2) {
+			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth()*2)/2) {
 				if (otherPlayer.x() > ownPlayer.x()) {
 					otherPlayer.cannotMoveRight = true;
 					ownPlayer.cannotMoveLeft = true;
@@ -390,6 +407,13 @@ public class PlayerView extends Updateable implements Observer
 		} else if (this.drawOwnDoor) {
 			this.cameraOffsetX = (int)(((ownDoor.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((ownDoor.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
+			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth()*2)/2) {
+				if (cameraOffsetX > 0) {
+					ownPlayer.cannotMoveLeft = true;
+				} else {
+					ownPlayer.cannotMoveRight = true;
+				}
+			}
 		}
 		
 		// Place the player in the middle
@@ -698,11 +722,6 @@ public class PlayerView extends Updateable implements Observer
 				if (((Integer)map.get("tunnelTwin"))==this.viewNumber) {
 					this.shouldTunnelTwin = true;
 				}
-			} else if  (map.containsKey("untunnelTwin")) {
-				if (((Integer)map.get("untunnelTwin"))==this.viewNumber) {
-					System.out.println("untunnel him!");
-					this.shouldUntunnelTwin = true;
-				}
 			}
 		} else if (arg1 instanceof String) {
 			String msg = (String)arg1;
@@ -715,7 +734,9 @@ public class PlayerView extends Updateable implements Observer
 			} else if (msg.contentEquals("blowDoors")) {
 				this.shouldBeCloseBy = false;
 				this.shouldBlowDoor = true;
-			} 
+			} else if (msg.contentEquals("untunnelTwin")) {
+				this.shouldUntunnelTwin = true;
+			}
 		}
 	}
 }
