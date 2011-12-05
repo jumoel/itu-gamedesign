@@ -122,8 +122,11 @@ public class Player extends GameElement
 		this.level = level;
 		
 		// determine our position
-		this.xpos = level.spawnX + 5;// in case
-		this.ypos = level.spawnY + 0.5; // there is no spawn point set
+		this.xpos = level.spawnX; //+ 5;// in case
+		this.ypos = level.spawnY;// + 0.5; // there is no spawn point set
+		
+		System.out.println("before: " + this.xpos + ", " + this.ypos);
+		
 		for (int x = 0; x < level.levelWidth; x++) {
 			for (int y = 0; y < level.levelHeight; y++) {
 				if (level.getMetaDataAt(x, y) == Level.MetaTiles.SPAWNPOINT.index()) {
@@ -133,6 +136,7 @@ public class Player extends GameElement
 				}
 			}
 		}
+		System.out.println("before: " + this.xpos + ", " + this.ypos);
 		
 		this.setCollisionEffect(Effects.NONE);
 		System.out.println(this.xpos + ", " + this.ypos);

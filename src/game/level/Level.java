@@ -293,6 +293,7 @@ public class Level extends CollisionLevel
 				
 				if (metaData[i] == MetaTiles.SPAWNPOINT.index())
 				{
+					System.out.println("Found it");
 					this.spawnX = i % levelWidth;
 					this.spawnY = i / levelWidth;
 				}
