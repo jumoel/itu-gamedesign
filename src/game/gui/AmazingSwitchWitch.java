@@ -196,6 +196,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		pvSource.drawOwnPlayer = false;
 		
 		//player1backup = playerView1.getLevel();
+		pvSource.getLevel().removeElement(pvSource.getPlayer());
+		pvTarget.getLevel().addElement(pvSource.getPlayer());
 		pvSource.getPlayer().setLevel(pvTarget.getLevel());
 		
 		playerBackupX = pvSource.getPlayer().x();
@@ -215,6 +217,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	}
 	
 	private void untunnelTwin() {
+		System.out.println("untunneling twin"+playerSwitched);
 		if (this.playerSwitched == -1) return;
 		
 		PlayerView pvSource = (playerSwitched == 1 ? playerView1 : playerView2);
@@ -227,6 +230,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		pvSource.getPlayer().setPos(playerBackupX, playerBackupY);
 		
 		//playerView1.setLevel(player1backup);
+		pvTarget.getLevel().removeElement(pvSource.getPlayer());
+		pvSource.getLevel().addElement(pvSource.getPlayer());
 		pvSource.getPlayer().setLevel(pvSource.getLevel());
 		
 		pvSource.getPlayer().takeWeapon();
@@ -256,38 +261,11 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		// show first door
 		pvDarling.initShowDoor(true);
-		/*if (number == 1) {
-			playerView1.initShowDoor(true);
-		} else {
-			playerView2.initShowDoor(true);
-		}*/
-		
-		//move camera 
-		/*if (number == 1) {
-			new MoveCamera(0, playerView2.getWidth()/2 - 100, 2, cameraMoveDuration, playerView2);
-		} else {
-			new MoveCamera(0, playerView1.getWidth()/2 - 100, 2, cameraMoveDuration, playerView1);
-		}*/
+		// show second door
 		pvVictim.initShowDoor();
 		new ChangeCameraOffsetFactor(0, 100, 2, cameraMoveDuration, pvVictim);
 		
-		// wait till the camera is moved
-		/*try
-		{
-			Thread.currentThread().sleep(cameraMoveDuration);
-		}
-		catch (InterruptedException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
 		
-		// show 2nd door
-		/*if (number == 1) {
-			playerView2.initShowDoor();
-		} else {
-			playerView1.initShowDoor();
-		}*/
 		
 		
 	}
@@ -307,8 +285,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		/*Level l1, l2;
 		l1 = playerView1.getLevel();
 		l2 = playerView2.getLevel();*/
-		playerView1.switchPrepare();
-		playerView2.switchPrepare();
+		playerView1.initSwitchPrepare();
+		playerView2.initSwitchPrepare();
 
 		new SwitchTransition(0, 255, 3, SWITCH_DURATION/2, playerView1, playerView2, bunnyHat);
 		
@@ -322,8 +300,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 			e.printStackTrace();
 		}
 		
-		playerView1.switchExecute();
-		playerView2.switchExecute();
+		playerView1.initSwitchExecute();
+		playerView2.initSwitchExecute();
 		
 		new SwitchTransition(255, 0, 2, SWITCH_DURATION/2, playerView1, playerView2, bunnyHat);
 		try
@@ -341,8 +319,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		this.hasChanged();
 		this.notifyObservers("startAnimations");
 		
-		playerView1.switchFinish();
-		playerView2.switchFinish();
+		playerView1.initSwitchFinish();
+		playerView2.initSwitchFinish();
 	}
 	
 	public void wakeHer() {
@@ -368,6 +346,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 				if (shouldSwitchDreams) {switchDreams(); shouldSwitchDreams = false;}
 				if (shouldSwitchPlayerBack) {
 					this.blowDoors();
+					Thread.currentThread().sleep(100);
 					this.untunnelTwin();
 					shouldSwitchPlayerBack = false;
 				}

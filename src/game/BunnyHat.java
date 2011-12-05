@@ -279,7 +279,8 @@ public class BunnyHat extends PApplet implements Observer
 		{
 			inputState.put('d', false);
 		}
-		else if (key == 'j')
+		
+		if (key == 'j')
 		{
 			inputState.put('l', false);
 		}
@@ -287,15 +288,18 @@ public class BunnyHat extends PApplet implements Observer
 		{
 			inputState.put('j', false);
 		}
-		else if (key == 'f')
+		
+		if (key == 'f')
 		{
 			SHOW_FPS = !SHOW_FPS;
 		}
-		else if (key == 'q') {
+		
+		if (key == 'q') {
 			gameMaster.stopGame();
 			currentView = Screens.MENU_MAIN;
 		}
-		else if (keyCode == ALT || keyCode == CONTROL) {
+		// TODO ALT is not ideal: hindering other keys by changing their keyvalue
+		if (keyCode == ALT) {
 			inputState.put('.', true);
 		}
 		
@@ -357,7 +361,7 @@ public class BunnyHat extends PApplet implements Observer
 		view1 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 1, 
 				goodDream, badDream, gameMaster, DreamStyle.BAD);
 		view2 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 2,
-				goodDream, badDream, gameMaster, DreamStyle.BAD);
+				goodDream, badDream, gameMaster, DreamStyle.GOOD);
 		/*view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);*/
 		player1 = new Player(this, 1, view1.getLevel());
@@ -370,8 +374,10 @@ public class BunnyHat extends PApplet implements Observer
 		view1.setOtherPlayerView(view2);
 		view2.setOtherPlayerView(view1);
 		gameMaster.setTwins(player1, player2);
-		view1.insertGameElements();
-		view2.insertGameElements();
+		goodDream.setTwinDream(badDream);
+		badDream.setTwinDream(goodDream);
+		goodDream.insertGameElements();
+		badDream.insertGameElements();
 		
 		
 		indicator = new RaceIndicator(width, RACEINDICATORHEIGHT, this);

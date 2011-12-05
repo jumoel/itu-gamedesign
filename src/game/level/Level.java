@@ -1,6 +1,7 @@
 package game.level;
 
 import java.awt.geom.Rectangle2D;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -9,6 +10,7 @@ import java.util.LinkedList;
 import game.BunnyHat;
 import game.CollisionBox;
 import game.Player;
+import game.elements.BadSheep;
 import game.elements.BubbleGunGum;
 import game.elements.GameElement;
 import game.elements.GoodSheep;
@@ -57,7 +59,9 @@ public class Level extends CollisionLevel
 	private ArrayList creaturesAndObjects;
 	
 	public String levelName;
+	private String levelPath;
 	public DreamStyle dream;
+	private Level twinDream;
 	
 	public int spawnX;
 	public int spawnY;
@@ -74,15 +78,35 @@ public class Level extends CollisionLevel
 		super(p);
 		this.processing = p;
 		this.levelName = levelName;
+		this.levelPath = levelName.substring(0, levelName.lastIndexOf(File.separatorChar));
 		this.dream = style;
 		
 		loadXML();
-		tiles = BImage.cutImageSprite(processing, processing.loadImage("levels/" + imageFile), BunnyHat.TILEDIMENSION, BunnyHat.TILEDIMENSION);
+		tiles = BImage.cutImageSprite(processing, processing.loadImage(imageFile), BunnyHat.TILEDIMENSION, BunnyHat.TILEDIMENSION);
 		
 		// setup collision level
 		this.collisionSetup();
 		
 		creaturesAndObjects = new ArrayList();
+	}
+	
+	public void setTwinDream(Level dream) {
+		this.twinDream = dream;
+	}
+	
+	public void insertGameElements() {
+		for (int x = 0; x < levelWidth; x++) {
+			for (int y = 0; y < levelHeight; y++) {
+				//if (this.level.getMetaDataAt(x, y) > 1) {System.out.println(this.level.getMetaDataAt(x, y));}
+				if (this.getMetaDataAt(x, y) == Level.MetaTiles.Sheep.index() && dream == DreamStyle.GOOD) {
+					GoodSheep goodSheep = new GoodSheep(x, y, 3, 3, processing);
+					BadSheep badSheep = new BadSheep(x, y, 3, 3, processing, goodSheep);
+					
+					twinDream.addElement(badSheep);
+					this.addElement(goodSheep);
+				}
+			}
+		}
 	}
 	
 	public int getLevelDataAt(int x, int y)
@@ -239,7 +263,7 @@ public class Level extends CollisionLevel
 				System.exit(-1);
 			}
 			
-			imageFile = ((String) imgFileXPath.evaluate(doc, XPathConstants.STRING));
+			imageFile = levelPath+File.separator+((String) imgFileXPath.evaluate(doc, XPathConstants.STRING));
 			imageWidth = ((Double) imgWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			imageHeight = ((Double) imgHeightXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();
 			levelWidth = ((Double) levelWidthXPath.evaluate(doc, XPathConstants.NUMBER)).intValue();

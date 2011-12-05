@@ -27,6 +27,7 @@ public class Player extends GameElement
 	//private boolean isInAir;
 	private boolean isJumping;
 	private boolean didJump = false;
+	private boolean didFire = false;
 	
 	//public boolean isMovingSideways;
 
@@ -426,8 +427,8 @@ public class Player extends GameElement
 
 		// a player should always have to press jump again for another jump
 		if (didJump && !jumpbutton) didJump = false;  
-		// once the game is over, players can not move left / right
-		//if (gameOver) leftbutton = rightbutton = false;
+		// same for firing a gum
+		if (didFire && !shootbutton) didFire = false;
 		
 		if (jumpbutton && !didJump)
 		{
@@ -455,8 +456,8 @@ public class Player extends GameElement
 			// Use stuff
 		}
 		
-		if (shootbutton && !unarmed) {
-			state.put('.', false);
+		if (shootbutton && !unarmed && !didFire) {
+			didFire = true;
 			fireGum();
 		}
 		

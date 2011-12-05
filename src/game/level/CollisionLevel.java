@@ -63,7 +63,7 @@ public abstract class CollisionLevel
 	
 	public CollisionBox getBoxAt(int x, int y) {
 		int index = levelWidth*y + x;
-		if (index < 0 || index > fixedObjects.length) {
+		if (index < 0 || index >= fixedObjects.length) {
 			return null;
 		} else {
 			return fixedObjects[index];

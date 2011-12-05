@@ -74,7 +74,9 @@ public class PlayerView extends Updateable implements Observer
 	private boolean shouldShowDoor = false;
 	private boolean shouldBlowDoor = false;
 	private boolean shouldBeCloseBy = false;
-	
+	private boolean shouldPrepareSwitch = false;
+	private boolean shouldExecuteSwitch = false;
+	private boolean shouldFinishSwitch = false;
 	
 	private Level level;
 	private Level goodDream, badDream;
@@ -87,21 +89,23 @@ public class PlayerView extends Updateable implements Observer
 	public Level getLevel() {return level;}
 	
 	
-	
-	public void switchPrepare() { 
+	protected void initSwitchPrepare() {this.shouldPrepareSwitch = true;}
+	private void switchPrepare() { 
 		switchHappening = true;
 		ownPlayer.holdAnimation();
 		// getting the player y-Offset (distance above ground)
 	}
 	
-	public void switchExecute() {
+	protected void initSwitchExecute() {this.shouldExecuteSwitch = true;}
+	private void switchExecute() {
 		level.removeElement(ownPlayer);
 		level = (level == goodDream ? badDream : goodDream);
 		level.addElement(ownPlayer);
 		ownPlayer.removeCollisionGroundPath();
 	}
 	
-	public void switchFinish() {
+	protected void initSwitchFinish() {this.shouldFinishSwitch = true;}
+	private void switchFinish() {
 		ownPlayer.unholdAnimation();
 		switchHappening = false;
 	}
@@ -124,7 +128,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	
 	// show the next best door
-	protected void showDoor(boolean closeBy) {
+	private void showDoor(boolean closeBy) {
 		//System.out.println("show them the doors - maxX:"+getMaximumTileX()+" minX:"+getMinimumTileX());
 		// Counting y from down towards the sky
 		int minimumTileX = (int)ownPlayer.x() + 1;
@@ -178,7 +182,7 @@ public class PlayerView extends Updateable implements Observer
 	}
 	
 	//remove all doors
-	protected void blowDoor() {
+	private void blowDoor() {
 		this.level.removeDoorAt((int)this.ownDoor.x(), (int)this.ownDoor.y());
 		this.ownDoor.blowDoor();
 		//this.drawOwnDoor = false;
@@ -243,27 +247,15 @@ public class PlayerView extends Updateable implements Observer
 		this.timeSlowingFactor = 1; // normal speed
 	}
 	
-	public void insertGameElements() {
-		for (int x = 0; x < level.levelWidth; x++) {
-			for (int y = 0; y < level.levelHeight; y++) {
-				//if (this.level.getMetaDataAt(x, y) > 1) {System.out.println(this.level.getMetaDataAt(x, y));}
-				if (this.level.getMetaDataAt(x, y) == Level.MetaTiles.Sheep.index() && level.dream == DreamStyle.GOOD) {
-					GoodSheep goodSheep = new GoodSheep(x, y, 3, 3, processing);
-					BadSheep badSheep = new BadSheep(x, y, 3, 3, processing, goodSheep);
-					
-					this.otherPlayerView.level.addElement(badSheep);
-					this.level.addElement(goodSheep);
-				}
-			}
-		}
-	}
-	
 	
 	
 	public void update(int xpos, int ypos, int deltaT)
 	{	
 		if (this.shouldShowDoor) {this.showDoor(this.shouldBeCloseBy); this.shouldShowDoor = false;}
 		if (this.shouldBlowDoor) {this.blowDoor(); this.shouldBlowDoor = false;}
+		if (this.shouldPrepareSwitch) {this.switchPrepare(); this.shouldPrepareSwitch = false;}
+		if (this.shouldExecuteSwitch) {this.switchExecute(); this.shouldExecuteSwitch = false;}
+		if (this.shouldFinishSwitch) {this.switchFinish(); this.shouldFinishSwitch = false;}
 		
 		
 		buffer.beginDraw();
@@ -322,7 +314,8 @@ public class PlayerView extends Updateable implements Observer
 		
 		// calculate camera offset for door / other player
 		int otherXPos, otherYPos;
-		if (this.drawOtherPlayer) {
+		if (!drawOwnPlayer) {
+		} else if (this.drawOtherPlayer) {
 			this.cameraOffsetX = (int)(((otherPlayer.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((otherPlayer.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
 		} else if (this.drawOwnDoor) {
