@@ -143,9 +143,9 @@ public class BunnyHat extends PApplet implements Observer
 						lvlSrc.previewImage = files[e].getPath();
 					} else if (name.endsWith(".png")) {
 						if (name.startsWith("good")) {
-							lvlSrc.goodBackgroundImages.add(files[e].getPath());
+							lvlSrc.goodBackgroundImages.add(loadImage(files[e].getPath()));
 						} else if (name.startsWith("bad")) {
-							lvlSrc.badBackgroundImages.add(files[e].getPath());
+							lvlSrc.badBackgroundImages.add(loadImage(files[e].getPath()));
 						}
 					}
 				}
@@ -359,9 +359,11 @@ public class BunnyHat extends PApplet implements Observer
 		badDream = new Level(this, lvlSrc.badLevelFile, DreamStyle.BAD);
 		
 		view1 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 1, 
-				goodDream, badDream, gameMaster, DreamStyle.BAD);
+				goodDream, badDream, gameMaster, DreamStyle.BAD,
+				lvlSrc.goodBackgroundImages, lvlSrc.badBackgroundImages);
 		view2 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 2,
-				goodDream, badDream, gameMaster, DreamStyle.GOOD);
+				goodDream, badDream, gameMaster, DreamStyle.GOOD,
+				lvlSrc.goodBackgroundImages, lvlSrc.badBackgroundImages);
 		/*view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);*/
 		player1 = new Player(this, 1, view1.getLevel());

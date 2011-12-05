@@ -1,5 +1,6 @@
 package game.gui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
@@ -80,6 +81,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	private Level level;
 	private Level goodDream, badDream;
+	private ArrayList goodBackgroundImages, badBackgroundImages;
 	
 	// dream switch data
 	private boolean switchHappening = false;
@@ -205,7 +207,8 @@ public class PlayerView extends Updateable implements Observer
 	}
 	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber, 
-			Level goodDream, Level badDream, GameMaster gameMaster, DreamStyle style)
+			Level goodDream, Level badDream, GameMaster gameMaster, DreamStyle style,
+			ArrayList goodBackgrounds, ArrayList badBackgrounds)
 	{	
 		this.buffer = applet.createGraphics(width, height, PConstants.JAVA2D);
 		this.colorLayerColor = new int[3];
@@ -234,6 +237,8 @@ public class PlayerView extends Updateable implements Observer
 		this.level = (style == DreamStyle.GOOD ? goodDream : badDream);
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
 		
+		this.goodBackgroundImages = goodBackgrounds;
+		this.badBackgroundImages = badBackgrounds;
 		
 		/*this.ownPlayer = new Player(processing, viewNumber, this.level);
 		this.ownPlayer.addObserver(this);
@@ -260,6 +265,7 @@ public class PlayerView extends Updateable implements Observer
 		
 		buffer.beginDraw();
 		buffer.background(255);
+		this.drawLevelBackground(buffer);
 		
 
 		if (ownPlayer == null)
@@ -436,6 +442,18 @@ public class PlayerView extends Updateable implements Observer
 		processing.image(buffer, xpos, ypos);
 	}
 	
+	private void drawLevelBackground(PGraphics graphics)
+	{
+		ArrayList backgrounds = level.dream == DreamStyle.GOOD ? this.goodBackgroundImages : this.badBackgroundImages;
+		for (int i = 0; i < backgrounds.size(); i++) {
+			PImage image = (PImage)backgrounds.get(i);
+			int x = 0;
+			int y = 0;
+			graphics.image(image, x, y);
+		}
+	}
+
+
 	private void drawLevelEndScreen(PGraphics graphics) {
 		// draw something cool!
 		graphics.fill(0, 0, 0);
