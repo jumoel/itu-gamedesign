@@ -98,6 +98,9 @@ public class Level extends CollisionLevel
 		for (int x = 0; x < levelWidth; x++) {
 			for (int y = 0; y < levelHeight; y++) {
 				//if (this.level.getMetaDataAt(x, y) > 1) {System.out.println(this.level.getMetaDataAt(x, y));}
+				/*
+				 * TODO: Sam should fix his leaky sheep :)
+				 * */
 				if (this.getMetaDataAt(x, y) == Level.MetaTiles.CROSSINGSHEEP.index()) {
 					GoodSheep goodSheep = new GoodSheep(x, y, 3, 3, processing);
 					BadSheep badSheep = new BadSheep(x, y, 3, 3, processing, goodSheep);
@@ -109,6 +112,7 @@ public class Level extends CollisionLevel
 						//this.addElement(badSheep);
 					}
 				}
+				/**/
 			}
 		}
 	}

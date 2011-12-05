@@ -3,7 +3,7 @@
  <tileset firstgid="1" name="Graphics" tilewidth="24" tileheight="24">
   <image source="tileset_good_dream.png" width="600" height="1000"/>
  </tileset>
- <tileset firstgid="1026" name="meta_tiles" tilewidth="24" tileheight="24">
+ <tileset firstgid="1026" name="Meta" tilewidth="24" tileheight="24">
   <image source="meta_tiles.png" width="96" height="48"/>
  </tileset>
  <layer name="Graphics" width="350" height="150">
