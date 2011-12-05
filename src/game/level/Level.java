@@ -56,7 +56,7 @@ public class Level extends CollisionLevel
 	private int levelData[];
 	private int levelDataForeground[];
 	private int metaData[];
-	private ArrayList creaturesAndObjects;
+	private ArrayList<GameElement> gameElements;
 	
 	public String levelName;
 	private String levelPath;
@@ -87,7 +87,7 @@ public class Level extends CollisionLevel
 		// setup collision level
 		this.collisionSetup();
 		
-		creaturesAndObjects = new ArrayList();
+		gameElements = new ArrayList<GameElement>();
 	}
 	
 	public void setTwinDream(Level dream) {
@@ -172,7 +172,7 @@ public class Level extends CollisionLevel
 	
 	public CollisionBox getCollider(CollisionBox box) {
 		CollisionBox ret = null;
-		Iterator cnos = creaturesAndObjects.iterator();
+		Iterator cnos = gameElements.iterator();
 		while (cnos.hasNext()) {
 			CollisionBox currentCBox = (CollisionBox)cnos.next();
 			if (currentCBox != box && box.getCBox().intersects(currentCBox.getCBox())) {
@@ -185,21 +185,31 @@ public class Level extends CollisionLevel
 		return ret;
 	}
 	
-	public void updateCreaturesAndObjects(int deltaT) {
-		Iterator cnos = creaturesAndObjects.iterator();
+	public void updateGameElements(int deltaT) {
+		Iterator<GameElement> cnos = gameElements.iterator();
 		while (cnos.hasNext()) {
-			GameElement currentCreature = (GameElement)cnos.next();
+			GameElement currentCreature = cnos.next();
 			if (currentCreature.updateMe) {
 				currentCreature.update(deltaT);
+			}
+		}
+		
+		// sort once, get elements with high zIndex further to the front
+		// sorting once is enough, to get e.g. one player to the front
+		for (int i = 1; i < gameElements.size(); i++) {
+			if (gameElements.get(i-1).zIndex > gameElements.get(i).zIndex) {
+				GameElement element = gameElements.get(i);
+				gameElements.set(i, gameElements.get(i-1));
+				gameElements.set(i-1, element);
 			}
 		}
 	}
 	
 	public void drawCreaturesAndObjects(int x, int y, int width, int height, PGraphics graphics) {
-		Iterator cnos = creaturesAndObjects.iterator();
+		Iterator<GameElement> cnos = gameElements.iterator();
 		GameElement toBeDestroyed = null;
 		while (cnos.hasNext()) {
-			GameElement currentCreature = (GameElement)cnos.next();
+			GameElement currentCreature = cnos.next();
 			if (currentCreature.destroyed) {
 				toBeDestroyed = currentCreature;
 			} else if (currentCreature.drawMe) {
@@ -217,17 +227,17 @@ public class Level extends CollisionLevel
 			}
 		}
 		if (toBeDestroyed != null) {
-			creaturesAndObjects.remove(toBeDestroyed);
+			gameElements.remove(toBeDestroyed);
 		}
 	}
 	
 	public void addElement(GameElement e) {
 		e.setLevel(this);
-		creaturesAndObjects.add(e);
+		gameElements.add(e);
 	}
 	
 	public void removeElement(GameElement e) {
-		creaturesAndObjects.remove(e);
+		gameElements.remove(e);
 	}
 	
 	

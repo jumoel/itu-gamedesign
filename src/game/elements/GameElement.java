@@ -42,6 +42,7 @@ public abstract class GameElement extends CollisionBox
 	public boolean destroyed = false; 
 	public boolean drawMe = true;
 	public boolean updateMe = true;
+	public int zIndex = 0; // higher index = further in front
 	
 	protected double xSpeed, ySpeed;
 	protected double xpos, ypos, previous_xpos, previous_ypos;
@@ -133,7 +134,7 @@ public abstract class GameElement extends CollisionBox
 		// once they travel too far, they can cross a collision box  - and we surely do not want that!
 		double yDiff = ypos - previous_ypos;
 		double xDiff = xpos - previous_xpos;
-		double maxDistance = 0.8;
+		double maxDistance = 0.95;
 		if (Math.abs(yDiff)>=maxDistance) {
 			ypos = previous_ypos + maxDistance * Math.signum(yDiff);
 		}

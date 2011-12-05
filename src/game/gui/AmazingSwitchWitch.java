@@ -189,14 +189,15 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	}
 	
 	private void tunnelTwin(int number) {
+		this.setChanged();
+		HashMap map = new HashMap();
+		map.put("tunnelTwin", number);
+		this.notifyObservers(map);
+		
 		playerSwitched = number;
 		
-		PlayerView pvSource = (number == 1 ? playerView1 : playerView2);
+		/*PlayerView pvSource = (number == 1 ? playerView1 : playerView2);
 		PlayerView pvTarget = (pvSource == playerView1 ? playerView2 : playerView1);
-		
-		
-		
-		
 		
 		pvSource.drawOwnPlayer = false;
 		
@@ -215,15 +216,18 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		
 		pvSource.getPlayer().giveWeapon();
 		
-		pvTarget.drawOtherPlayer = true;
+		pvTarget.drawOtherPlayer = true;*/
 		
 	}
 	
 	private void untunnelTwin() {
 		System.out.println("untunneling twin"+playerSwitched);
 		if (this.playerSwitched == -1) return;
-		
-		PlayerView pvSource = (playerSwitched == 1 ? playerView1 : playerView2);
+		this.setChanged();
+		HashMap map = new HashMap();
+		map.put("untunnelTwin", playerSwitched);
+		this.notifyObservers(map);
+		/*PlayerView pvSource = (playerSwitched == 1 ? playerView1 : playerView2);
 		PlayerView pvTarget = (pvSource == playerView1 ? playerView2 : playerView1);
 		
 		
@@ -237,7 +241,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		pvSource.getPlayer().setLevel(pvSource.getLevel());
 		
 		pvSource.getPlayer().takeWeapon();
-		pvSource.drawOwnPlayer = true;
+		pvSource.drawOwnPlayer = true;*/
 		playerSwitched = -1;
 	}
 	
@@ -374,8 +378,18 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 					if (foundDoor1 && foundDoor2) {
 						spawnDoors(doorSpawnDarling); 
 						shouldSpawnDoors = false;
+						this.doorPrepareAttempt = 0;
+						foundDoor1 = foundDoor2 = false;
 					} else {
-						this.prepareDoors(doorSpawnDarling);
+						if (this.doorPrepareAttempt > 13) {
+							shouldSpawnDoors = false;
+							this.doorPrepareAttempt = 0;
+							foundDoor1 = foundDoor2 = false;
+						} else {
+							this.doorPrepareAttempt++;
+							this.prepareDoors(doorSpawnDarling);
+							foundDoor1 = foundDoor2 = false;
+						}
 					}
 				}
 				

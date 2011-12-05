@@ -112,6 +112,7 @@ public class Player extends GameElement
 		super.setGameElement(this);
 		
 		this.updateMe = false;
+		this.zIndex = 100;
 		
 		this.myID = playerNumber;
 		
@@ -143,7 +144,7 @@ public class Player extends GameElement
 		
 		isJumping = true;
 		//isMovingSideways = false;
-		cannotMoveLeft = false;
+		//cannotMoveLeft = false;
 
 		unarmed = true;
 		
@@ -356,7 +357,12 @@ public class Player extends GameElement
 		if (theWinner == -1) handleInput(state);
 		else xSpeed = 0;
 		
-		
+		while ((level.getMetaDataAt((int)(xpos+0.2), (int)(ypos+1.5)) == Level.MetaTiles.OBSTACLE.index())
+				|| level.getMetaDataAt((int)(xpos+0.8), (int)(ypos+1.5)) == Level.MetaTiles.OBSTACLE.index()) {
+			System.out.println("correct");
+			
+			ypos += 1;
+		}
 		
 		super.update(deltaT);
 		
@@ -384,7 +390,7 @@ public class Player extends GameElement
 		
 		// any interesting collision partners?
 		Object gameElement = this.getBouncePartner();
-		if (gameElement instanceof FinishLine) {
+		if (unarmed && gameElement instanceof FinishLine) { // player has to be unarmed
 			// we won!!!
 			this.setChanged();
 			HashMap map = new HashMap();

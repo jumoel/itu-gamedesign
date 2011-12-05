@@ -191,8 +191,8 @@ public class BunnyHat extends PApplet implements Observer
 			break;
 		case GAME:
 			deltaT = (int)(deltaT * physicsTimeFactor);
-			goodDream.updateCreaturesAndObjects(deltaT);
-			badDream.updateCreaturesAndObjects(deltaT);
+			goodDream.updateGameElements(deltaT);
+			badDream.updateGameElements(deltaT);
 			player1.update(inputState, deltaT);
 			player2.update(inputState, deltaT);
 			view1.update(LEFT, VIEW1Y, deltaT);

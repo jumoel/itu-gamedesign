@@ -40,7 +40,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	private int playerPosition;
 
-	private GameMaster gameMaster;
+	//private GameMaster gameMaster;
 	
 	private Player ownPlayer;
 	private Player otherPlayer;
@@ -79,6 +79,8 @@ public class PlayerView extends Updateable implements Observer
 	private boolean shouldPrepareSwitch = false;
 	private boolean shouldExecuteSwitch = false;
 	private boolean shouldFinishSwitch = false;
+	private boolean shouldTunnelTwin = false;
+	private boolean shouldUntunnelTwin = false;
 	
 	private Level level;
 	private Level goodDream, badDream;
@@ -199,6 +201,44 @@ public class PlayerView extends Updateable implements Observer
 		//this.drawOwnDoor = false;
 	}
 	
+	//tunnel stuff
+	private void tunnelTwin() {
+		if (!drawOwnPlayer) return;
+		
+		this.drawOwnPlayer = false;
+		
+		level.removeElement(ownPlayer);
+		otherPlayerView.getLevel().addElement(ownPlayer);
+		ownPlayer.setLevel(otherPlayerView.getLevel());
+		
+		//playerBackupX = pvSource.getPlayer().x();
+		//playerBackupY = pvSource.getPlayer().y();
+		xbackup = getPlayer().x();
+		ybackup = getPlayer().y();
+
+		otherPlayerView.setDoorPosition(ownPlayer);
+		ownPlayer.removeCollisionGroundPath();
+		
+		ownPlayer.giveWeapon();
+		
+		otherPlayerView.drawOtherPlayer = true;
+	}
+	private void untunnelTwin() {
+		
+		otherPlayerView.drawOtherPlayer = false;
+		
+		ownPlayer.setPos(xbackup, ybackup);
+		
+		
+		otherPlayerView.getLevel().removeElement(ownPlayer);
+		level.addElement(ownPlayer);
+		ownPlayer.setLevel(level);
+		
+		ownPlayer.takeWeapon();
+		drawOwnPlayer = true;
+		
+	}
+	
 	protected Player getPlayer() {
 		return this.ownPlayer;
 	}
@@ -237,7 +277,7 @@ public class PlayerView extends Updateable implements Observer
 		this.halfheight = this.height / 2;
 		
 		this.processing = applet;
-		this.gameMaster = gameMaster;
+		//this.gameMaster = gameMaster;
 		
 		this.viewNumber = viewNumber;
 		
@@ -271,6 +311,8 @@ public class PlayerView extends Updateable implements Observer
 		if (this.shouldPrepareSwitch) {this.switchPrepare(); this.shouldPrepareSwitch = false;}
 		if (this.shouldExecuteSwitch) {this.switchExecute(); this.shouldExecuteSwitch = false;}
 		if (this.shouldFinishSwitch) {this.switchFinish(); this.shouldFinishSwitch = false;}
+		if (this.shouldTunnelTwin) {this.tunnelTwin(); this.shouldTunnelTwin = false;}
+		if (this.shouldUntunnelTwin) {this.untunnelTwin(); this.shouldUntunnelTwin = false;}
 		
 		
 		buffer.beginDraw();
@@ -301,8 +343,8 @@ public class PlayerView extends Updateable implements Observer
 			pypos = (int) (ybackup * BunnyHat.TILEDIMENSION);
 		}
 
-		int drawpxpos;
-		int drawpypos;
+		//int drawpxpos;
+		//int drawpypos;
 		
 		if (pxpos < 0)
 		{
@@ -336,6 +378,15 @@ public class PlayerView extends Updateable implements Observer
 		} else if (this.drawOtherPlayer) {
 			this.cameraOffsetX = (int)(((otherPlayer.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((otherPlayer.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
+			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth())/2) {
+				if (otherPlayer.x() > ownPlayer.x()) {
+					otherPlayer.cannotMoveRight = true;
+					ownPlayer.cannotMoveLeft = true;
+				} else {
+					otherPlayer.cannotMoveLeft = true;
+					ownPlayer.cannotMoveRight = true;
+				}
+			}
 		} else if (this.drawOwnDoor) {
 			this.cameraOffsetX = (int)(((ownDoor.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((ownDoor.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
@@ -347,15 +398,15 @@ public class PlayerView extends Updateable implements Observer
 		yCoordCameraMiddle = pypos;
 		yCoordCamera = yCoordCameraMiddle - halfheight + (int)(cameraOffsetY * cameraOffsetFactor);
 		
-		drawpxpos = halfwidth - (int)(cameraOffsetX * cameraOffsetFactor)
+		/*drawpxpos = halfwidth - (int)(cameraOffsetX * cameraOffsetFactor)
 				- (int)(ownPlayer.collisionBoxWidth() * BunnyHat.TILEDIMENSION / 2);
 		drawpypos = halfheight - (int)(cameraOffsetY * cameraOffsetFactor)
-				- (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);
+				- (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);*/
 		
 		if (xCoordCamera < 0)
 		{
 			int diff = -xCoordCamera;
-			drawpxpos = drawpxpos - diff;
+			//drawpxpos = drawpxpos - diff;
 			xCoordCamera = 0;
 			xCoordCameraMiddle = halfwidth;
 		}
@@ -365,7 +416,7 @@ public class PlayerView extends Updateable implements Observer
 		if (xCoordCamera > maxCameraPosX)
 		{
 			int diff = xCoordCamera - maxCameraPosX;
-			drawpxpos = drawpxpos + diff;
+			//drawpxpos = drawpxpos + diff;
 			xCoordCamera = maxCameraPosX;
 			xCoordCameraMiddle = xCoordCamera + halfwidth;
 		}
@@ -373,7 +424,7 @@ public class PlayerView extends Updateable implements Observer
 		if (yCoordCamera < 0)
 		{
 			int diff = -yCoordCamera;
-			drawpypos = drawpypos - diff;
+			//drawpypos = drawpypos - diff;
 			yCoordCamera = 0;
 			yCoordCameraMiddle = halfheight;
 		}
@@ -382,24 +433,24 @@ public class PlayerView extends Updateable implements Observer
 		if (yCoordCamera > maxCameraPosY)
 		{
 			int diff = yCoordCamera - maxCameraPosY;
-			drawpypos = (drawpypos + diff);
+			//drawpypos = (drawpypos + diff);
 			yCoordCamera = maxCameraPosY;
 			yCoordCameraMiddle = yCoordCamera + halfheight;
 		}
 		
-		drawpypos = height - drawpypos;
+		//drawpypos = height - drawpypos;
 		
 		drawLevelGraphics(buffer, Level.Layer.BACKGROUND);
 		
 		level.drawCreaturesAndObjects(xCoordCamera, yCoordCamera, 
 				xCoordCamera + width, yCoordCamera + height, buffer);
 		
-		if (drawOwnPlayer)
+		/*if (drawOwnPlayer)
 		{
-			drawImage(ownPlayer.getCurrentTexture(), buffer, drawpxpos, drawpypos, Horizontal.LEFT, Vertical.BOTTOM);
-		}
+			//drawImage(ownPlayer.getCurrentTexture(), buffer, drawpxpos, drawpypos, Horizontal.LEFT, Vertical.BOTTOM);
+		}*/
 		
-		if (drawOtherPlayer)
+		/*if (drawOtherPlayer)
 		{
 			int opxpos = (int) (otherPlayer.x() * BunnyHat.TILEDIMENSION);
 			int opypos = (int) (otherPlayer.y() * BunnyHat.TILEDIMENSION);
@@ -433,8 +484,8 @@ public class PlayerView extends Updateable implements Observer
 			int drawopypos = drawpypos - ydiff - (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);;
 			int drawopxpos = drawpxpos + xdiff + (int)(ownPlayer.collisionBoxWidth() * BunnyHat.TILEDIMENSION / 2);;
 			
-			drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.LEFT, Vertical.BOTTOM);	
-		}
+			//drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.LEFT, Vertical.BOTTOM);	
+		}*/
 		
 		drawLevelGraphics(buffer, Level.Layer.FOREGROUND);
 		
@@ -643,6 +694,15 @@ public class PlayerView extends Updateable implements Observer
 					this.shouldBeCloseBy = false;
 				}
 				this.shouldPrepareDoor = true;
+			} else if (map.containsKey("tunnelTwin")) {
+				if (((Integer)map.get("tunnelTwin"))==this.viewNumber) {
+					this.shouldTunnelTwin = true;
+				}
+			} else if  (map.containsKey("untunnelTwin")) {
+				if (((Integer)map.get("untunnelTwin"))==this.viewNumber) {
+					System.out.println("untunnel him!");
+					this.shouldUntunnelTwin = true;
+				}
 			}
 		} else if (arg1 instanceof String) {
 			String msg = (String)arg1;
