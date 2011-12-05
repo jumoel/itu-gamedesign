@@ -142,8 +142,8 @@ public abstract class CollisionBox extends Observable
 		
 		//determine points
 		int x0, y0, x1, y1, fx0, fy0, fx1, fy1;
-		x0 = (int)(cBox.x + 0.1); x1 = (int)(cBox.x + cBox.width - 0.1);
-		y0 = (int)(cBox.y+1.1); y1 = (int)(cBox.y + cBox.height+0.9);
+		x0 = (int)(cBox.x + 0.2); x1 = (int)(cBox.x + cBox.width - 0.2);
+		y0 = (int)(cBox.y+1.2); y1 = (int)(cBox.y + cBox.height+0.8);
 		fx0 = (int)x; fy0 = (int)y + 1;
 		fx1 = (int)(x + cBox.width); fy1 = (int)(y + 1 + cBox.height);
 		
@@ -252,7 +252,7 @@ public abstract class CollisionBox extends Observable
 		CollisionBox hardCollider = collider; // backup the hard stuff
 		
 		
-		if (collider == null) {
+		//if (true || collider == null) {
 			collider = collisionLevel.getCollider(this);
 			if (collider != null) {
 				collision = true;
@@ -291,14 +291,14 @@ public abstract class CollisionBox extends Observable
 							break;
 						case BAD_SHEEP_BOUNCE:
 							if (gameElement instanceof Player) {
-								newYSpeed = 2;
+								newYSpeed = 3;
 								newXSpeed = -6;
 							}
 							break;
 					}
 				}
 			}
-		}
+		//}
 		
 		
 		return collision;

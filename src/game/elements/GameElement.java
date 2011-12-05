@@ -133,7 +133,7 @@ public abstract class GameElement extends CollisionBox
 		// once they travel too far, they can cross a collision box  - and we surely do not want that!
 		double yDiff = ypos - previous_ypos;
 		double xDiff = xpos - previous_xpos;
-		double maxDistance = 0.9;
+		double maxDistance = 0.8;
 		if (Math.abs(yDiff)>=maxDistance) {
 			ypos = previous_ypos + maxDistance * Math.signum(yDiff);
 		}
