@@ -404,12 +404,15 @@ public class BunnyHat extends PApplet implements Observer
 
 		// setup communication
 		gameMaster.addObserver(switcher); // listen for level switch message
+		switcher.addObserver(gameMaster); // also in a good relationship.. .)
 		player1.addObserver(view1);
 		player2.addObserver(view2);
 		player1.addObserver(gameMaster);
 		player2.addObserver(gameMaster);
 		switcher.addObserver(view1);
 		switcher.addObserver(view2);
+		view1.addObserver(switcher);
+		view2.addObserver(switcher);
 		
 		//switcher.addObserver(view1);
 		//switcher.addObserver(view2);

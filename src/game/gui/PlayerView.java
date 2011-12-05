@@ -75,6 +75,7 @@ public class PlayerView extends Updateable implements Observer
 	private boolean shouldShowDoor = false;
 	private boolean shouldBlowDoor = false;
 	private boolean shouldBeCloseBy = false;
+	private boolean shouldPrepareDoor = false;
 	private boolean shouldPrepareSwitch = false;
 	private boolean shouldExecuteSwitch = false;
 	private boolean shouldFinishSwitch = false;
@@ -112,6 +113,7 @@ public class PlayerView extends Updateable implements Observer
 		switchHappening = false;
 	}
 	
+	
 	protected void initShowDoor() {
 		this.initShowDoor(false);
 	}
@@ -130,7 +132,8 @@ public class PlayerView extends Updateable implements Observer
 	
 	
 	// show the next best door
-	private void showDoor(boolean closeBy) {
+	private void prepareDoor() {
+		boolean closeBy = this.shouldBeCloseBy;
 		//System.out.println("show them the doors - maxX:"+getMaximumTileX()+" minX:"+getMinimumTileX());
 		// Counting y from down towards the sky
 		int minimumTileX = (int)ownPlayer.x() + 1;
@@ -176,11 +179,17 @@ public class PlayerView extends Updateable implements Observer
 		}
 		if (doorFound) {
 			this.ownDoor.updatePosition(doorX, doorY);
-			//System.out.println(actualX+":"+y);
-			this.level.setDoorAt(doorX, doorY, this.ownDoor);
-			this.ownDoor.showDoor();
-			this.drawOwnDoor = true;
+			this.setChanged();
+			HashMap map = new HashMap();
+			map.put("foundDoor", this.viewNumber);
+			this.notifyObservers(map);
 		}
+	}
+	
+	private void showDoor() {
+		this.level.setDoorAt((int)this.ownDoor.x(), (int)this.ownDoor.y(), this.ownDoor);
+		this.ownDoor.showDoor();
+		this.drawOwnDoor = true;
 	}
 	
 	//remove all doors
@@ -256,7 +265,8 @@ public class PlayerView extends Updateable implements Observer
 	
 	public void update(int xpos, int ypos, int deltaT)
 	{	
-		if (this.shouldShowDoor) {this.showDoor(this.shouldBeCloseBy); this.shouldShowDoor = false;}
+		if (this.shouldPrepareDoor) {this.prepareDoor(); this.shouldPrepareDoor = false;}
+		if (this.shouldShowDoor) {this.showDoor(); this.shouldShowDoor = false;}
 		if (this.shouldBlowDoor) {this.blowDoor(); this.shouldBlowDoor = false;}
 		if (this.shouldPrepareSwitch) {this.switchPrepare(); this.shouldPrepareSwitch = false;}
 		if (this.shouldExecuteSwitch) {this.switchExecute(); this.shouldExecuteSwitch = false;}
@@ -619,6 +629,20 @@ public class PlayerView extends Updateable implements Observer
 				if (((Integer)map.get("IFUCKINGWON"))==this.viewNumber) {
 					this.ownPlayerWon = true;
 				}
+			} else if (map.containsKey("showDoors") && !gameOver) {
+				if (((Integer)map.get("showDoors"))==this.viewNumber) {
+					this.shouldBeCloseBy = true;
+				} else {
+					this.shouldBeCloseBy = false;
+				}
+				this.shouldShowDoor = true;
+			} else if (map.containsKey("prepareDoors")) {
+				if (((Integer)map.get("prepareDoors"))==this.viewNumber) {
+					this.shouldBeCloseBy = true;
+				} else {
+					this.shouldBeCloseBy = false;
+				}
+				this.shouldPrepareDoor = true;
 			}
 		} else if (arg1 instanceof String) {
 			String msg = (String)arg1;
@@ -628,7 +652,10 @@ public class PlayerView extends Updateable implements Observer
 				this.shouldExecuteSwitch = true;
 			} else if (msg.contentEquals("switchFinish")) {
 				this.shouldFinishSwitch = true;
-			}
+			} else if (msg.contentEquals("blowDoors")) {
+				this.shouldBeCloseBy = false;
+				this.shouldBlowDoor = true;
+			} 
 		}
 	}
 }

@@ -355,6 +355,9 @@ public class Player extends GameElement
 	{
 		if (theWinner == -1) handleInput(state);
 		else xSpeed = 0;
+		
+		
+		
 		super.update(deltaT);
 		
 		double xSignum = Math.signum(xSpeed);

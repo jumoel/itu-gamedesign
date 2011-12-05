@@ -27,6 +27,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	private static boolean shouldSwitchDreams = false;
 	private static boolean shouldSwitchPlayerBack = false;
+	private static boolean shouldPrepareDoors = false;
+	private static int doorPrepareAttempt = 0;
 	private static boolean shouldSpawnDoors = false;
 	private static int doorSpawnDarling = -1;
 	
@@ -39,6 +41,8 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	private double player2xbackup, player2ybackup;
 	private boolean player1switched, player2switched;
 	private int playerSwitched = -1;
+	
+	private boolean foundDoor1, foundDoor2;
 	
 	// animate camera position
 	private class MoveCamera extends Animator {
@@ -176,6 +180,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		playerView2 = pv2;
 		bunnyHat = papplet;
 		player1switched = player2switched = false;
+		foundDoor1 = foundDoor2 = false;
 	}
 	
 	public void swapPlayer1()
@@ -251,15 +256,27 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		untunnelTwin();
 	}
 	
-	public void setupDoors(int number) {
+	public void prepareDoors(int number) {
+		this.setChanged();
+		HashMap map = new HashMap();
+		map.put("prepareDoors", number);
+		this.notifyObservers(map);
+	}
+	
+	public void spawnDoors(int number) {
 		int cameraMoveDuration = 500;
 		PlayerView pvDarling = number == 1 ? playerView1 : playerView2;
 		PlayerView pvVictim = pvDarling == playerView1 ? playerView2 : playerView1;
 		
 		// show first door
-		pvDarling.initShowDoor(true);
+		//pvDarling.initShowDoor(true);
 		// show second door
-		pvVictim.initShowDoor();
+		//pvVictim.initShowDoor();
+		this.setChanged();
+		HashMap map = new HashMap();
+		map.put("showDoors", number);
+		this.notifyObservers(map);
+		
 		new ChangeCameraOffsetFactor(0, 100, 2, cameraMoveDuration, pvVictim);
 		System.out.println("doortime");
 		
@@ -274,8 +291,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		//new MoveCamera(pvTarget.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
 		new ChangeCameraOffsetFactor(100, 0, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
 		
-		playerView1.initBlowDoor();
-		playerView2.initBlowDoor();
+		//playerView1.initBlowDoor();
+		//playerView2.initBlowDoor();
+		this.setChanged();
+		this.notifyObservers("blowDoors");
 	}
 
 	public void switchDreams() {
@@ -351,7 +370,14 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 					this.untunnelTwin();
 					shouldSwitchPlayerBack = false;
 				}
-				if (shouldSpawnDoors) {setupDoors(doorSpawnDarling); shouldSpawnDoors = false;}
+				if (shouldSpawnDoors) {
+					if (foundDoor1 && foundDoor2) {
+						spawnDoors(doorSpawnDarling); 
+						shouldSpawnDoors = false;
+					} else {
+						this.prepareDoors(doorSpawnDarling);
+					}
+				}
 				
 				Thread.currentThread().sleep(200);
 			}
@@ -399,6 +425,19 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 					if (this.playerSwitched == -1) this.tunnelTwin(2);
 					break;
 			}
+		} else if (arg instanceof HashMap) {
+			HashMap map = (HashMap)arg;
+			if (map.containsKey("foundDoor")) {
+				int number = (Integer)map.get("foundDoor");
+				switch (number) {
+					case 1:
+						this.foundDoor1 = true;
+						break;
+					case 2:
+						this.foundDoor2 = true;
+						break;
+				}
+			} 
 		}
 	}
 
