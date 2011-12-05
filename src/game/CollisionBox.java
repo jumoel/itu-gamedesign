@@ -148,8 +148,8 @@ public abstract class CollisionBox extends Observable
 		fx1 = (int)(x + cBox.width); fy1 = (int)(y + 1 + cBox.height);
 		
 		// anti inside stuff
-		while (collisionLevel.getBoxAt((int)cBox.x, (int)(cBox.y+1.1)) != null
-				|| collisionLevel.getBoxAt((int)cBox.x+1, (int)(cBox.y+1.1)) != null) {
+		while ((collisionLevel.getMetaDataAt((int)cBox.x, (int)(cBox.y+1.2)) == Level.MetaTiles.OBSTACLE.index())
+				|| collisionLevel.getMetaDataAt((int)(cBox.x+1), (int)(cBox.y+1.2)) == Level.MetaTiles.OBSTACLE.index()) {
 			System.out.println("correct");
 			collision = true;
 			cBox.y = newY += 1;
