@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import game.graphics.AnimationImages;
 import game.gui.AmazingSwitchWitch;
 import game.gui.PlayerView;
 import game.gui.RaceIndicator;
@@ -19,6 +20,7 @@ import fullscreen.*;
 @SuppressWarnings("serial")
 public class BunnyHat extends PApplet implements Observer
 {
+	public static AnimationImages ANIMATION_IMAGES;
 	
 	private class LevelSource {
 		String goodLevelFile, badLevelFile;
@@ -87,7 +89,9 @@ public class BunnyHat extends PApplet implements Observer
 	
 	
 	public void setup()
-	{	
+	{
+		ANIMATION_IMAGES = new AnimationImages(this);
+		
 		currentView = Screens.INTRO;
 		
 		inputState = new State();

@@ -9,10 +9,7 @@ import processing.core.PImage;
 import util.BImage;
 
 public class Animation
-{
-	public static String ANIMATIONPATH = BunnyHat.SETTINGS.getValue("graphics/animations/animationpath");
-	
-	
+{	
 	private PApplet processing;
 	private PImage[] sprites;
 	private int millisPerFrame;
@@ -34,14 +31,11 @@ public class Animation
 	
 	private void setupAnimation(PApplet p, String settingskey) {
 		int fps = BunnyHat.SETTINGS.getValue(settingskey + "/fps");
-		int width = BunnyHat.SETTINGS.getValue(settingskey + "/framewidth");
-		int height = BunnyHat.SETTINGS.getValue(settingskey + "/frameheight");
-		String spritesheet = BunnyHat.SETTINGS.getValue(settingskey + "/path");
 		
 		this.processing = p;
 		this.millisPerFrame = 1000 / fps;
 		
-		this.sprites = BImage.cutImageSprite(processing, processing.loadImage(ANIMATIONPATH + spritesheet), width, height);
+		this.sprites = BunnyHat.ANIMATION_IMAGES.getSprites(settingskey);
 		this.numberOfFrames = sprites.length;
 		
 		this.isRunning = false;
