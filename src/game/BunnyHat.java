@@ -21,6 +21,7 @@ import fullscreen.*;
 public class BunnyHat extends PApplet implements Observer
 {
 	public static AnimationImages ANIMATION_IMAGES;
+	private static HashMap<String, PImage> imageBuffer = new HashMap<String, PImage>();
 	
 	private class LevelSource {
 		String goodLevelFile, badLevelFile;
@@ -362,11 +363,15 @@ public class BunnyHat extends PApplet implements Observer
 		goodDream = new Level(this, lvlSrc.goodLevelFile, DreamStyle.GOOD);
 		badDream = new Level(this, lvlSrc.badLevelFile, DreamStyle.BAD);
 		
+		// throw die: who starts in the good dream?
+		double dice = Math.random();
+		DreamStyle stylePlayer1 = dice > 0.5 ? DreamStyle.GOOD : DreamStyle.BAD;
+		
 		view1 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 1, 
-				goodDream, badDream, gameMaster, DreamStyle.BAD,
+				goodDream, badDream, gameMaster, stylePlayer1,
 				lvlSrc.goodBackgroundImages, lvlSrc.badBackgroundImages);
 		view2 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 2,
-				goodDream, badDream, gameMaster, DreamStyle.GOOD,
+				goodDream, badDream, gameMaster, stylePlayer1 == DreamStyle.GOOD ? DreamStyle.BAD : DreamStyle.GOOD,
 				lvlSrc.goodBackgroundImages, lvlSrc.badBackgroundImages);
 		/*view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);*/
@@ -423,5 +428,16 @@ public class BunnyHat extends PApplet implements Observer
 			}
 		}
 		
+	}
+	
+	@Override
+	public PImage loadImage(String filename) {
+		if (imageBuffer.containsKey(filename)) {
+			return imageBuffer.get(filename);
+		} else {
+			PImage image = super.loadImage(filename);
+			imageBuffer.put(filename, image);
+			return image;
+		}
 	}
 }
