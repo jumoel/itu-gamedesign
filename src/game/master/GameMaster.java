@@ -94,6 +94,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 	 * makes its decisions
 	 */
 	private void makeDecisions(int msSinceLastDecisions) {
+		System.out.println(msTillNextSwitch + " - " + msSinceLastDecisions);
 		// time for a switch?
 		if (!doorsHappening) msTillNextSwitch -= msSinceLastDecisions; // stop countdown for doors
 		if (msTillNextSwitch < 0) { // yes, it is time
@@ -176,11 +177,11 @@ public class GameMaster extends Observable implements Observer, Runnable
 	@Override
 	public void run()
 	{
-		int lastFrameTime = 0; 
+		int lastFrameTime = ourPApplet.millis(); 
 		int lastFpsTime = 0;
 		int fps = 0;
 		int timeStepSize = 100;
-		msTillNextSwitch = getNewTimeTillNextSwitch();
+		this.msTillNextSwitch = getNewTimeTillNextSwitch();
 		while (runGame) {
 			try
 			{

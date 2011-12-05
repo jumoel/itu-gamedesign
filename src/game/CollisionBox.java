@@ -155,7 +155,57 @@ public abstract class CollisionBox extends Observable
 			cBox.y = newY += 1;
 		}
 		
+		
+		
 		CollisionBox collider = null;
+		if (xDistance > 0) {
+			for (int curY = y0; curY <= y1; curY++) {
+				//System.out.println(curY);
+				collider = collisionLevel.getBoxAt(fx1, curY);
+				if (collider != null) {
+					if (collider.getCollisionEffect() == Effects.STOP) {
+						newXSpeed = 0;
+						newX = collider.x()-this.cBox.width;
+						//System.out.println("new x:"+newX);
+					}
+					collision = true;
+					updateCollisionPartners(collider);
+					break;
+				}
+					
+				
+			}
+			
+		} else if (xDistance < 0) {
+			for (int curY = y0; curY <= y1; curY++) {
+				collider = collisionLevel.getBoxAt(fx0, curY);
+				if (collider != null) {
+					if (collider.getCollisionEffect() == Effects.STOP) {
+						newXSpeed = 0;
+						newX = collider.x()+collider.collisionBoxWidth();
+					}
+					collision = true;
+					updateCollisionPartners(collider);
+					//System.out.println("newX:"+newX+" x:"+x);
+					break;
+				}
+				
+				
+			}
+			
+		}
+		
+		
+		
+		if (collisionGroundPath != null) {
+			double xLeftEnd = newX;
+			double xRightEnd = newX + this.cBox.width;
+			if (collisionGroundPath.x1 >= xRightEnd
+					|| collisionGroundPath.x2 <= xLeftEnd) {
+				collisionGroundPath = null; // we fell of an edge : no path anymore
+			}
+		}
+		
 		if (yDistance > 0) {
 			this.collisionGroundPath = null; // jump or so: we are losing connection to ground
 			
@@ -202,54 +252,6 @@ public abstract class CollisionBox extends Observable
 				}
 			}
 		}
-		
-		
-		if (xDistance > 0) {
-			for (int curY = y0; curY <= y1; curY++) {
-				//System.out.println(curY);
-				collider = collisionLevel.getBoxAt(fx1, curY);
-				if (collider != null) {
-					if (collider.getCollisionEffect() == Effects.STOP) {
-						newXSpeed = 0;
-						newX = collider.x()-this.cBox.width;
-						//System.out.println("new x:"+newX);
-					}
-					collision = true;
-					updateCollisionPartners(collider);
-					break;
-				}
-					
-				
-			}
-			
-		} else if (xDistance < 0) {
-			for (int curY = y0; curY <= y1; curY++) {
-				collider = collisionLevel.getBoxAt(fx0, curY);
-				if (collider != null) {
-					if (collider.getCollisionEffect() == Effects.STOP) {
-						newXSpeed = 0;
-						newX = collider.x()+collider.collisionBoxWidth();
-					}
-					collision = true;
-					updateCollisionPartners(collider);
-					//System.out.println("newX:"+newX+" x:"+x);
-					break;
-				}
-				
-				
-			}
-			
-		}
-		if (collisionGroundPath != null) {
-			double xLeftEnd = newX;
-			double xRightEnd = newX + this.cBox.width;
-			if (collisionGroundPath.x1 > xRightEnd
-					|| collisionGroundPath.x2 < xLeftEnd) {
-				collisionGroundPath = null; // we fell of an edge : no path anymore
-			}
-		}
-		
-		
 		
 		
 		CollisionBox hardCollider = collider; // backup the hard stuff

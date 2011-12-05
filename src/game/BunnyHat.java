@@ -102,7 +102,7 @@ public class BunnyHat extends PApplet implements Observer
 		
 		//size(WINDOWWIDTH, WINDOWHEIGHT);
 		size(1024, 768);
-		background(0);
+		//background(0);
 		
 		frameRate(2000);
 		
@@ -131,6 +131,7 @@ public class BunnyHat extends PApplet implements Observer
 		levelSources = new ArrayList();
 		File levelDirRoot = new File("levels/");
 		File[] levelDirs = levelDirRoot.listFiles();
+		PImage dummy;
 		for (int i = 0; i < levelDirs.length; i++) {
 			if (levelDirs[i].isDirectory() && levelDirs[i].getName().startsWith("lvl")) {
 				File levelDir = new File(levelDirs[i].getPath());
@@ -144,13 +145,15 @@ public class BunnyHat extends PApplet implements Observer
 						lvlSrc.badLevelFile = files[e].getPath();
 					} else if (name.endsWith("od.tmx")) {
 						lvlSrc.goodLevelFile = files[e].getPath();
-					} else if (name.contentEquals("preview.png")) {
-						lvlSrc.previewImage = files[e].getPath();
 					} else if (name.endsWith(".png")) {
+						String path = files[e].getPath();
 						if (name.startsWith("good")) {
-							lvlSrc.goodBackgroundImages.add(loadImage(files[e].getPath()));
+							lvlSrc.goodBackgroundImages.add(loadImage(path));
 						} else if (name.startsWith("bad")) {
-							lvlSrc.badBackgroundImages.add(loadImage(files[e].getPath()));
+							lvlSrc.badBackgroundImages.add(loadImage(path));
+						} else if (name.contentEquals("preview.png")) {
+							lvlSrc.previewImage = path;
+							dummy = loadImage(path);
 						}
 					}
 				}
@@ -223,7 +226,6 @@ public class BunnyHat extends PApplet implements Observer
 
 	private void drawMenuMainScreen()
 	{
-		// TODO Auto-generated method stub
 		background(255);
 		fill(0);
 		int currentY = height/2;
@@ -437,6 +439,7 @@ public class BunnyHat extends PApplet implements Observer
 	@Override
 	public PImage loadImage(String filename) {
 		if (imageBuffer.containsKey(filename)) {
+			//System.out.println(filename);
 			return imageBuffer.get(filename);
 		} else {
 			PImage image = super.loadImage(filename);
