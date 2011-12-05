@@ -143,19 +143,67 @@ public abstract class CollisionBox extends Observable
 		//determine points
 		int x0, y0, x1, y1, fx0, fy0, fx1, fy1;
 		x0 = (int)(cBox.x + 0.2); x1 = (int)(cBox.x + cBox.width - 0.2);
-		y0 = (int)(cBox.y+1.2); y1 = (int)(cBox.y + cBox.height+0.8);
+		y0 = (int)(cBox.y+1.2); y1 = (int)(cBox.y + cBox.height + 0.8);
 		fx0 = (int)x; fy0 = (int)y + 1;
 		fx1 = (int)(x + cBox.width); fy1 = (int)(y + 1 + cBox.height);
 		
 		// anti inside stuff
-		while ((collisionLevel.getMetaDataAt((int)cBox.x, (int)(cBox.y+1.2)) == Level.MetaTiles.OBSTACLE.index())
-				|| collisionLevel.getMetaDataAt((int)(cBox.x+1), (int)(cBox.y+1.2)) == Level.MetaTiles.OBSTACLE.index()) {
+		while ((collisionLevel.getMetaDataAt((int)(cBox.x+0.2), (int)(cBox.y+1.2)) == Level.MetaTiles.OBSTACLE.index())
+				|| collisionLevel.getMetaDataAt((int)(cBox.x+0.8), (int)(cBox.y+1.2)) == Level.MetaTiles.OBSTACLE.index()) {
 			System.out.println("correct");
 			collision = true;
 			cBox.y = newY += 1;
 		}
 		
 		CollisionBox collider = null;
+		if (yDistance > 0) {
+			this.collisionGroundPath = null; // jump or so: we are losing connection to ground
+			
+			for (int curX = x0; curX <= x1; curX++) {
+				collider = collisionLevel.getBoxAt(curX, fy1);
+				if (collider != null) {
+					if (collider.getCollisionEffect() == Effects.STOP) {
+						newYSpeed = 0.0;
+						newY = collider.y()-this.cBox.height-1;
+					}
+					collision = true;
+					updateCollisionPartners(collider);
+					break;
+				}
+			}
+		} else if (yDistance < 0) {
+			if (collisionGroundPath != null) {
+				newYSpeed = 0;
+				newY = cBox.y;
+				newIsJumping = false;
+				newIsInAir = false;
+				collision = true;
+				//System.out.print("onground \n");
+			} else {
+				//System.out.print("in air\n");
+				for (int curX = x0; curX <= x1; curX++) {
+					collider = collisionLevel.getBoxAt(curX, fy0); 
+					if (collider != null) {
+						// hit feet
+						if (collider.getCollisionEffect() == Effects.STOP) {
+							newYSpeed = 0;
+							newY = fy0;
+							newIsInAir = false;
+							//newIsJumping = true;
+							this.collisionGroundPath = collider.getHeadline();
+						} else if (collider.getCollisionEffect() == Effects.BOUNCE) {
+							newYSpeed = -ySpeed;
+							newY = fy0;
+						}
+						collision = true;
+						updateCollisionPartners(collider);
+						break;
+					} 
+				}
+			}
+		}
+		
+		
 		if (xDistance > 0) {
 			for (int curY = y0; curY <= y1; curY++) {
 				//System.out.println(curY);
@@ -202,52 +250,7 @@ public abstract class CollisionBox extends Observable
 		}
 		
 		
-		if (yDistance > 0) {
-			this.collisionGroundPath = null; // jump or so: we are losing connection to ground
-			
-			for (int curX = x0; curX <= x1; curX++) {
-				collider = collisionLevel.getBoxAt(curX, fy1);
-				if (collider != null) {
-					if (collider.getCollisionEffect() == Effects.STOP) {
-						newYSpeed = -0.01;
-						newY = collider.y()-this.cBox.height;
-					}
-					collision = true;
-					updateCollisionPartners(collider);
-					break;
-				}
-			}
-		} else if (yDistance < 0) {
-			if (collisionGroundPath != null) {
-				newYSpeed = 0;
-				newY = cBox.y;
-				newIsJumping = false;
-				newIsInAir = false;
-				collision = true;
-				//System.out.print("onground \n");
-			} else {
-				//System.out.print("in air\n");
-				for (int curX = x0; curX <= x1; curX++) {
-					collider = collisionLevel.getBoxAt(curX, fy0); 
-					if (collider != null) {
-						// hit feet
-						if (collider.getCollisionEffect() == Effects.STOP) {
-							newYSpeed = 0;
-							newY = fy0;
-							newIsInAir = false;
-							//newIsJumping = true;
-							this.collisionGroundPath = collider.getHeadline();
-						} else if (collider.getCollisionEffect() == Effects.BOUNCE) {
-							newYSpeed = -ySpeed;
-							newY = fy0;
-						}
-						collision = true;
-						updateCollisionPartners(collider);
-						break;
-					} 
-				}
-			}
-		}
+		
 		
 		CollisionBox hardCollider = collider; // backup the hard stuff
 		

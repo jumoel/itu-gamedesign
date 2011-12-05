@@ -43,6 +43,10 @@ public class BadSheep extends CrossingGameElement
 
 	}
 	
-	
+	@Override
+	public void update(int deltaT) {
+		super.update(deltaT);
+		
+	}
 
 }
