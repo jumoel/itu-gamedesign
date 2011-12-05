@@ -31,11 +31,11 @@ public class Level extends CollisionLevel
 	
 	public enum MetaTiles
 	{
-		Obstacle(1),
-		SpawnPoint(2),
-		FinishLine(3),
-		DoorSpawnPoint(4),
-		Sheep(5);
+		OBSTACLE(1),
+		SPAWNPOINT(2),
+		FINISHLINE(3),
+		DOORSPAWNPOINT(4),
+		CROSSINGSHEEP(5);
 		
 		private final int index;
 		
@@ -98,12 +98,16 @@ public class Level extends CollisionLevel
 		for (int x = 0; x < levelWidth; x++) {
 			for (int y = 0; y < levelHeight; y++) {
 				//if (this.level.getMetaDataAt(x, y) > 1) {System.out.println(this.level.getMetaDataAt(x, y));}
-				if (this.getMetaDataAt(x, y) == Level.MetaTiles.Sheep.index() && dream == DreamStyle.GOOD) {
+				if (this.getMetaDataAt(x, y) == Level.MetaTiles.CROSSINGSHEEP.index()) {
 					GoodSheep goodSheep = new GoodSheep(x, y, 3, 3, processing);
 					BadSheep badSheep = new BadSheep(x, y, 3, 3, processing, goodSheep);
-					
-					twinDream.addElement(badSheep);
-					this.addElement(goodSheep);
+					if (dream == DreamStyle.GOOD) {
+						twinDream.addElement(badSheep);
+						this.addElement(goodSheep);
+					} else {
+						twinDream.addElement(goodSheep);
+						this.addElement(badSheep);
+					}
 				}
 			}
 		}
@@ -287,7 +291,7 @@ public class Level extends CollisionLevel
 					metaData[i] = metaData[i] - metaFirstGid + 1;
 				}
 				
-				if (metaData[i] == MetaTiles.SpawnPoint.index())
+				if (metaData[i] == MetaTiles.SPAWNPOINT.index())
 				{
 					this.spawnX = i % levelWidth;
 					this.spawnY = i / levelWidth;

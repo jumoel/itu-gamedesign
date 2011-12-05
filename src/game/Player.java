@@ -126,7 +126,7 @@ public class Player extends GameElement
 		this.ypos = level.spawnY + 0.5; // there is no spawn point set
 		for (int x = 0; x < level.levelWidth; x++) {
 			for (int y = 0; y < level.levelHeight; y++) {
-				if (level.getMetaDataAt(x, y) == Level.MetaTiles.SpawnPoint.index()) {
+				if (level.getMetaDataAt(x, y) == Level.MetaTiles.SPAWNPOINT.index()) {
 					this.xpos = x; // in case
 					this.ypos = y; // there is a spawn point
 					break;

@@ -148,7 +148,7 @@ public class PlayerView extends Updateable implements Observer
 		{
 			for (int y = minimumTileY; y <= maximumTileY; y++)
 			{		
-				if (this.level.getMetaDataAt(x, y) == Level.MetaTiles.DoorSpawnPoint.index()) {
+				if (this.level.getMetaDataAt(x, y) == Level.MetaTiles.DOORSPAWNPOINT.index()) {
 					doorFound = true;
 					double pxDist = ownPlayer.x() - x;
 					double pyDist = ownPlayer.y() - y;

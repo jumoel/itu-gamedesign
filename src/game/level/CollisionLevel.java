@@ -33,10 +33,10 @@ public abstract class CollisionLevel
 		for (int x = 0; x < levelWidth; x++) {
 			for (int y = 0; y < levelHeight; y++) {
 				CollisionBox cBox = null;
-				if (getMetaDataAt(x, y) == Level.MetaTiles.Obstacle.index()) {
+				if (getMetaDataAt(x, y) == Level.MetaTiles.OBSTACLE.index()) {
 					cBox = new Obstacle(processing, x, y, 1, 1);
 					cBox.setCollisionEffect(Effects.STOP);
-				} else if (getMetaDataAt(x, y) == Level.MetaTiles.FinishLine.index()) {
+				} else if (getMetaDataAt(x, y) == Level.MetaTiles.FINISHLINE.index()) {
 					cBox = new FinishLine(processing, x, y, 1, 1);
 					cBox.setCollisionEffect(Effects.FINISH);
 				}
