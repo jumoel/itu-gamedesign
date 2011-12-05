@@ -317,6 +317,8 @@ public class PlayerView extends Updateable implements Observer
 		}
 		
 		this.playerPosition = pxpos;
+		pxpos += (int)(ownPlayer.collisionBoxWidth() * BunnyHat.TILEDIMENSION / 2);
+		pypos += (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);
 		
 		// calculate camera offset for door / other player
 		int otherXPos, otherYPos;
@@ -335,8 +337,10 @@ public class PlayerView extends Updateable implements Observer
 		yCoordCameraMiddle = pypos;
 		yCoordCamera = yCoordCameraMiddle - halfheight + (int)(cameraOffsetY * cameraOffsetFactor);
 		
-		drawpxpos = halfwidth - (int)(cameraOffsetX * cameraOffsetFactor);
-		drawpypos = halfheight - (int)(cameraOffsetY * cameraOffsetFactor);
+		drawpxpos = halfwidth - (int)(cameraOffsetX * cameraOffsetFactor)
+				- (int)(ownPlayer.collisionBoxWidth() * BunnyHat.TILEDIMENSION / 2);
+		drawpypos = halfheight - (int)(cameraOffsetY * cameraOffsetFactor)
+				- (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);
 		
 		if (xCoordCamera < 0)
 		{
@@ -416,8 +420,8 @@ public class PlayerView extends Updateable implements Observer
 			int ydiff = opypos - pypos;
 			
 
-			int drawopypos = drawpypos - ydiff;
-			int drawopxpos = drawpxpos + xdiff;
+			int drawopypos = drawpypos - ydiff - (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);;
+			int drawopxpos = drawpxpos + xdiff + (int)(ownPlayer.collisionBoxWidth() * BunnyHat.TILEDIMENSION / 2);;
 			
 			drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.LEFT, Vertical.BOTTOM);	
 		}

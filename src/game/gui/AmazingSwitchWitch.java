@@ -261,7 +261,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		// show second door
 		pvVictim.initShowDoor();
 		new ChangeCameraOffsetFactor(0, 100, 2, cameraMoveDuration, pvVictim);
-		
+		System.out.println("doortime");
 		
 		
 		
