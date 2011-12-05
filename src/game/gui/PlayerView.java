@@ -19,6 +19,7 @@ import game.level.Level;
 import game.level.Level.DreamStyle;
 import game.level.Level.MetaTiles;
 import game.master.GameMaster;
+import game.sound.Stereophone;
 import processing.core.*;
 
 public class PlayerView extends Updateable implements Observer
@@ -210,6 +211,7 @@ public class PlayerView extends Updateable implements Observer
 		this.ownDoor.blowDoor();
 		this.doorEnabled = false;
 		this.untunnelTwin();
+		Stereophone.playSound("304", "blowdoors", 1000);
 		this.ownPlayer.tookTheDoor = false;
 		//this.drawOwnDoor = false;
 	}

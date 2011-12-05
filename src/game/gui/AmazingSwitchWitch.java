@@ -4,6 +4,7 @@ import game.BunnyHat;
 import game.control.PatternDetector;
 import game.level.Level;
 import game.master.GameMaster;
+import game.sound.Stereophone;
 import game.util.Animator;
 
 import java.util.Enumeration;

@@ -3,6 +3,7 @@ package game;
 import game.elements.BubbleGunGum;
 import game.elements.GameElement;
 import game.level.Level;
+import game.sound.Stereophone;
 
 import java.awt.Polygon;
 import java.awt.geom.Line2D;
@@ -288,6 +289,8 @@ public abstract class CollisionBox extends Observable
 									newYSpeed = Math.abs(ySpeed) * 1.5;
 									newXSpeed = xSpeed * 1.5;
 									newY = collider.y() + collider.collisionBoxHeight();
+									double dice = Math.random();
+									Stereophone.playSound(dice > 0.5?"100":"101", "good_sheep_bounce", 1000);
 								}
 							}
 							break;
@@ -295,6 +298,8 @@ public abstract class CollisionBox extends Observable
 							if (gameElement instanceof Player) {
 								newYSpeed = 3;
 								newXSpeed = -6;
+								double dice = Math.random();
+								Stereophone.playSound(dice > 0.5?"102":"103", "bad_sheep_bounce", 250);
 							}
 							break;
 					}

@@ -103,6 +103,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 			this.notifyObservers(GameMaster.MSG.SWITCH_ALERT_STOP);
 			this.setChanged();
 			this.notifyObservers(GameMaster.MSG.SWITCH_DREAMS);
+			Stereophone.playSound("302", "switchhappening", 1000);
 			msTillNextSwitch = this.getNewTimeTillNextSwitch();
 			switchAlertStarted = false;
 			//return;
@@ -111,7 +112,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 			switchAlertStarted = true;
 			this.setChanged();
 			this.notifyObservers(GameMaster.MSG.SWITCH_ALERT_START);
-			Stereophone.playSound("302", "switchwarning", 1000);
+			Stereophone.playSound("300", "switchwarning", 1000);
 		} else { switchHappening = false;}
 		
 		// time for some doors?

@@ -4,6 +4,7 @@ import game.Obstacle;
 import game.Player;
 import game.graphics.Animation;
 import game.level.Level;
+import game.sound.Stereophone;
 import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
@@ -68,6 +69,16 @@ public class BubbleGunGum extends GameElement
 		} else if (this.getBouncePartner() instanceof Obstacle) {
 			if (xSpeed == 0 && ySpeed != 0) {
 				this.xSpeed = -this.oldSpeed;
+				double dice = Math.random();
+				String sound;
+				if (dice < 0.3) {
+					sound = "120";
+				} else if (dice > 0.3) {
+					sound = "121";
+				} else {
+					sound = "122";
+				}
+				Stereophone.playSound(sound, "gum_bounce", 100);
 			}
 		}
 	}

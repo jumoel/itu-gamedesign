@@ -19,7 +19,7 @@ public class GoodSheep extends GameElement
 		this.processing = processing;
 		this.goodSheepAnimation = new Animation(processing, "graphics/animations/goodSheep");
 		this.goodSheepAnimation.start();
-		this.oldXSpeed = this.xSpeed = 0.5;
+		this.oldXSpeed = this.xSpeed = 0.7;
 	}
 
 	@Override
