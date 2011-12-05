@@ -207,7 +207,7 @@ public class Level extends CollisionLevel
 				int xcoord = (int)(currentCreature.x() * BunnyHat.TILEDIMENSION - x);
 				int ycoord = (int)((height - currentCreature.y() * BunnyHat.TILEDIMENSION));
 				
-				if (xcoord+currentCreature.collisionBoxWidth() > 0 && xcoord <  width 
+				if (xcoord+currentCreature.collisionBoxWidth()+200 > 0 && xcoord <  width 
 						&& ycoord + currentCreature.collisionBoxHeight() > 0 && ycoord <  height) {
 					
 					PImage image = currentCreature.getCurrentTexture();

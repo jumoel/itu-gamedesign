@@ -21,5 +21,9 @@ public abstract class CrossingGameElement extends GameElement
 		this.myTwinElement = twinElement;
 	}
 	
-	
+	@Override
+	public void update(int deltaT) {
+		super.update(deltaT);
+		this.xSpeed = this.myTwinElement.xSpeed;
+	}
 }

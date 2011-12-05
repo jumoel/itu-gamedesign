@@ -280,8 +280,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 
 	public void switchDreams() {
 		
-		playerView1.initSwitchPrepare();
-		playerView2.initSwitchPrepare();
+		this.setChanged();
+		this.notifyObservers("switchPrepare");
+		//playerView1.initSwitchPrepare();
+		//playerView2.initSwitchPrepare();
 
 		new SwitchTransition(0, 255, 3, SWITCH_DURATION/2, playerView1, playerView2, bunnyHat);
 		
@@ -295,8 +297,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 			e.printStackTrace();
 		}
 		
-		playerView1.initSwitchExecute();
-		playerView2.initSwitchExecute();
+		this.setChanged();
+		this.notifyObservers("switchExecute");
+		//playerView1.initSwitchExecute();
+		//playerView2.initSwitchExecute();
 		
 		new SwitchTransition(255, 0, 2, SWITCH_DURATION/2, playerView1, playerView2, bunnyHat);
 		try
@@ -314,8 +318,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		this.hasChanged();
 		this.notifyObservers("startAnimations");
 		
-		playerView1.initSwitchFinish();
-		playerView2.initSwitchFinish();
+		this.setChanged();
+		this.notifyObservers("switchFinish");
+		//playerView1.initSwitchFinish();
+		//playerView2.initSwitchFinish();
 	}
 	
 	public void wakeHer() {

@@ -616,6 +616,15 @@ public class PlayerView extends Updateable implements Observer
 					this.ownPlayerWon = true;
 				}
 			}
+		} else if (arg1 instanceof String) {
+			String msg = (String)arg1;
+			if (msg.contentEquals("switchPrepare")) {
+				this.shouldPrepareSwitch = true;
+			} else if (msg.contentEquals("switchExecute")) {
+				this.shouldExecuteSwitch = true;
+			} else if (msg.contentEquals("switchFinish")) {
+				this.shouldFinishSwitch = true;
+			}
 		}
 	}
 }
