@@ -81,6 +81,7 @@ public class Player extends GameElement
 	}
 	
 	public void holdAnimation() {
+		
 		this.walkAnimation.holdAnimation();
 		this.jumpAnimation.holdAnimation();
 		this.idleAnimation.holdAnimation();
@@ -108,6 +109,8 @@ public class Player extends GameElement
 		super(level.spawnX + 0.5, level.spawnY + 0.5, 2, 3);
 		super.setLevel(level);
 		super.setGameElement(this);
+		
+		this.updateMe = false;
 		
 		this.myID = playerNumber;
 		
@@ -258,7 +261,7 @@ public class Player extends GameElement
 				processing, (this.myID == 1 ? BallColor.GIRL : BallColor.BOY));
 		gum.setLevel(level);
 		
-		this.level.addCreature(gum);
+		this.level.addElement(gum);
 	}
 	
 	

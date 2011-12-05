@@ -63,6 +63,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	protected int cameraOffsetX = 0;
 	protected int cameraOffsetY = 0;
+	protected double cameraOffsetFactor = 0.0;
 	
 	private int levelLength;
 	
@@ -75,7 +76,8 @@ public class PlayerView extends Updateable implements Observer
 	private boolean shouldBeCloseBy = false;
 	
 	
-	private Level level; public void setLevel(Level lvl) {level = lvl; ownPlayer.setLevel(lvl);}
+	private Level level;
+	private Level goodDream, badDream;
 	
 	// dream switch data
 	private boolean switchHappening = false;
@@ -92,10 +94,11 @@ public class PlayerView extends Updateable implements Observer
 		// getting the player y-Offset (distance above ground)
 	}
 	
-	public void switchExecute(Level lvl) {
-		setLevel(lvl);
+	public void switchExecute() {
+		level.removeElement(ownPlayer);
+		level = (level == goodDream ? badDream : goodDream);
+		level.addElement(ownPlayer);
 		ownPlayer.removeCollisionGroundPath();
-		//TODO: transfer player to same distance above ground
 	}
 	
 	public void switchFinish() {
@@ -193,10 +196,12 @@ public class PlayerView extends Updateable implements Observer
 	
 	public void setOwnPlayer(Player p) {
 		this.ownPlayer = p;
-		level.setPlayer(p);
+		//level.setPlayer(p);
+		level.addElement(p);
 	}
 	
-	public PlayerView(int width, int height, PApplet applet, int viewNumber, String levelPath, GameMaster gameMaster, DreamStyle style)
+	public PlayerView(int width, int height, PApplet applet, int viewNumber, 
+			Level goodDream, Level badDream, GameMaster gameMaster, DreamStyle style)
 	{	
 		this.buffer = applet.createGraphics(width, height, PConstants.JAVA2D);
 		this.colorLayerColor = new int[3];
@@ -220,7 +225,9 @@ public class PlayerView extends Updateable implements Observer
 		
 		this.viewNumber = viewNumber;
 		
-		this.level = new Level(processing, levelPath, style);
+		this.goodDream = goodDream;
+		this.badDream = badDream;
+		this.level = (style == DreamStyle.GOOD ? goodDream : badDream);
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
 		
 		
@@ -244,8 +251,8 @@ public class PlayerView extends Updateable implements Observer
 					GoodSheep goodSheep = new GoodSheep(x, y, 3, 3, processing);
 					BadSheep badSheep = new BadSheep(x, y, 3, 3, processing, goodSheep);
 					
-					this.otherPlayerView.level.addCreature(badSheep);
-					this.level.addCreature(goodSheep);
+					this.otherPlayerView.level.addElement(badSheep);
+					this.level.addElement(goodSheep);
 				}
 			}
 		}
@@ -258,13 +265,10 @@ public class PlayerView extends Updateable implements Observer
 		if (this.shouldShowDoor) {this.showDoor(this.shouldBeCloseBy); this.shouldShowDoor = false;}
 		if (this.shouldBlowDoor) {this.blowDoor(); this.shouldBlowDoor = false;}
 		
-		level.updateCreaturesAndObjects(deltaT);
 		
 		buffer.beginDraw();
 		buffer.background(255);
 		
-		//if (switchHappening) deltaT = 0; // freeze time
-		deltaT = (int)(deltaT * this.physicsTimeFactor);
 
 		if (ownPlayer == null)
 		{
@@ -316,14 +320,24 @@ public class PlayerView extends Updateable implements Observer
 		
 		this.playerPosition = pxpos;
 		
+		// calculate camera offset for door / other player
+		int otherXPos, otherYPos;
+		if (this.drawOtherPlayer) {
+			this.cameraOffsetX = (int)(((otherPlayer.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
+			this.cameraOffsetY = (int)(((otherPlayer.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
+		} else if (this.drawOwnDoor) {
+			this.cameraOffsetX = (int)(((ownDoor.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
+			this.cameraOffsetY = (int)(((ownDoor.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
+		}
+		
 		// Place the player in the middle
 		xCoordCameraMiddle = pxpos;
-		xCoordCamera = xCoordCameraMiddle - halfwidth + cameraOffsetX;
+		xCoordCamera = xCoordCameraMiddle - halfwidth + (int)(cameraOffsetX * cameraOffsetFactor);
 		yCoordCameraMiddle = pypos;
-		yCoordCamera = yCoordCameraMiddle - halfheight + cameraOffsetY;
+		yCoordCamera = yCoordCameraMiddle - halfheight + (int)(cameraOffsetY * cameraOffsetFactor);
 		
-		drawpxpos = halfwidth - cameraOffsetX;
-		drawpypos = halfheight - cameraOffsetY;
+		drawpxpos = halfwidth - (int)(cameraOffsetX * cameraOffsetFactor);
+		drawpypos = halfheight - (int)(cameraOffsetY * cameraOffsetFactor);
 		
 		if (xCoordCamera < 0)
 		{

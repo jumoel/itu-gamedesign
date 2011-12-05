@@ -30,7 +30,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	private static boolean shouldSpawnDoors = false;
 	private static int doorSpawnDarling = -1;
 	
-	private PApplet ourPApplet;
+	private BunnyHat bunnyHat;
 	
 	private int tintColor;
 	
@@ -58,6 +58,26 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 			pv.cameraOffsetX = value;
 		}
 		
+	}
+	
+	// affect camera offset factor
+	private class ChangeCameraOffsetFactor extends Animator {
+		private PlayerView pv;
+		private int maxValue;
+		
+		public ChangeCameraOffsetFactor(int from, int to, int stepSize, int timeSpan, PlayerView pv)
+		{
+			super(from, to, stepSize, timeSpan);
+			this.pv = pv;
+			super.begin();
+			this.maxValue = from < to ? to : from;
+		}
+		
+		@Override
+		protected void applyValue(int value)
+		{
+			pv.cameraOffsetFactor = 1.0 * value / maxValue;
+		}
 	}
 	
 	//shake camera
@@ -122,12 +142,14 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	// make a nice switch transition
 	private class SwitchTransition extends Animator {
 		private PlayerView pv1, pv2;
+		private BunnyHat bunnyHat;
 
 		public SwitchTransition(int from, int to, int stepSize, int timeSpan, 
-				PlayerView pv1, PlayerView pv2)
+				PlayerView pv1, PlayerView pv2, BunnyHat bunnyHat)
 		{
 			super(from, to, stepSize, timeSpan);
 			this.pv1 = pv1; this.pv2 = pv2;
+			this.bunnyHat = bunnyHat;
 			super.begin();
 		}
 
@@ -136,23 +158,23 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		{
 			pv1.colorLayerVisibility = pv2.colorLayerVisibility = value;
 			if (value == 0) {
-				pv1.physicsTimeFactor = pv2.physicsTimeFactor = 1.0;
+				bunnyHat.physicsTimeFactor = bunnyHat.physicsTimeFactor = 1.0;
 			} else if (value > 0 && value < 100) {
-				pv1.physicsTimeFactor = pv2.physicsTimeFactor = 0.5;
+				bunnyHat.physicsTimeFactor = bunnyHat.physicsTimeFactor = 0.5;
 			} else if (value >= 100 && value < 200) {
-				pv1.physicsTimeFactor = pv2.physicsTimeFactor = 0.1;
+				bunnyHat.physicsTimeFactor = bunnyHat.physicsTimeFactor = 0.1;
 			} else {
-				pv1.physicsTimeFactor = pv2.physicsTimeFactor = 0.0;
+				bunnyHat.physicsTimeFactor = bunnyHat.physicsTimeFactor = 0.0;
 			}
 		}
 		
 	}
 	
 	
-	public AmazingSwitchWitch(PlayerView pv1, PlayerView pv2, PApplet papplet) {
+	public AmazingSwitchWitch(PlayerView pv1, PlayerView pv2, BunnyHat papplet) {
 		playerView1 = pv1;
 		playerView2 = pv2;
-		ourPApplet = papplet;
+		bunnyHat = papplet;
 		player1switched = player2switched = false;
 	}
 	
@@ -198,7 +220,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		PlayerView pvSource = (playerSwitched == 1 ? playerView1 : playerView2);
 		PlayerView pvTarget = (pvSource == playerView1 ? playerView2 : playerView1);
 		
-		new MoveCamera(pvTarget.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
+		//new MoveCamera(pvTarget.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
 		
 		pvTarget.drawOtherPlayer = false;
 		
@@ -229,23 +251,28 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	
 	public void setupDoors(int number) {
 		int cameraMoveDuration = 500;
+		PlayerView pvDarling = number == 1 ? playerView1 : playerView2;
+		PlayerView pvVictim = pvDarling == playerView1 ? playerView2 : playerView1;
 		
 		// show first door
-		if (number == 1) {
+		pvDarling.initShowDoor(true);
+		/*if (number == 1) {
 			playerView1.initShowDoor(true);
 		} else {
 			playerView2.initShowDoor(true);
-		}
+		}*/
 		
 		//move camera 
-		if (number == 1) {
+		/*if (number == 1) {
 			new MoveCamera(0, playerView2.getWidth()/2 - 100, 2, cameraMoveDuration, playerView2);
 		} else {
 			new MoveCamera(0, playerView1.getWidth()/2 - 100, 2, cameraMoveDuration, playerView1);
-		}
+		}*/
+		pvVictim.initShowDoor();
+		new ChangeCameraOffsetFactor(0, 100, 2, cameraMoveDuration, pvVictim);
 		
 		// wait till the camera is moved
-		try
+		/*try
 		{
 			Thread.currentThread().sleep(cameraMoveDuration);
 		}
@@ -253,14 +280,15 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
+		}*/
 		
 		// show 2nd door
-		if (number == 1) {
+		/*if (number == 1) {
 			playerView2.initShowDoor();
 		} else {
 			playerView1.initShowDoor();
-		}
+		}*/
+		
 		
 	}
 	
@@ -268,20 +296,21 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 		PlayerView pvSource = (doorSpawnDarling == 1 ? playerView1 : playerView2);
 		PlayerView pvTarget = (pvSource == playerView1 ? playerView2 : playerView1);
 		
-		new MoveCamera(pvTarget.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
+		//new MoveCamera(pvTarget.getWidth()/2 - 100, 0, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
+		new ChangeCameraOffsetFactor(100, 0, 2, DOOR_CAMERA_MOVE_DURATION, pvTarget);
 		
 		playerView1.initBlowDoor();
 		playerView2.initBlowDoor();
 	}
 
 	public void switchDreams() {
-		Level l1, l2;
+		/*Level l1, l2;
 		l1 = playerView1.getLevel();
-		l2 = playerView2.getLevel();
+		l2 = playerView2.getLevel();*/
 		playerView1.switchPrepare();
 		playerView2.switchPrepare();
 
-		new SwitchTransition(0, 255, 3, SWITCH_DURATION/2, playerView1, playerView2);
+		new SwitchTransition(0, 255, 3, SWITCH_DURATION/2, playerView1, playerView2, bunnyHat);
 		
 		try
 		{
@@ -293,10 +322,10 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 			e.printStackTrace();
 		}
 		
-		playerView1.switchExecute(l2);
-		playerView2.switchExecute(l1);
+		playerView1.switchExecute();
+		playerView2.switchExecute();
 		
-		new SwitchTransition(255, 0, 2, SWITCH_DURATION/2, playerView1, playerView2);
+		new SwitchTransition(255, 0, 2, SWITCH_DURATION/2, playerView1, playerView2, bunnyHat);
 		try
 		{
 			Thread.currentThread().sleep(SWITCH_DURATION/2);
@@ -307,7 +336,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 			e.printStackTrace();
 		}
 		
-		ourPApplet.noTint();
+		//bunnyHat.noTint();
 		
 		this.hasChanged();
 		this.notifyObservers("startAnimations");

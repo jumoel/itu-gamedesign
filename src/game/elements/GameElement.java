@@ -37,7 +37,10 @@ public abstract class GameElement extends CollisionBox
 
 	protected Facing facing;
 	
+	// information for Level and ColisionLevel
 	public boolean destroyed = false; 
+	public boolean drawMe = true;
+	public boolean updateMe = true;
 	
 	protected double xSpeed, ySpeed;
 	protected double xpos, ypos, previous_xpos, previous_ypos;
@@ -119,7 +122,7 @@ public abstract class GameElement extends CollisionBox
 		
 		
 		if(deltaT > 84) {
-			System.out.println("high deltaT: "+ deltaT);
+			//System.out.println("high deltaT: "+ deltaT);
 		}
 		
 		//make sure, ypos and xpos did not travel to far for one frame 

@@ -147,9 +147,9 @@ public class Level extends CollisionLevel
 				return currentCBox;
 			}
 		}
-		if (box.getGameElement() != ownPlayer  && ownPlayer.getCBox().intersects(box.getCBox())) {
+		/*if (box.getGameElement() != ownPlayer  && ownPlayer.getCBox().intersects(box.getCBox())) {
 			return ownPlayer;
-		}
+		}*/
 		return ret;
 	}
 	
@@ -157,7 +157,9 @@ public class Level extends CollisionLevel
 		Iterator cnos = creaturesAndObjects.iterator();
 		while (cnos.hasNext()) {
 			GameElement currentCreature = (GameElement)cnos.next();
-			currentCreature.update(deltaT);
+			if (currentCreature.updateMe) {
+				currentCreature.update(deltaT);
+			}
 		}
 	}
 	
@@ -168,18 +170,14 @@ public class Level extends CollisionLevel
 			GameElement currentCreature = (GameElement)cnos.next();
 			if (currentCreature.destroyed) {
 				toBeDestroyed = currentCreature;
-			} else {
-				//System.out.println("want to draw creature");
+			} else if (currentCreature.drawMe) {
+				
 				int xcoord = (int)(currentCreature.x() * BunnyHat.TILEDIMENSION - x);
 				int ycoord = (int)((height - currentCreature.y() * BunnyHat.TILEDIMENSION));
-				//int drawx = (int)(currentCreature.x() * BunnyHat.TILEDIMENSION - x);
-				//int drawy = (int)(((height - currentCreature.y()) * BunnyHat.TILEDIMENSION) + y);
-				//System.out.println("draw at " + xcoord +":"+ycoord +" with x:"+ x +" ,y:"+y +", pos:"+currentCreature.x()+":"+currentCreature.y());
-				//int lvlHpx = levelHeight * BunnyHat.TILEDIMENSION;
+				
 				if (xcoord+currentCreature.collisionBoxWidth() > 0 && xcoord <  width 
 						&& ycoord + currentCreature.collisionBoxHeight() > 0 && ycoord <  height) {
-					//int drawx = (int)(currentCreature.x() * BunnyHat.TILEDIMENSION - x);
-					//int drawy = (int)(currentCreature.y() * BunnyHat.TILEDIMENSION - y);
+					
 					PImage image = currentCreature.getCurrentTexture();
 					
 					graphics.image(image, xcoord, ycoord-image.height);
@@ -191,9 +189,13 @@ public class Level extends CollisionLevel
 		}
 	}
 	
-	public void addCreature(GameElement c) {
-		c.setLevel(this);
-		creaturesAndObjects.add(c);
+	public void addElement(GameElement e) {
+		e.setLevel(this);
+		creaturesAndObjects.add(e);
+	}
+	
+	public void removeElement(GameElement e) {
+		creaturesAndObjects.remove(e);
 	}
 	
 	

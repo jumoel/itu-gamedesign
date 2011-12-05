@@ -55,6 +55,7 @@ public class BunnyHat extends PApplet implements Observer
 	
 	private Player player1, player2;
 	public PlayerView view1, view2, view3;
+	private Level goodDream, badDream;
 	private RaceIndicator indicator;
 	private SoundControl sndCtrl;
 	private Stereophone sndOut;
@@ -66,6 +67,7 @@ public class BunnyHat extends PApplet implements Observer
 	private int lastTimestamp;
 	private int currentTimestamp;
 	private int deltaT;
+	public double physicsTimeFactor = 1.0;
 	
 	// statistics
 	private int lastFpsTime;
@@ -180,6 +182,9 @@ public class BunnyHat extends PApplet implements Observer
 			drawMenuMainScreen();
 			break;
 		case GAME:
+			deltaT = (int)(deltaT * physicsTimeFactor);
+			goodDream.updateCreaturesAndObjects(deltaT);
+			badDream.updateCreaturesAndObjects(deltaT);
 			player1.update(inputState, deltaT);
 			player2.update(inputState, deltaT);
 			view1.update(LEFT, VIEW1Y, deltaT);
@@ -346,10 +351,13 @@ public class BunnyHat extends PApplet implements Observer
 		
 		LevelSource lvlSrc = (LevelSource) levelSources.get(level);
 		
+		goodDream = new Level(this, lvlSrc.goodLevelFile, DreamStyle.GOOD);
+		badDream = new Level(this, lvlSrc.badLevelFile, DreamStyle.BAD);
+		
 		view1 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 1, 
-				lvlSrc.goodLevelFile, gameMaster, DreamStyle.GOOD);
+				goodDream, badDream, gameMaster, DreamStyle.BAD);
 		view2 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 2,
-				lvlSrc.badLevelFile, gameMaster, DreamStyle.BAD);
+				goodDream, badDream, gameMaster, DreamStyle.BAD);
 		/*view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);*/
 		player1 = new Player(this, 1, view1.getLevel());
