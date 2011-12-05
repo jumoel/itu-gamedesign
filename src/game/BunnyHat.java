@@ -409,9 +409,11 @@ public class BunnyHat extends PApplet implements Observer
 		
 		//switcher.addObserver(view1);
 		//switcher.addObserver(view2);
-
+		
 		//setup and run game master
 		gameMaster.startGame();
+		
+		this.lastTimestamp = this.millis();
 	}
 
 	@Override
