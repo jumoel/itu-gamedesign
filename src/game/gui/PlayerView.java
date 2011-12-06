@@ -40,8 +40,6 @@ public class PlayerView extends Updateable implements Observer
 	private int yCoordCameraMiddle;
 	
 	private int playerPosition;
-
-	//private GameMaster gameMaster;
 	
 	private Player ownPlayer;
 	private Player otherPlayer;
@@ -105,11 +103,11 @@ public class PlayerView extends Updateable implements Observer
 	
 	protected void initSwitchExecute() {this.shouldExecuteSwitch = true;}
 	private void switchExecute() {
-		level.removeElement(ownPlayer);
-		level = (level == goodDream ? badDream : goodDream);
-		level.addElement(ownPlayer);
-		ownPlayer.removeCollisionGroundPath();
-		ownPlayer.removePushable();
+		level.removeElement(ownPlayer); // take player out
+		level = (level == goodDream ? badDream : goodDream); // switch level
+		level.addElement(ownPlayer); // put player in
+		ownPlayer.removeCollisionGroundPath(); // in case he was standing on something - usually the case
+		ownPlayer.removePushable(); // in case he was pushing something
 	}
 	
 	protected void initSwitchFinish() {this.shouldFinishSwitch = true;}

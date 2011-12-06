@@ -145,7 +145,11 @@ public class Level extends CollisionLevel
 					this.addElement(dreamSwitch);
 				} else if (currentMetaTile == MetaTiles.PUSHBOX.index()) {
 					PushBox pushBox = new PushBox(x, y-1, processing);
+					PushBox pushBoxOther = new PushBox(x, y-1, processing);
 					this.addElement(pushBox);
+					twinDream.addElement(pushBoxOther);
+					pushBox.setBoxTwin(pushBoxOther);
+					pushBoxOther.setBoxTwin(pushBox);
 				}
 			}
 		}

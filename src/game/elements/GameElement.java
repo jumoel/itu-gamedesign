@@ -47,10 +47,12 @@ public abstract class GameElement extends CollisionBox
 	public boolean updateMe = true;
 	public int zIndex = 0; // higher index = further in front
 	
-	protected double xSpeed, ySpeed;
+	protected double xSpeed, ySpeed; 
+	public double getYSpeed() {return ySpeed;} public void setYSpeed(double speed) {ySpeed = speed;}
 	protected double xpos, ypos, previous_xpos, previous_ypos;
 	protected double yAcceleration;
 	protected boolean isInAir;
+	protected boolean hasMovedX = false;
 	public boolean cannotMoveLeft;
 	public boolean cannotMoveRight;
 	protected double gravityFactor = 1.0;
@@ -58,6 +60,7 @@ public abstract class GameElement extends CollisionBox
 	protected double breakAccelGroundFactor = 1.0;
 	
 	public void setPos(double x, double y) {
+		this.hasMovedX = (this.xpos != x);
 		this.xpos = x;
 		this.ypos = y;
 		this.updatePosition(x, y);
@@ -85,9 +88,11 @@ public abstract class GameElement extends CollisionBox
 		if (ourPushable != null) {
 			if ((pushRight && xSpeed < 0 && hasXSpeed)
 					|| (!pushRight && xSpeed > 0 && hasXSpeed)) {
+				ourPushable.isBeingPushedRight = ourPushable.isBeingPushedLeft = false;
 				ourPushable = null;
 			} else if (!(this.y()+this.collisionBoxHeight() >= ourPushable.y()
 					&& this.y() <= ourPushable.y() + ourPushable.collisionBoxHeight())) {
+				ourPushable.isBeingPushedRight = ourPushable.isBeingPushedLeft = false;
 				ourPushable = null;
 			}
 		}
@@ -187,11 +192,16 @@ public abstract class GameElement extends CollisionBox
 		// update the position of the characters collision box
 		this.updatePosition(xpos, ypos);
 		// update pushable position
+		this.hasMovedX = (previous_xpos != xpos);
+		
 		if (ourPushable != null) {
 			
-			this.ourPushable.setPos(pushRight?xpos + collisionBoxWidth():xpos-ourPushable.collisionBoxWidth(), ourPushable.y());
 			
-		}
+			this.ourPushable.hasMovedX = true;
+			this.ourPushable.setPos(pushRight?xpos + collisionBoxWidth():xpos-ourPushable.collisionBoxWidth(), 
+					ourPushable.y());
+			
+		}  
 	}
 		
 

@@ -10,6 +10,7 @@ public class PushBox extends GameElement
 
 	private PApplet processing;
 	private Animation pushBoxAnimation;
+	private PushBox myTwinBox; 
 	
 	public PushBox(double x, double y, PApplet p)
 	{
@@ -22,6 +23,18 @@ public class PushBox extends GameElement
 		
 		this.pushBoxAnimation = new Animation(p, "graphics/animations/pushBox");
 		this.pushBoxAnimation.start();
+	}
+	
+	public void setBoxTwin(PushBox twin) {
+		myTwinBox = twin;
+		this.collisionPartnerX = twin;
+	}
+	
+	public boolean twinBoxPushedRight() {
+		return myTwinBox.isBeingPushedRight;
+	}
+	public boolean twinBoxPushedLeft() {
+		return myTwinBox.isBeingPushedLeft;
 	}
 
 	@Override
@@ -42,6 +55,7 @@ public class PushBox extends GameElement
 		return ret;
 	}
 
+	
 	@Override
 	public void collisionDraw(PGraphics cb, int xOff, int yOff)
 	{
@@ -50,8 +64,26 @@ public class PushBox extends GameElement
 
 	}
 	
+	
+	
 	@Override
 	public void update(int deltaT) {
+		if ((isBeingPushedRight && !myTwinBox.isBeingPushedLeft) 
+				|| (isBeingPushedLeft && !myTwinBox.isBeingPushedRight)) { // we don't have to update always, right?
+			//System.out.println("update my twin box");
+			/*double boxDistance = xpos - myTwinBox.x();
+			if (boxDistance > 0.1) { 
+				myTwinBox.xpos = myTwinBox.x()+0.1;
+				myTwinBox.ySpeed = ySpeed;
+				myTwinBox.updatePosition(myTwinBox.xpos, myTwinBox.ypos);
+				myTwinBox.isInAir = true;
+			} else if (boxDistance < -0.1) {
+				myTwinBox.xpos = myTwinBox.x()-0.1;
+				myTwinBox.isInAir = true;
+			}*/
+			myTwinBox.xpos = xpos;
+			//System.out.println(ypos+" vs "+myTwinBox.ypos);
+		}
 		super.update(deltaT);
 	}
 

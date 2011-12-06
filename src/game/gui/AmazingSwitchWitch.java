@@ -21,7 +21,7 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 	private Thread ourThread;
 	private static boolean awake = false;
 	
-	private final static int SWITCH_DURATION = 2000;
+	private final static int SWITCH_DURATION = 1600;
 	private final static int DOOR_CAMERA_MOVE_DURATION = 500;
 	
 	private static PlayerView playerView1, playerView2;

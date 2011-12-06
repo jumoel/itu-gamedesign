@@ -103,7 +103,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 			this.notifyObservers(GameMaster.MSG.SWITCH_ALERT_STOP);
 			this.setChanged();
 			this.notifyObservers(GameMaster.MSG.SWITCH_DREAMS);
-			Stereophone.playSound("302", "switchhappening", 1000);
+			Stereophone.playSound("302", "switchhappening", 1600);
 			msTillNextSwitch = this.getNewTimeTillNextSwitch();
 			switchAlertStarted = false;
 			//return;

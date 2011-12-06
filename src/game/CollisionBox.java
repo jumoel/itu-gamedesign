@@ -2,6 +2,7 @@ package game;
 
 import game.elements.BubbleGunGum;
 import game.elements.GameElement;
+import game.elements.PushBox;
 import game.level.Level;
 import game.sound.Stereophone;
 
@@ -53,13 +54,18 @@ public abstract class CollisionBox extends Observable
 	protected boolean isAbleToPush = false;
 	protected boolean pushRight = false;
 	
+	// if we have crossing elements, we are interested in their collision too
+	protected GameElement collisionPartnerX, collisionPartnerY;
 	
+	protected boolean isBeingPushedRight = false;
+	protected boolean isBeingPushedLeft = false;
 	protected GameElement ourPushable; // something we can push
 	public void removePushable() {ourPushable = null;}
 	/**
 	 * Describing the path, a object can move along while being on ground
 	 */
 	private Line2D.Double collisionGroundPath;
+	private CollisionBox collisionGroundPathSource;
 	
 	/**
 	 * collision box for this object
@@ -138,7 +144,17 @@ public abstract class CollisionBox extends Observable
 	 * @param y future y
 	 * @return
 	 */
+	protected boolean isCollidingPartner (double x, double y, double xSpeed, double ySpeed, 
+			double xDist, double yDist) {
+		return isColliding (x, y, xSpeed, ySpeed, 0, 0, true);
+	}
+	
 	protected boolean isColliding (double x, double y, double xSpeed, double ySpeed) {
+		return isColliding (x, y, xSpeed, ySpeed, 0, 0, false);
+	}
+	
+	protected boolean isColliding (double x, double y, double xSpeed, double ySpeed, 
+			double xDist, double yDist, boolean collisionPartnerRequest) {
 		contactLeft = contactRight = contactTop = contactBottom = false;
 		boolean collision = false;
 		newIsInAir = newIsJumping = true;
@@ -148,9 +164,10 @@ public abstract class CollisionBox extends Observable
 		//determine directions
 		double xDistance = x - cBox.x;
 		double yDistance = y - cBox.y;
+		if (xDist != 0) xDistance = xDist;
+		if (yDist != 0) yDistance = yDist;
 		//int xDirection = (int)(xDistance / Math.abs(xDistance));
 		//int yDirection = (int)(yDistance / Math.abs(yDistance));
-		
 		
 		// anti inside stuff
 		
@@ -164,68 +181,119 @@ public abstract class CollisionBox extends Observable
 		fx1 = (int)(x + cBox.width); fy1 = (int)(y + 1 + cBox.height);
 		
 		
-		
 		CollisionBox collider = null;
-		if (xDistance > 0) {
-			for (int curY = y0; curY <= y1; curY++) {
-				//System.out.println(curY);
-				collider = collisionLevel.getBoxAt(fx1, curY);
-				if (collider != null) {
-					contactRight = true;
-					if ((this.getCollisionEffect() == Effects.BALL_BOUNCE
-							&& collider.getCollisionEffect() == Effects.STOP)) {
-						newXSpeed = -xSpeed;
-						newX = collider.x() - this.cBox.width - 0.2;
-					} else if (collider.getCollisionEffect() == Effects.STOP) {
-						newXSpeed = 0;
-						newX = collider.x()-this.cBox.width;
-						//System.out.println("new x:"+newX);
-					} 
-					collision = true;
-					updateCollisionPartners(collider);
-					break;
-				}
-					
-				
+		
+		if (xDistance != 0 && collisionPartnerX != null && !collisionPartnerRequest) { 
+			// check auf collisionPartnerRequest um endlosschleifen zu vermeiden
+			// lŠsst sich mit einer HashMap interessanter gestalten
+			//double partnerYSpeedBackup = ((GameElement)collisionPartnerX).getYSpeed();
+			
+			if (collisionPartnerX.isBeingPushedLeft 
+					&& ((GameElement)gameElement).isBeingPushedRight) {
+				newXSpeed = 0;
+				newX = collisionPartnerX.x();
+				collision = true;
+				System.out.println("lock left right");
+			} else if (collisionPartnerX.isBeingPushedRight 
+					&& ((GameElement)gameElement).isBeingPushedLeft) {
+				newXSpeed = 0;
+				newX = collisionPartnerX.x();
+				collision = true;
+				System.out.println("lock right left");
+			} else if (collisionPartnerX.isCollidingPartner(x, y, xSpeed, 0, xDistance, 0)) {
+				newXSpeed = collisionPartnerX.getNewXSpeed();
+				newX = collisionPartnerX.getNewX();
+				collision = true;
 			}
 			
-		} else if (xDistance < 0) {
-			for (int curY = y0; curY <= y1; curY++) {
-				collider = collisionLevel.getBoxAt(fx0, curY);
-				if (collider != null) {
-					contactLeft = true;
-					if ((this.getCollisionEffect() == Effects.BALL_BOUNCE
-							&& collider.getCollisionEffect() == Effects.STOP)) {
-						newXSpeed = -xSpeed;
-						newX = collider.x()+collider.collisionBoxWidth() + 0.2;
-					} else if (collider.getCollisionEffect() == Effects.STOP) {
-						newXSpeed = 0;
-						newX = collider.x()+collider.collisionBoxWidth();
+			//((GameElement)collisionPartnerX).setYSpeed(partnerYSpeedBackup);
+		}
+		
+		if (ourPushable != null) {
+			double newBoxX; 
+			if (pushRight) {
+				newBoxX = this.x() + this.collisionBoxWidth();
+				//ourPushable.updatePosition(cBox.x + cBox.width, ourPushable.y());
+			} else {
+				newBoxX = this.x() - ourPushable.collisionBoxWidth();
+				//ourPushable.updatePosition(cBox.x + ourPushable.collisionBoxWidth(), ourPushable.y());
+			}
+			if (ourPushable.isColliding(newBoxX, ourPushable.y(), xSpeed, 0, xDistance, 0, false)) {
+				newXSpeed = ourPushable.getNewXSpeed();
+				
+				if (pushRight) {
+					newX = ourPushable.getNewX() - this.collisionBoxWidth();
+				} else {
+					newX = ourPushable.getNewX() + ourPushable.collisionBoxWidth();
+				}
+				//System.out.println("hmm, "+newX+ " vorher:"+x);
+				collision = true;
+			} 
+		} else {
+			if (xDistance > 0) {
+				for (int curY = y0; curY <= y1; curY++) {
+					//System.out.println(curY);
+					collider = collisionLevel.getBoxAt(fx1, curY);
+					if (collider != null) {
+						contactRight = true;
+						if ((this.getCollisionEffect() == Effects.BALL_BOUNCE
+								&& collider.getCollisionEffect() == Effects.STOP)) {
+							newXSpeed = -xSpeed;
+							newX = collider.x() - this.cBox.width - 0.2;
+						} else if (collider.getCollisionEffect() == Effects.STOP) {
+							newXSpeed = 0;
+							newX = collider.x()-this.cBox.width;
+							//System.out.println("new x:"+newX);
+						} 
+						collision = true;
+						updateCollisionPartners(collider);
+						break;
 					}
-					collision = true;
-					updateCollisionPartners(collider);
-					//System.out.println("newX:"+newX+" x:"+x);
-					break;
+						
+					
 				}
 				
+			} else if (xDistance < 0) {
+				for (int curY = y0; curY <= y1; curY++) {
+					collider = collisionLevel.getBoxAt(fx0, curY);
+					if (collider != null) {
+						contactLeft = true;
+						if ((this.getCollisionEffect() == Effects.BALL_BOUNCE
+								&& collider.getCollisionEffect() == Effects.STOP)) {
+							newXSpeed = -xSpeed;
+							newX = collider.x()+collider.collisionBoxWidth() + 0.2;
+						} else if (collider.getCollisionEffect() == Effects.STOP) {
+							newXSpeed = 0;
+							newX = collider.x()+collider.collisionBoxWidth();
+						}
+						collision = true;
+						updateCollisionPartners(collider);
+						//System.out.println("newX:"+newX+" x:"+x);
+						break;
+					}
+					
+					
+				}
 				
 			}
-			
 		}
 		
 		
 		
 		if (collisionGroundPath != null) {
+			collisionGroundPath = collisionGroundPathSource.getHeadline();// refresh - some objects move
 			double xLeftEnd = newX;
 			double xRightEnd = newX + this.cBox.width;
 			if (collisionGroundPath.x1 >= xRightEnd
 					|| collisionGroundPath.x2 <= xLeftEnd) {
 				collisionGroundPath = null; // we fell of an edge : no path anymore
+				collisionGroundPathSource = null;
 			}
 		}
 		
 		if (yDistance > 0) {
 			this.collisionGroundPath = null; // jump or so: we are losing connection to ground
+			this.collisionGroundPathSource = null;
 			
 			for (int curX = x0; curX <= x1; curX++) {
 				collider = collisionLevel.getBoxAt(curX, fy1);
@@ -261,6 +329,7 @@ public abstract class CollisionBox extends Observable
 							newIsInAir = false;
 							//newIsJumping = true;
 							this.collisionGroundPath = collider.getHeadline();
+							this.collisionGroundPathSource = collider;
 						} 
 						collision = true;
 						updateCollisionPartners(collider);
@@ -328,9 +397,11 @@ public abstract class CollisionBox extends Observable
 								if (rightHit) {
 									newX = collider.x() - cBox.width;
 									this.pushRight = true;
+									collider.isBeingPushedRight = true;
 								} else {
 									newX = collider.x() + collider.collisionBoxWidth();
 									this.pushRight = false;
+									collider.isBeingPushedLeft = true;
 								}
 								ourPushable = (GameElement)collider.gameElement;
 								break;
@@ -343,6 +414,7 @@ public abstract class CollisionBox extends Observable
 								} else {
 									newY = collider.y() + collider.collisionBoxHeight();
 									this.collisionGroundPath = collider.getHeadline();
+									this.collisionGroundPathSource = collider;
 								}
 							} else {
 								if (rightHit) {
@@ -378,6 +450,7 @@ public abstract class CollisionBox extends Observable
 	
 	public void removeCollisionGroundPath() {
 		this.collisionGroundPath = null;
+		this.collisionGroundPathSource = null;
 	}
 	
 	/**

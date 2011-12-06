@@ -128,7 +128,7 @@ public class Player extends GameElement
 		this.xpos = level.spawnX; //+ 5;// in case
 		this.ypos = level.spawnY;// + 0.5; // there is no spawn point set
 		
-		System.out.println("before: " + this.xpos + ", " + this.ypos);
+		//System.out.println("before: " + this.xpos + ", " + this.ypos);
 		
 		for (int x = 0; x < level.levelWidth; x++) {
 			for (int y = 0; y < level.levelHeight; y++) {
@@ -139,10 +139,10 @@ public class Player extends GameElement
 				}
 			}
 		}
-		System.out.println("before: " + this.xpos + ", " + this.ypos);
+		//System.out.println("before: " + this.xpos + ", " + this.ypos);
 		
 		this.setCollisionEffect(Effects.NONE);
-		System.out.println(this.xpos + ", " + this.ypos);
+		//System.out.println(this.xpos + ", " + this.ypos);
 		
 		isJumping = true;
 		//isMovingSideways = false;
