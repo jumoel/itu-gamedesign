@@ -269,6 +269,8 @@ public class Player extends GameElement
 		gum.setLevel(level);
 		
 		this.level.addElement(gum);
+		double dice = Math.random();
+		Stereophone.playSound(dice > 0.5 ? "010" : "011", "gun shoot", 100);
 	}
 	
 	

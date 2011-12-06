@@ -1,11 +1,16 @@
 package util;
 
+import java.util.HashMap;
+
 import processing.core.PApplet;
 import processing.core.PConstants;
 import processing.core.PImage;
 
 public class BImage
 {
+	// <original, mirrored version>
+	private static HashMap<PImage,PImage> mirroredImages = new HashMap<PImage, PImage>();
+	
 	/***
 	 * Cuts an image into multiple sprites.
 	 * The function will not save 'half empty' tiles, so preferably,
@@ -44,21 +49,29 @@ public class BImage
 	
 	public static PImage mirrorAroundY(PApplet processing, PImage original)
 	{
-		PImage ret = processing.createImage(original.width, original.height, PConstants.ARGB);
-		
-		int width = original.width;
-		int height = original.height;
-		
-		for (int x = 0; x < (width / 2) + 1; x++)
+		if (BImage.mirroredImages.containsKey(original)) 
 		{
-			for (int y = 0; y < height; y++)
-			{
-				int xreverse = (width - x - 1);
-				ret.pixels[y * width + x] = original.pixels[y * width + xreverse];
-				ret.pixels[y * width + xreverse] = original.pixels[y * width + x];
-			}
+			return BImage.mirroredImages.get(original);
 		}
-		
-		return ret;
+		else
+		{
+			PImage ret = processing.createImage(original.width, original.height, PConstants.ARGB);
+			
+			int width = original.width;
+			int height = original.height;
+			
+			for (int x = 0; x < (width / 2) + 1; x++)
+			{
+				for (int y = 0; y < height; y++)
+				{
+					int xreverse = (width - x - 1);
+					ret.pixels[y * width + x] = original.pixels[y * width + xreverse];
+					ret.pixels[y * width + xreverse] = original.pixels[y * width + x];
+				}
+			}
+			BImage.mirroredImages.put(original, ret);
+			
+			return ret;
+		}
 	}
 }

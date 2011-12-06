@@ -45,7 +45,7 @@ public abstract class CollisionBox extends Observable
 	protected double getNewXSpeed() {return newXSpeed;}
 	protected double getNewYSpeed() {return newYSpeed;}
 	protected Object getBouncePartner() { return collidingGameElement; }
-	protected void resetBouncePartner() {collidingGameElement = null; }
+	public void resetBouncePartner() {collidingGameElement = null; }
 	protected boolean contactLeft = false;
 	protected boolean contactRight = false;
 	protected boolean contactTop = false;

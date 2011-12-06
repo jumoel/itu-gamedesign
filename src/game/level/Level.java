@@ -53,6 +53,7 @@ public class Level extends CollisionLevel
 	
 	
 	private PImage tiles[];
+	public PImage bigPicture;
 	private int levelData[];
 	private int levelDataForeground[];
 	private int metaData[];
@@ -88,6 +89,28 @@ public class Level extends CollisionLevel
 		this.collisionSetup();
 		
 		gameElements = new ArrayList<GameElement>();
+		//this.setupTheBigPiture();
+	}
+	
+	// creating a complete picture of our level
+	public void setupTheBigPiture() {
+		int dim = BunnyHat.TILEDIMENSION;
+		int width = this.levelWidth * dim;
+		int height = this.levelHeight * dim;
+		
+		bigPicture = processing.createImage(width, height, processing.ARGB);
+		//PGraphics bigPic = processing.createGraphics(width, height, PConstants.JAVA2D);
+		
+		for (int x = 0; x < levelWidth; x++) {
+			for (int y = 0; y < levelHeight; y++) {
+				//System.out.println(x+":"+y);
+				PImage img = this.getLevelImageAt(x, y, Layer.BACKGROUND);
+				if (img != null) {
+					bigPicture.copy(img, 0, 0, dim, dim, 
+							x * dim, (y-1) * dim, dim, dim);
+				}
+			}
+		}
 	}
 	
 	public void setTwinDream(Level dream) {
@@ -218,7 +241,7 @@ public class Level extends CollisionLevel
 				int ycoord = (int)((height - currentCreature.y() * BunnyHat.TILEDIMENSION));
 				
 				if (xcoord+currentCreature.collisionBoxWidth()+200 > 0 && xcoord <  width 
-						&& ycoord + currentCreature.collisionBoxHeight() > 0 && ycoord <  height) {
+						&& ycoord - currentCreature.collisionBoxHeight() > 0 && ycoord <  height) {
 					
 					PImage image = currentCreature.getCurrentTexture();
 					

@@ -15,7 +15,7 @@ public class BubbleGunGum extends GameElement
 	private PApplet processing;
 	public enum BallColor {GIRL, BOY};
 	private int startTime;
-	private static int TIME_TO_LIVE = 200000;
+	private static int TIME_TO_LIVE = 23000;
 	private double oldSpeed;
 	
 	public BubbleGunGum(double x, double y, double xSpeed, double ySpeed, 

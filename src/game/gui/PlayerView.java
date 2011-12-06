@@ -249,6 +249,7 @@ public class PlayerView extends Updateable implements Observer
 		otherPlayerView.getLevel().removeElement(ownPlayer);
 		level.addElement(ownPlayer);
 		ownPlayer.setLevel(level);
+		ownPlayer.resetBouncePartner();
 		
 		ownPlayer.takeWeapon();
 		drawOwnPlayer = true;
@@ -586,21 +587,20 @@ public class PlayerView extends Updateable implements Observer
 		return maximumTileY;
 	}
 	
-	private void drawObjectsAndCreatures() {
-		
-	}
+	
 	
 	// drawing the level graphics
 	private void drawLevelGraphics(PGraphics graphics, Level.Layer layer)
 	{	
+		
 		int minimumTileX = getMinimumTileX();
 		int maximumTileX = getMaximumTileX();
 		
 		int minimumTileY = getMinimumTileY();
 		int maximumTileY = getMaximumTileY();
 		
-		
-		
+		//graphics.image(level.bigPicture, -minimumTileX*BunnyHat.TILEDIMENSION- xCoordCamera, (maximumTileY-level.levelHeight)*BunnyHat.TILEDIMENSION+ yCoordCamera);
+		//graphics.image(level.bigPicture, 0, 0);
 		// Counting y from down towards the sky
 		for (int reversey = minimumTileY; reversey <= maximumTileY; reversey++)
 		{
