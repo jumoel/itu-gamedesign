@@ -22,7 +22,7 @@ public class BubbleGunGum extends GameElement
 			PApplet processing, BallColor ballColor)
 	{
 		super(x, y, 7/24.0, 7/24.0);
-		super.setCollisionEffect(Effects.NONE);
+		super.setCollisionEffect(Effects.BALL_BOUNCE);
 		super.setGameElement(this);
 		
 		this.processing = processing;
@@ -67,18 +67,19 @@ public class BubbleGunGum extends GameElement
 		} else if (this.getBouncePartner() instanceof Player) {
 			this.destroyed = true;
 		} else if (this.getBouncePartner() instanceof Obstacle) {
+			double dice = Math.random();
+			String sound;
+			if (dice < 0.3) {
+				sound = "120";
+			} else if (dice > 0.3) {
+				sound = "121";
+			} else {
+				sound = "122";
+			}
+			Stereophone.playSound(sound, "gum_bounce", 100);
 			if (xSpeed == 0 && ySpeed != 0) {
-				this.xSpeed = -this.oldSpeed;
-				double dice = Math.random();
-				String sound;
-				if (dice < 0.3) {
-					sound = "120";
-				} else if (dice > 0.3) {
-					sound = "121";
-				} else {
-					sound = "122";
-				}
-				Stereophone.playSound(sound, "gum_bounce", 100);
+				//this.xSpeed = -this.oldSpeed;
+				
 			}
 		}
 	}

@@ -346,7 +346,10 @@ public class BunnyHat extends PApplet implements Observer
 				inputState.put('w', false);
 				inputState.put('i', false);
 			}
-			else 
+			else if (keyCode == ALT) {
+				inputState.put('.', false);
+			}
+			else
 			{
 				inputState.put(key, false);
 			}

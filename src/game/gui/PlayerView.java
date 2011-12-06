@@ -150,7 +150,7 @@ public class PlayerView extends Updateable implements Observer
 		//System.out.println("show them the doors - maxX:"+getMaximumTileX()+" minX:"+getMinimumTileX());
 		// Counting y from down towards the sky
 		int minimumTileX = (int)ownPlayer.x() + 1;
-		int maximumTileX = getMaximumTileX() + width/2/BunnyHat.TILEDIMENSION;
+		int maximumTileX = getMaximumTileX() - 5 + width/2/BunnyHat.TILEDIMENSION;
 		int tileSpanX = maximumTileX - minimumTileX;
 		
 		int minimumTileY = getMinimumTileY();
@@ -212,6 +212,8 @@ public class PlayerView extends Updateable implements Observer
 		this.doorEnabled = false;
 		this.untunnelTwin();
 		Stereophone.playSound("304", "blowdoors", 1000);
+		this.ownPlayer.cannotMoveLeft = false;
+		this.ownPlayer.cannotMoveRight = false;
 		this.ownPlayer.tookTheDoor = false;
 		//this.drawOwnDoor = false;
 	}
@@ -361,8 +363,8 @@ public class PlayerView extends Updateable implements Observer
 			pypos = (int) (ybackup * BunnyHat.TILEDIMENSION);
 		}
 
-		//int drawpxpos;
-		//int drawpypos;
+		int drawpxpos;
+		int drawpypos;
 		
 		if (pxpos < 0)
 		{
@@ -406,7 +408,7 @@ public class PlayerView extends Updateable implements Observer
 					ownPlayer.cannotMoveRight = true;
 				}
 			}
-		} else if (this.drawOwnDoor) {
+		} else if (this.doorEnabled) {
 			this.cameraOffsetX = (int)(((ownDoor.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((ownDoor.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
 			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth()*2)/2) {
@@ -424,15 +426,15 @@ public class PlayerView extends Updateable implements Observer
 		yCoordCameraMiddle = pypos;
 		yCoordCamera = yCoordCameraMiddle - halfheight + (int)(cameraOffsetY * cameraOffsetFactor);
 		
-		/*drawpxpos = halfwidth - (int)(cameraOffsetX * cameraOffsetFactor)
+		drawpxpos = halfwidth - (int)(cameraOffsetX * cameraOffsetFactor)
 				- (int)(ownPlayer.collisionBoxWidth() * BunnyHat.TILEDIMENSION / 2);
 		drawpypos = halfheight - (int)(cameraOffsetY * cameraOffsetFactor)
-				- (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);*/
+				- (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);
 		
 		if (xCoordCamera < 0)
 		{
 			int diff = -xCoordCamera;
-			//drawpxpos = drawpxpos - diff;
+			drawpxpos = drawpxpos - diff;
 			xCoordCamera = 0;
 			xCoordCameraMiddle = halfwidth;
 		}
@@ -442,7 +444,7 @@ public class PlayerView extends Updateable implements Observer
 		if (xCoordCamera > maxCameraPosX)
 		{
 			int diff = xCoordCamera - maxCameraPosX;
-			//drawpxpos = drawpxpos + diff;
+			drawpxpos = drawpxpos + diff;
 			xCoordCamera = maxCameraPosX;
 			xCoordCameraMiddle = xCoordCamera + halfwidth;
 		}
@@ -450,7 +452,7 @@ public class PlayerView extends Updateable implements Observer
 		if (yCoordCamera < 0)
 		{
 			int diff = -yCoordCamera;
-			//drawpypos = drawpypos - diff;
+			drawpypos = drawpypos - diff;
 			yCoordCamera = 0;
 			yCoordCameraMiddle = halfheight;
 		}
@@ -459,22 +461,22 @@ public class PlayerView extends Updateable implements Observer
 		if (yCoordCamera > maxCameraPosY)
 		{
 			int diff = yCoordCamera - maxCameraPosY;
-			//drawpypos = (drawpypos + diff);
+			drawpypos = (drawpypos + diff);
 			yCoordCamera = maxCameraPosY;
 			yCoordCameraMiddle = yCoordCamera + halfheight;
 		}
 		
-		//drawpypos = height - drawpypos;
+		drawpypos = height - drawpypos;
 		
 		drawLevelGraphics(buffer, Level.Layer.BACKGROUND);
 		
 		level.drawCreaturesAndObjects(xCoordCamera, yCoordCamera, 
 				xCoordCamera + width, yCoordCamera + height, buffer);
 		
-		/*if (drawOwnPlayer)
+		if (drawOwnPlayer)
 		{
-			//drawImage(ownPlayer.getCurrentTexture(), buffer, drawpxpos, drawpypos, Horizontal.LEFT, Vertical.BOTTOM);
-		}*/
+			drawImage(ownPlayer.getCurrentTexture(), buffer, drawpxpos, drawpypos, Horizontal.LEFT, Vertical.BOTTOM);
+		}
 		
 		/*if (drawOtherPlayer)
 		{

@@ -25,7 +25,7 @@ gamerules:
     alertPhaseDuration: 5000
   doors:
     playerMinBehindDistance: 20.0
-    playerMinBehindTime: 7000
+    playerMinBehindTime: 10000
     doorDuration: 10000
   creatures:
     speed: 1

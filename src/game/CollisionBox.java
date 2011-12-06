@@ -23,7 +23,7 @@ import processing.core.PGraphics;
 public abstract class CollisionBox extends Observable
 {
 	public enum Effects {STOP, BOUNCE, SLOW_DOWN, FINISH, NONE,
-		GOOD_SHEEP_BOUNCE, BAD_SHEEP_BOUNCE}
+		GOOD_SHEEP_BOUNCE, BAD_SHEEP_BOUNCE, BALL_BOUNCE}
 	private Effects collisionEffect = Effects.STOP;
 	
 	private Level collisionLevel;
@@ -46,6 +46,11 @@ public abstract class CollisionBox extends Observable
 	protected double getNewYSpeed() {return newYSpeed;}
 	protected Object getBouncePartner() { return collidingGameElement; }
 	protected void resetBouncePartner() {collidingGameElement = null; }
+	protected boolean contactLeft = false;
+	protected boolean contactRight = false;
+	protected boolean contactTop = false;
+	protected boolean contactBottom = false;
+	
 	
 	/**
 	 * Describing the path, a object can move along while being on ground
@@ -130,6 +135,7 @@ public abstract class CollisionBox extends Observable
 	 * @return
 	 */
 	protected boolean isColliding (double x, double y, double xSpeed, double ySpeed) {
+		contactLeft = contactRight = contactTop = contactBottom = false;
 		boolean collision = false;
 		newIsInAir = newIsJumping = true;
 		newX = x; newY = y; newXSpeed = xSpeed; newYSpeed = ySpeed;
@@ -161,11 +167,16 @@ public abstract class CollisionBox extends Observable
 				//System.out.println(curY);
 				collider = collisionLevel.getBoxAt(fx1, curY);
 				if (collider != null) {
-					if (collider.getCollisionEffect() == Effects.STOP) {
+					contactRight = true;
+					if ((this.getCollisionEffect() == Effects.BALL_BOUNCE
+							&& collider.getCollisionEffect() == Effects.STOP)) {
+						newXSpeed = -xSpeed;
+						newX = collider.x() - this.cBox.width - 0.2;
+					} else if (collider.getCollisionEffect() == Effects.STOP) {
 						newXSpeed = 0;
 						newX = collider.x()-this.cBox.width;
 						//System.out.println("new x:"+newX);
-					}
+					} 
 					collision = true;
 					updateCollisionPartners(collider);
 					break;
@@ -178,7 +189,12 @@ public abstract class CollisionBox extends Observable
 			for (int curY = y0; curY <= y1; curY++) {
 				collider = collisionLevel.getBoxAt(fx0, curY);
 				if (collider != null) {
-					if (collider.getCollisionEffect() == Effects.STOP) {
+					contactLeft = true;
+					if ((this.getCollisionEffect() == Effects.BALL_BOUNCE
+							&& collider.getCollisionEffect() == Effects.STOP)) {
+						newXSpeed = -xSpeed;
+						newX = collider.x()+collider.collisionBoxWidth() + 0.2;
+					} else if (collider.getCollisionEffect() == Effects.STOP) {
 						newXSpeed = 0;
 						newX = collider.x()+collider.collisionBoxWidth();
 					}
@@ -210,6 +226,7 @@ public abstract class CollisionBox extends Observable
 			for (int curX = x0; curX <= x1; curX++) {
 				collider = collisionLevel.getBoxAt(curX, fy1);
 				if (collider != null) {
+					contactTop = true;
 					if (collider.getCollisionEffect() == Effects.STOP) {
 						newYSpeed = 0.0;
 						newY = collider.y()-this.cBox.height-1;
@@ -232,6 +249,7 @@ public abstract class CollisionBox extends Observable
 				for (int curX = x0; curX <= x1; curX++) {
 					collider = collisionLevel.getBoxAt(curX, fy0); 
 					if (collider != null) {
+						contactBottom = true;
 						// hit feet
 						if (collider.getCollisionEffect() == Effects.STOP) {
 							newYSpeed = 0;
@@ -239,10 +257,7 @@ public abstract class CollisionBox extends Observable
 							newIsInAir = false;
 							//newIsJumping = true;
 							this.collisionGroundPath = collider.getHeadline();
-						} else if (collider.getCollisionEffect() == Effects.BOUNCE) {
-							newYSpeed = -ySpeed;
-							newY = fy0;
-						}
+						} 
 						collision = true;
 						updateCollisionPartners(collider);
 						break;
@@ -271,7 +286,7 @@ public abstract class CollisionBox extends Observable
 					boolean topHit = yDiff > 0;
 					switch (collider.getCollisionEffect()) {
 						case BOUNCE:
-							if (topOrBottomHit) {
+							/*if (topOrBottomHit) {
 								newYSpeed = -ySpeed;
 								newY = collider.y() + collider.collisionBoxHeight();
 							} else {
@@ -281,7 +296,7 @@ public abstract class CollisionBox extends Observable
 								} else {
 									newX = collider.x() + collider.collisionBoxWidth();
 								}
-							}
+							}*/
 							break;
 						case GOOD_SHEEP_BOUNCE:
 							if (gameElement instanceof Player) {
