@@ -248,8 +248,13 @@ public class GameMaster extends Observable implements Observer, Runnable
 			} else if (map.containsKey("IGOTGUMMED") && !gameOver) {
 				// player got hit by gum: finish doors
 				this.msTillDoorsEnd = 0;
+			} else if (map.containsKey("IHITTHESWITCH") && !gameOver) {
+				// dream switch button: 
+				if (!this.switchAlertStarted) { // we would never mess with an upcoming switch
+					this.msTillNextSwitch = 0;  // would we?
+				}
 			}
-		}
+		} 
 		
 	}
 	

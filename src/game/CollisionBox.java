@@ -23,7 +23,7 @@ import processing.core.PGraphics;
 public abstract class CollisionBox extends Observable
 {
 	public enum Effects {STOP, BOUNCE, SLOW_DOWN, FINISH, NONE,
-		GOOD_SHEEP_BOUNCE, BAD_SHEEP_BOUNCE, BALL_BOUNCE}
+		GOOD_SHEEP_BOUNCE, BAD_SHEEP_BOUNCE, BALL_BOUNCE, PUSH}
 	private Effects collisionEffect = Effects.STOP;
 	
 	private Level collisionLevel;
@@ -50,8 +50,12 @@ public abstract class CollisionBox extends Observable
 	protected boolean contactRight = false;
 	protected boolean contactTop = false;
 	protected boolean contactBottom = false;
+	protected boolean isAbleToPush = false;
+	protected boolean pushRight = false;
 	
 	
+	protected GameElement ourPushable; // something we can push
+	public void removePushable() {ourPushable = null;}
 	/**
 	 * Describing the path, a object can move along while being on ground
 	 */
@@ -286,17 +290,17 @@ public abstract class CollisionBox extends Observable
 					boolean topHit = yDiff > 0;
 					switch (collider.getCollisionEffect()) {
 						case BOUNCE:
-							/*if (topOrBottomHit) {
+							if (topOrBottomHit) {
 								newYSpeed = -ySpeed;
 								newY = collider.y() + collider.collisionBoxHeight();
 							} else {
-								newXSpeed = -xSpeed;
+								/*newXSpeed = -xSpeed;
 								if (rightHit) {
 									newX = collider.x() - this.collisionBoxWidth();
 								} else {
 									newX = collider.x() + collider.collisionBoxWidth();
-								}
-							}*/
+								}*/
+							}
 							break;
 						case GOOD_SHEEP_BOUNCE:
 							if (gameElement instanceof Player) {
@@ -317,6 +321,41 @@ public abstract class CollisionBox extends Observable
 								Stereophone.playSound(dice > 0.5?"102":"103", "bad_sheep_bounce", 250);
 							}
 							break;
+						case PUSH:
+							if (ourPushable == collider) break;
+							if (!topOrBottomHit && isAbleToPush) {
+								newXSpeed = 0;
+								if (rightHit) {
+									newX = collider.x() - cBox.width;
+									this.pushRight = true;
+								} else {
+									newX = collider.x() + collider.collisionBoxWidth();
+									this.pushRight = false;
+								}
+								ourPushable = (GameElement)collider.gameElement;
+								break;
+							}
+						case STOP:
+							if (topOrBottomHit) {
+								if (!topHit) {
+									newYSpeed = 0.0;
+									newY = collider.y() - cBox.height;
+								} else {
+									newY = collider.y() + collider.collisionBoxHeight();
+									this.collisionGroundPath = collider.getHeadline();
+								}
+							} else {
+								if (rightHit) {
+									newX = collider.x() - cBox.width;
+									((GameElement)gameElement).cannotMoveRight = true;
+									
+								} else {
+									newX = collider.x() + collider.collisionBoxWidth();
+									((GameElement)gameElement).cannotMoveLeft = true;
+								}
+							}
+							break;
+						
 					}
 				}
 			}

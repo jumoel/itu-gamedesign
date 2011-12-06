@@ -6,7 +6,7 @@ gameplay:
   gravity: -0.981
   jumpforce: 4.2
   moveacceleration:
-    ground: 1.2
+    ground: 0.6
     air: 0.2
   breakacceleration:
     ground: 1.5
@@ -16,6 +16,8 @@ gameplay:
   maxXspeed: 5.0
   gumspeed: 3.0
   gumstucktime: 7000
+  pushspeedmax: 0.5
+  pushaccelerationfactor: 0.5  
 debug:
   fps: false
 gamerules:
@@ -173,6 +175,51 @@ graphics:
       fps: 27
     badSheep:
       path: creatures/badsheep.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    goodSheepStanding:
+      path: creatures/sheepstanding.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    goodSheepMoveMouth:
+      path: creatures/sheepmovemouth.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    badSheepStanding:
+      path: creatures/sheepstanding.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    badSheepMoveMouth:
+      path: creatures/sheepmovemouth.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    dreamSwitch:
+      path: objects/dreamswitch.png
+      framewidth: 72
+      frameheight: 24
+      fps: 27
+    dreamSwitchPushed:
+      path: objects/dreamswitchpushed.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    dreamSwitchAlarm:
+      path: objects/dreamswitchalarm.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    dreamSwitchInactive:
+      path: objects/dreamswitchinactive.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    pushBox:
+      path: objects/pushbox.png
       framewidth: 72
       frameheight: 72
       fps: 27

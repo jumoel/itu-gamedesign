@@ -109,6 +109,7 @@ public class PlayerView extends Updateable implements Observer
 		level = (level == goodDream ? badDream : goodDream);
 		level.addElement(ownPlayer);
 		ownPlayer.removeCollisionGroundPath();
+		ownPlayer.removePushable();
 	}
 	
 	protected void initSwitchFinish() {this.shouldFinishSwitch = true;}

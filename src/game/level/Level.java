@@ -12,8 +12,10 @@ import game.CollisionBox;
 import game.Player;
 import game.elements.BadSheep;
 import game.elements.BubbleGunGum;
+import game.elements.DreamSwitch;
 import game.elements.GameElement;
 import game.elements.GoodSheep;
+import game.elements.PushBox;
 import processing.core.*;
 import util.BImage;
 import util.BString;
@@ -35,7 +37,10 @@ public class Level extends CollisionLevel
 		SPAWNPOINT(2),
 		FINISHLINE(3),
 		DOORSPAWNPOINT(4),
-		CROSSINGSHEEP(5);
+		CROSSINGSHEEP(5),
+		NORMALSHEEP(6),
+		DREAMSWITCH(7),
+		PUSHBOX(8);
 		
 		private final int index;
 		
@@ -124,9 +129,10 @@ public class Level extends CollisionLevel
 				/*
 				 * TODO: Sam should fix his leaky sheep :)
 				 * */
-				if (this.getMetaDataAt(x, y) == Level.MetaTiles.CROSSINGSHEEP.index()) {
-					GoodSheep goodSheep = new GoodSheep(x, y, 3, 3, processing);
-					BadSheep badSheep = new BadSheep(x, y, 3, 3, processing, goodSheep);
+				int currentMetaTile = this.getMetaDataAt(x, y); 
+				if (currentMetaTile == Level.MetaTiles.CROSSINGSHEEP.index()) {
+					GoodSheep goodSheep = new GoodSheep(x, y-1, 3, 3, processing);
+					BadSheep badSheep = new BadSheep(x, y-1, 3, 3, processing, goodSheep);
 					if (dream == DreamStyle.GOOD) {
 						twinDream.addElement(badSheep);
 						this.addElement(goodSheep);
@@ -134,8 +140,13 @@ public class Level extends CollisionLevel
 						//twinDream.addElement(goodSheep);
 						//this.addElement(badSheep);
 					}
+				} else if (currentMetaTile == MetaTiles.DREAMSWITCH.index()) {
+					DreamSwitch dreamSwitch = new DreamSwitch(x, y-1, processing);
+					this.addElement(dreamSwitch);
+				} else if (currentMetaTile == MetaTiles.PUSHBOX.index()) {
+					PushBox pushBox = new PushBox(x, y-1, processing);
+					this.addElement(pushBox);
 				}
-				/**/
 			}
 		}
 	}

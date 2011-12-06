@@ -35,6 +35,9 @@ public abstract class GameElement extends CollisionBox
 	
 	private static int DELTAT_DIVIDENT = BunnyHat.SETTINGS.getValue("gameplay/deltatdivident");
 	private static double CLAMPTOZERO = BunnyHat.SETTINGS.getValue("gameplay/clamptozero");
+	
+	private static double PUSH_SPEED_MAX = BunnyHat.SETTINGS.getValue("gameplay/pushspeedmax");
+	private static double PUSH_ACCEL_FACTOR = BunnyHat.SETTINGS.getValue("gameplay/pushaccelerationfactor");
 
 	protected Facing facing;
 	
@@ -48,6 +51,8 @@ public abstract class GameElement extends CollisionBox
 	protected double xpos, ypos, previous_xpos, previous_ypos;
 	protected double yAcceleration;
 	protected boolean isInAir;
+	public boolean cannotMoveLeft;
+	public boolean cannotMoveRight;
 	protected double gravityFactor = 1.0;
 	protected double breakAccelAirFactor = 1.0;
 	protected double breakAccelGroundFactor = 1.0;
@@ -76,6 +81,17 @@ public abstract class GameElement extends CollisionBox
 		// X
 		boolean hasXSpeed = Math.abs(xSpeed) > CLAMPTOZERO;
 		
+		// would we lose our pushable?
+		if (ourPushable != null) {
+			if ((pushRight && xSpeed < 0 && hasXSpeed)
+					|| (!pushRight && xSpeed > 0 && hasXSpeed)) {
+				ourPushable = null;
+			} else if (!(this.y()+this.collisionBoxHeight() >= ourPushable.y()
+					&& this.y() <= ourPushable.y() + ourPushable.collisionBoxHeight())) {
+				ourPushable = null;
+			}
+		}
+		
 		if (hasXSpeed)
 		{
 			double xSignum = Math.signum(xSpeed);
@@ -97,15 +113,18 @@ public abstract class GameElement extends CollisionBox
 				xSpeed = 0.0;
 			}
 			
-			
-			xSpeed = BMath.clamp(xSpeed, 0, xSignum * MAX_X_SPEED);
+			if (this.ourPushable == null) {
+				xSpeed = BMath.clamp(xSpeed, 0, xSignum * MAX_X_SPEED);
+			} else {
+				xSpeed = BMath.clamp(xSpeed, 0, xSignum * this.PUSH_SPEED_MAX);
+			}
 		}
 		else
 		{	
 			xSpeed = 0;
 		}
 		
-		xpos = xpos + xSpeed * deltaFactor;
+		xpos = xpos + xSpeed * deltaFactor * (this.ourPushable == null ? 1 : this.PUSH_ACCEL_FACTOR);
 		
 		
 		
@@ -167,6 +186,12 @@ public abstract class GameElement extends CollisionBox
 	
 		// update the position of the characters collision box
 		this.updatePosition(xpos, ypos);
+		// update pushable position
+		if (ourPushable != null) {
+			
+			this.ourPushable.setPos(pushRight?xpos + collisionBoxWidth():xpos-ourPushable.collisionBoxWidth(), ourPushable.y());
+			
+		}
 	}
 		
 

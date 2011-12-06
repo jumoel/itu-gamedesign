@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import game.elements.BubbleGunGum;
 import game.elements.BubbleGunGum.BallColor;
+import game.elements.DreamSwitch;
 import game.elements.GameElement; 
 import game.elements.StandardCreature;
 import game.graphics.Animation;
@@ -31,8 +32,7 @@ public class Player extends GameElement
 	
 	//public boolean isMovingSideways;
 
-	public boolean cannotMoveLeft;
-	public boolean cannotMoveRight;
+	
 	
 	//private double yAcceleration;
 	//public double ySpeed;
@@ -111,6 +111,7 @@ public class Player extends GameElement
 		super(level.spawnX + 0.5, level.spawnY + 0.5, 2, 3);
 		super.setLevel(level);
 		super.setGameElement(this);
+		this.isAbleToPush = true; // hardcore pusher!
 		
 		this.updateMe = false;
 		this.zIndex = 100;
@@ -418,6 +419,12 @@ public class Player extends GameElement
 			this.setChanged();
 			HashMap map = new HashMap();
 			map.put("IGOTGUMMED", myID);
+			this.notifyObservers(map);
+		} else if (unarmed && gameElement instanceof DreamSwitch) {
+			this.resetBouncePartner();
+			this.setChanged();
+			HashMap map = new HashMap();
+			map.put("IHITTHESWITCH", myID);
 			this.notifyObservers(map);
 		}
 			

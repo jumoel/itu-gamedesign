@@ -5,23 +5,23 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
-public class DreamSwitch extends GameElement
+public class PushBox extends GameElement
 {
 
 	private PApplet processing;
-	private Animation dreamSwitchAnimation;
+	private Animation pushBoxAnimation;
 	
-	public DreamSwitch(double x, double y, PApplet p)
+	public PushBox(double x, double y, PApplet p)
 	{
-		super(x, y, 3, 1);
-		this.setCollisionEffect(Effects.BOUNCE);
+		super(x, y, 3, 3);
+		this.setCollisionEffect(Effects.PUSH);
 		
 		processing = p;
 		
 		this.setGameElement(this);
 		
-		this.dreamSwitchAnimation = new Animation(p, "graphics/animations/dreamSwitch");
-		this.dreamSwitchAnimation.start();
+		this.pushBoxAnimation = new Animation(p, "graphics/animations/pushBox");
+		this.pushBoxAnimation.start();
 	}
 
 	@Override
@@ -35,8 +35,8 @@ public class DreamSwitch extends GameElement
 		}
 		else
 		{
-			this.dreamSwitchAnimation.start();
-			ret = this.dreamSwitchAnimation.getCurrentImage(time);
+			this.pushBoxAnimation.start();
+			ret = this.pushBoxAnimation.getCurrentImage(time);
 		}
 		
 		return ret;
@@ -52,7 +52,7 @@ public class DreamSwitch extends GameElement
 	
 	@Override
 	public void update(int deltaT) {
-		
+		super.update(deltaT);
 	}
 
 }
