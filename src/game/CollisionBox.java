@@ -200,7 +200,7 @@ public abstract class CollisionBox extends Observable
 				newX = collisionPartnerX.x();
 				collision = true;
 				System.out.println("lock right left");
-			} else if (collisionPartnerX.isCollidingPartner(x, y, xSpeed, 0, xDistance, 0)) {
+			} else if (collisionPartnerX.isCollidingPartner(x, collisionPartnerX.y(), xSpeed, 0, xDistance, 0)) {
 				newXSpeed = collisionPartnerX.getNewXSpeed();
 				newX = collisionPartnerX.getNewX();
 				collision = true;
