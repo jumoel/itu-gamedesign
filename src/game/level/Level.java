@@ -278,6 +278,14 @@ public class Level extends CollisionLevel
 		gameElements.remove(e);
 	}
 	
+	public void removeAllPushBoxConstraints() {
+		Iterator<GameElement> cnos = gameElements.iterator();
+		while (cnos.hasNext()) {
+			GameElement currentCreature = cnos.next();
+			currentCreature.removePushConstraints();
+		}
+	}
+	
 	
 	private void loadXML()
 	{

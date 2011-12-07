@@ -123,6 +123,7 @@ public class PlayerView extends Updateable implements Observer
 	private void switchFinish() {
 		ownPlayer.unholdAnimation();
 		switchHappening = false;
+		level.removeAllPushBoxConstraints();
 	}
 	
 	

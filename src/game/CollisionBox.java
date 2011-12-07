@@ -59,6 +59,7 @@ public abstract class CollisionBox extends Observable
 	
 	protected boolean isBeingPushedRight = false;
 	protected boolean isBeingPushedLeft = false;
+	public void removePushConstraints() {isBeingPushedRight = isBeingPushedLeft = false;}
 	protected GameElement ourPushable; // something we can push
 	public void removePushable() {ourPushable = null;}
 	/**

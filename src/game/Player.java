@@ -420,7 +420,7 @@ public class Player extends GameElement
 			HashMap map = new HashMap();
 			map.put("IGOTGUMMED", myID);
 			this.notifyObservers(map);
-		} else if (unarmed && gameElement instanceof DreamSwitch) {
+		} else if (unarmed && gameElement instanceof DreamSwitch && ySpeed < 0) {
 			this.resetBouncePartner();
 			this.setChanged();
 			HashMap map = new HashMap();
