@@ -63,6 +63,16 @@ public class BubbleGunGum extends GameElement
 	public void update(int deltaT) {
 		super.update(deltaT);
 		if (processing.millis() - this.startTime > TIME_TO_LIVE) {
+			double dice = Math.random();
+			String sound;
+			if (dice < 0.3) {
+				sound = "123";
+			} else if (dice > 0.3) {
+				sound = "124";
+			} else {
+				sound = "125";
+			}
+			Stereophone.playSound(sound, "gum_plop", 100);
 			this.destroyed = true;
 		} else if (this.getBouncePartner() instanceof Player) {
 			this.destroyed = true;

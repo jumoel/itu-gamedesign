@@ -98,6 +98,15 @@ public class PlayerView extends Updateable implements Observer
 	private void switchPrepare() { 
 		switchHappening = true;
 		ownPlayer.holdAnimation();
+		if (level.dream == DreamStyle.GOOD) {
+			colorLayerColor[0] = 100;
+			colorLayerColor[1] = 100;
+			colorLayerColor[2] = 100;
+		} else {
+			colorLayerColor[0] = 135;
+			colorLayerColor[1] = 206;
+			colorLayerColor[2] = 250;
+		}
 		// getting the player y-Offset (distance above ground)
 	}
 	
@@ -336,7 +345,11 @@ public class PlayerView extends Updateable implements Observer
 		//}
 		
 		buffer.beginDraw();
-		buffer.background(255);
+		if (level.dream == DreamStyle.GOOD){
+			buffer.background(135,206,250);
+		} else {
+			buffer.background(100);
+		}
 		this.drawLevelBackground(buffer);
 		
 
@@ -475,7 +488,7 @@ public class PlayerView extends Updateable implements Observer
 		
 		if (drawOwnPlayer)
 		{
-			drawImage(ownPlayer.getCurrentTexture(), buffer, drawpxpos, drawpypos, Horizontal.LEFT, Vertical.BOTTOM);
+			//drawImage(ownPlayer.getCurrentTexture(), buffer, drawpxpos, drawpypos, Horizontal.LEFT, Vertical.BOTTOM);
 		}
 		
 		/*if (drawOtherPlayer)
@@ -643,8 +656,8 @@ public class PlayerView extends Updateable implements Observer
 		graphics.line(cameraSecondTileCoord, 0, cameraSecondTileCoord, graphics.height);
 		*/
 		
-		level.collisionDraw(graphics, 0, 0);
-		this.ownPlayer.collisionDraw(graphics, 0, 0);
+		//level.collisionDraw(graphics, 0, 0);
+		//this.ownPlayer.collisionDraw(graphics, 0, 0);
 		
 	}
 	
