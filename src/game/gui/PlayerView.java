@@ -429,7 +429,8 @@ public class PlayerView extends Updateable implements Observer
 				if (cameraOffsetX > 0) {
 					ownPlayer.cannotMoveLeft = true;
 				} else {
-					ownPlayer.cannotMoveRight = true;
+					this.setChanged();
+					this.notifyObservers("MAKEDOORSDISAPPEAR");
 				}
 			}
 		}
