@@ -406,7 +406,8 @@ public class Player extends GameElement
 			// player hit a creature
 			//((StandardCreature) gameElement).contact(this); creature is informed via collision box
 		} else if (gameElement instanceof Door 
-				&& !this.myTwin.tookTheDoor) { // only one twin can use the door
+				&& !this.myTwin.tookTheDoor
+				&& this.myTwin.x() > this.x()) { // only one twin can use the door
 			
 			this.setChanged();
 			HashMap map = new HashMap();
