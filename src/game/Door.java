@@ -15,6 +15,7 @@ public class Door extends CollisionBox
 	public Door(PApplet p, double x, double y, int w, int h)
 	{
 		super(x, y, w, h);
+		super.setCollisionEffect(Effects.NONE);
 		
 		xPos = (float)x;
 		yPos = (float)y;

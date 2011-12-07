@@ -359,7 +359,7 @@ public class Player extends GameElement
 	public void update(State state, int deltaT)
 	{
 		if (theWinner == -1) handleInput(state);
-		else xSpeed = 0;
+		//else xSpeed = 0;
 		
 		while ((level.getMetaDataAt((int)(xpos+0.2), (int)(ypos+1.5)) == Level.MetaTiles.OBSTACLE.index())
 				|| level.getMetaDataAt((int)(xpos+0.8), (int)(ypos+1.5)) == Level.MetaTiles.OBSTACLE.index()) {

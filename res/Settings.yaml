@@ -7,9 +7,9 @@ gameplay:
   jumpforce: 4.2
   moveacceleration:
     ground: 0.6
-    air: 0.2
+    air: 0.15
   breakacceleration:
-    ground: 1.5
+    ground: 1.4
     air: 0.5
   maxspeed: 2.0
   maxYspeed: 5.0
