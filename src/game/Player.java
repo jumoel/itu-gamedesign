@@ -508,5 +508,66 @@ public class Player extends GameElement
 		//System.out.println("draw player "+xpos+":"+ypos);
 		cb.rect((float)xpos*2, (float)ypos*2+yOff, (float)this.collisionBoxWidth()*2, (float)this.collisionBoxHeight()*2);
 	}
+	
+	public void deleteAllTheStuff()
+	{
+		if (walkAnimation != null)
+		{
+			walkAnimation.deleteAllTheStuff();
+			walkAnimation = null;
+		}
+		
+		if (jumpAnimation != null)
+		{
+			jumpAnimation.deleteAllTheStuff();
+			jumpAnimation = null;
+		}
+		
+		if (idleAnimation != null)
+		{
+			idleAnimation.deleteAllTheStuff();
+			idleAnimation = null;
+		}
+		
+		if (walkAnimationGun != null)
+		{
+			walkAnimationGun.deleteAllTheStuff();
+			walkAnimationGun = null;
+		}
+		
+		if (jumpAnimationGun != null)
+		{
+			jumpAnimationGun.deleteAllTheStuff();
+			jumpAnimationGun = null;
+		}
+		
+		if (idleAnimationGun != null)
+		{
+			idleAnimationGun.deleteAllTheStuff();
+			idleAnimationGun = null;
+		}
+		
+		if (winAnimation != null)
+		{
+			winAnimation.deleteAllTheStuff();
+			winAnimation = null;
+		}
+		
+		if (loseAnimation != null)
+		{
+			loseAnimation.deleteAllTheStuff();
+			loseAnimation = null;
+		}
+		
+		if (stuckToTheGroundAnimation != null)
+		{
+			stuckToTheGroundAnimation.deleteAllTheStuff();
+			stuckToTheGroundAnimation = null;
+		}
+		
+		myTwin = null;
+		
+		processing = null;
+	}
 
 }

@@ -113,4 +113,18 @@ public class Animation
 	public void unholdAnimation() {
 		this.holdAnimations = false; 
 	}
+	
+	public void deleteAllTheStuff()
+	{
+		if (sprites != null)
+		{
+			for (PImage sprite : sprites)
+			{
+				sprite.delete();
+			}
+			sprites = null;
+		}
+		
+		processing = null;
+	}
 }

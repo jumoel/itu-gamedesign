@@ -274,15 +274,18 @@ public class BunnyHat extends PApplet implements Observer
 			inputState.put('w', true);
 			inputState.put('i', true);
 		}
-		else {
+		else
+		{
 			inputState.put(key, true);
 		}
 		
 		if (key == 'd')
 		{
+			System.out.println("lol");
 			inputState.put('a', false);
 		}
-		else if (key == 'a')
+		
+		if (key == 'a')
 		{
 			inputState.put('d', false);
 		}
@@ -291,7 +294,8 @@ public class BunnyHat extends PApplet implements Observer
 		{
 			inputState.put('l', false);
 		}
-		else if (key == 'l')
+		
+		if (key == 'l')
 		{
 			inputState.put('j', false);
 		}
@@ -301,15 +305,48 @@ public class BunnyHat extends PApplet implements Observer
 			SHOW_FPS = !SHOW_FPS;
 		}
 		
-		if (key == 'q') {
-			gameMaster.stopGame();
+		if (key == 'g') {
 			currentView = Screens.MENU_MAIN;
+			gameMaster.stopGame();
+			this.deleteAllTheStuff();
 		}
-		// TODO ALT is not ideal: hindering other keys by changing their keyvalue
-		if (keyCode == ALT) {
+		
+		if (key == 's' || key == 'k') {
 			inputState.put('.', true);
 		}
 		
+	}
+	
+	public void deleteAllTheStuff()
+	{
+		if (view1 != null)
+		{
+			view1.deleteAllTheStuff();
+			view1 = null;
+		}
+		
+		if (view2 != null)
+		{
+			view2.deleteAllTheStuff();
+			view2 = null;
+		}
+		
+		if (view3 != null)
+		{
+			view3.deleteAllTheStuff();
+			view3 = null;
+		}
+		/*
+		if (player1 != null)
+		{
+			player1.deleteAllTheStuff();
+		}
+		
+		if (player2 != null)
+		{
+			player2.deleteAllTheStuff();
+		}
+		*/
 	}
 	
 	private void handleKeyMenuMain() {
@@ -321,7 +358,7 @@ public class BunnyHat extends PApplet implements Observer
 			}
 		} else {
 			switch (key) {
-				case 'q':
+				case 'g':
 					exit();
 					break;
 					
@@ -346,7 +383,7 @@ public class BunnyHat extends PApplet implements Observer
 				inputState.put('w', false);
 				inputState.put('i', false);
 			}
-			else if (keyCode == ALT) {
+			else if (keyCode == 's' || keyCode == 'k') {
 				inputState.put('.', false);
 			}
 			else

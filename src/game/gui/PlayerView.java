@@ -756,4 +756,25 @@ public class PlayerView extends Updateable implements Observer
 			}
 		}
 	}
+	
+	public void deleteAllTheStuff()
+	{
+		if (level != null)
+		{
+			level.deleteAllTheStuff();
+			level = null;
+		}
+		
+		if (badDream != null)
+		{
+			badDream.deleteAllTheStuff();
+			badDream = null;
+		}
+		
+		if (goodDream != null)
+		{
+			goodDream.deleteAllTheStuff();
+			goodDream = null;
+		}
+	}
 }

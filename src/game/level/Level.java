@@ -380,4 +380,34 @@ public class Level extends CollisionLevel
 			e.printStackTrace();
 		}
 	}
+	
+	public void deleteAllTheStuff()
+	{
+		if (tiles != null)
+		{
+			for (PImage tile : tiles)
+			{
+				tile.delete();
+				tile = null;
+			}
+			
+			tiles = null;
+		}
+		
+		if (bigPicture != null)
+		{
+			bigPicture.delete();
+			bigPicture = null;
+		}
+		
+		levelData = null;
+		levelDataForeground = null;
+		metaData = null;
+		
+		gameElements = null;
+		
+		twinDream = null;
+		
+		processing = null;
+	}
 }

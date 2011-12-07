@@ -87,6 +87,8 @@ public class GameMaster extends Observable implements Observer, Runnable
 	 */
 	public void stopGame() {
 		runGame = false;
+		//player1 = null;
+		//player2 = null;
 	}
 	
 	/**
