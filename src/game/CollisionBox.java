@@ -224,7 +224,7 @@ public abstract class CollisionBox extends Observable
 				if (pushRight) {
 					newX = ourPushable.getNewX() - this.collisionBoxWidth();
 				} else {
-					newX = ourPushable.getNewX() + ourPushable.collisionBoxWidth();
+					newX = ourPushable.getNewX() + ourPushable.collisionBoxWidth()-0.1;
 				}
 				//System.out.println("hmm, "+newX+ " vorher:"+x);
 				collision = true;
