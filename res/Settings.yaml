@@ -43,6 +43,11 @@ gui:
 graphics:
   animations:
     animationpath: animations/
+    buttonOn:
+      path: objects/doorappeartemp.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     doorShow:
       path: objects/doorappeartemp.png
       framewidth: 48
@@ -55,6 +60,21 @@ graphics:
       fps: 27
     doorBlow:
       path: objects/doordisappeartemp.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    noDoorShow:
+      path: objects/nodoorappear.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    noDoorStay:
+      path: objects/nodoor.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    noDoorBlow:
+      path: objects/nodoordisappear.png
       framewidth: 48
       frameheight: 72
       fps: 27
@@ -219,7 +239,7 @@ graphics:
       frameheight: 72
       fps: 27
     pushBox:
-      path: objects/pushbox.png
+      path: objects/rock.png
       framewidth: 72
       frameheight: 72
       fps: 27

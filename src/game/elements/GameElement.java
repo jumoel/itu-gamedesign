@@ -159,11 +159,13 @@ public abstract class GameElement extends CollisionBox
 		double yDiff = ypos - previous_ypos;
 		double xDiff = xpos - previous_xpos;
 		double maxDistance = 0.9;
-		if (Math.abs(yDiff)>=maxDistance) {
-			ypos = previous_ypos + maxDistance * Math.signum(yDiff);
-		}
-		if (Math.abs(xDiff)>=maxDistance) {
-			xpos = previous_xpos + maxDistance * Math.signum(xDiff);
+		if (Math.abs(yDiff)>=maxDistance || Math.abs(xDiff)>=maxDistance) {
+			if (Math.abs(yDiff)>=maxDistance) {
+				ypos = previous_ypos + maxDistance * Math.signum(yDiff);
+			}
+			if (Math.abs(xDiff)>=maxDistance) {
+				xpos = previous_xpos + maxDistance * Math.signum(xDiff);
+			}
 		}
 		
 

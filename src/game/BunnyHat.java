@@ -70,7 +70,7 @@ public class BunnyHat extends PApplet implements Observer
 	private int lastTimestamp;
 	private int currentTimestamp;
 	private int deltaT;
-	public double physicsTimeFactor = 1.0;
+	public static double physicsTimeFactor = 1.0;
 	
 	// statistics
 	private int lastFpsTime;

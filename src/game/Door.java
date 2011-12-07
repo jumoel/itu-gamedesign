@@ -8,8 +8,9 @@ public class Door extends CollisionBox
 
 	PApplet processing;
 	float xPos, yPos, width, height;
+	public boolean accessible = true;
 	
-	private Animation doorShow, doorStay, doorBlow;
+	private Animation doorShow, doorStay, doorBlow, noDoorShow, noDoorStay, noDoorBlow;
 	
 	
 	public Door(PApplet p, double x, double y, int w, int h)
@@ -29,6 +30,9 @@ public class Door extends CollisionBox
 		this.doorShow = new Animation(p, "graphics/animations/doorShow");
 		this.doorStay = new Animation(p, "graphics/animations/doorStay");
 		this.doorBlow = new Animation(p, "graphics/animations/doorBlow");
+		this.noDoorShow = new Animation(p, "graphics/animations/noDoorShow");
+		this.noDoorStay = new Animation(p, "graphics/animations/noDoorStay");
+		this.noDoorBlow = new Animation(p, "graphics/animations/doorBlow");
 		this.doorStay.start();
 	}
 	
@@ -46,32 +50,50 @@ public class Door extends CollisionBox
 		
 		if (doorShow.isRunning())
 		{
-			ret = doorShow.getCurrentImage(time);
+			if (accessible) {
+				ret = doorShow.getCurrentImage(time);
+			} else {
+				ret = noDoorShow.getCurrentImage(time);
+			}
 		}
 		else if (doorBlow.isRunning())
 		{
-			ret = doorBlow.getCurrentImage(time);
+			if (accessible) {
+				ret = doorBlow.getCurrentImage(time);
+			} else {
+				ret = noDoorBlow.getCurrentImage(time);
+			}
 		}
 		else
 		{
-			doorStay.start();
-			ret = doorStay.getCurrentImage(time);
+			if (accessible) {
+				doorStay.start();
+				ret = doorStay.getCurrentImage(time);
+			} else {
+				noDoorStay.start();
+				ret = noDoorStay.getCurrentImage(time);
+			}
 		}
 		
 		return ret;
 	}
 	
 	public void showDoor() {
-		doorShow.start(false);
+		doorShow.start(false, true);
 		doorBlow.stop();
 		doorStay.stop();
+		noDoorShow.start(false, true);
+		noDoorBlow.stop();
+		noDoorStay.stop();
 	}
 	
 	public void blowDoor() {
 		doorShow.stop();
 		doorStay.stop();
-		doorBlow.start(false);
-		
+		doorBlow.start(false, true);
+		noDoorShow.stop();
+		noDoorStay.stop();
+		noDoorBlow.start(false, true);
 	}
 
 	public void collisionDraw(PGraphics cb, int xOff, int yOff)

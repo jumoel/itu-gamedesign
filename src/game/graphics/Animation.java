@@ -20,6 +20,7 @@ public class Animation
 	
 	private boolean holdAnimations;
 	private int timeOnStop;
+	private boolean holdOnLastFrame;
 	
 	private boolean loop;
 	
@@ -33,13 +34,14 @@ public class Animation
 		int fps = BunnyHat.SETTINGS.getValue(settingskey + "/fps");
 		
 		this.processing = p;
-		this.millisPerFrame = 1000 / fps;
+		this.millisPerFrame = (int)(1000 / fps * BunnyHat.physicsTimeFactor);
 		
 		this.sprites = BunnyHat.ANIMATION_IMAGES.getSprites(settingskey);
 		this.numberOfFrames = sprites.length;
 		
 		this.isRunning = false;
 		this.holdAnimations = false;
+		this.holdOnLastFrame = false;
 	}
 	
 	public boolean isRunning()
@@ -54,11 +56,12 @@ public class Animation
 	
 	public void start()
 	{
-		this.start(true);
+		this.start(true, false);
 	}
 	
-	public void start(boolean loop) {
+	public void start(boolean loop, boolean holdOnLastPicture) {
 		this.loop = loop;
+		this.holdOnLastFrame = holdOnLastPicture;
 		this.isRunning = true;
 		this.startTime = processing.millis();
 	}
@@ -86,7 +89,7 @@ public class Animation
 			if (frame >= numberOfFrames)
 			{
 				frame = numberOfFrames -1;
-				//this.isRunning = false;
+				if (!this.holdOnLastFrame) this.isRunning = false;
 			}
 		} 
 		

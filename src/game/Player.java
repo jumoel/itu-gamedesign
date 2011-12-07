@@ -84,12 +84,12 @@ public class Player extends GameElement
 	
 	public void holdAnimation() {
 		
-		this.walkAnimation.holdAnimation();
+		/*this.walkAnimation.holdAnimation();
 		this.jumpAnimation.holdAnimation();
 		this.idleAnimation.holdAnimation();
 		this.walkAnimationGun.holdAnimation();
 		this.jumpAnimationGun.holdAnimation();
-		this.idleAnimationGun.holdAnimation();
+		this.idleAnimationGun.holdAnimation();*/
 	}
 	
 	public void unholdAnimation() {

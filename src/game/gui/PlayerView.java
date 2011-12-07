@@ -148,6 +148,9 @@ public class PlayerView extends Updateable implements Observer
 	private void prepareDoor() {
 		boolean closeBy = this.shouldBeCloseBy;
 		if (this.prepareDoor(closeBy)) {
+			
+			this.ownDoor.accessible = this.ownPlayer.x() < this.otherPlayer.x();
+			
 			this.setChanged();
 			HashMap map = new HashMap();
 			map.put("foundDoor", this.viewNumber);
