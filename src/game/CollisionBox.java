@@ -201,7 +201,7 @@ public abstract class CollisionBox extends Observable
 				collision = true;
 				System.out.println("lock right left");
 			} else if (collisionPartnerX.isCollidingPartner(x, collisionPartnerX.y(), xSpeed, 0, xDistance, 0)) {
-				newXSpeed = collisionPartnerX.getNewXSpeed();
+				newXSpeed = 0;//collisionPartnerX.getNewXSpeed();
 				newX = collisionPartnerX.getNewX();
 				collision = true;
 			}
@@ -219,7 +219,7 @@ public abstract class CollisionBox extends Observable
 				//ourPushable.updatePosition(cBox.x + ourPushable.collisionBoxWidth(), ourPushable.y());
 			}
 			if (ourPushable.isColliding(newBoxX, ourPushable.y(), xSpeed, 0, xDistance, 0, false)) {
-				newXSpeed = ourPushable.getNewXSpeed();
+				newXSpeed = 0;//ourPushable.getNewXSpeed();
 				
 				if (pushRight) {
 					newX = ourPushable.getNewX() - this.collisionBoxWidth();
