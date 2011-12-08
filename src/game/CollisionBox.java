@@ -23,6 +23,8 @@ import processing.core.PGraphics;
  */
 public abstract class CollisionBox extends Observable
 {
+	protected final static double BOUNCE_FORCE = BunnyHat.SETTINGS.getValue("gameplay/bounceforce");
+	
 	public enum Effects {STOP, BOUNCE, SLOW_DOWN, FINISH, NONE,
 		GOOD_SHEEP_BOUNCE, BAD_SHEEP_BOUNCE, BALL_BOUNCE, PUSH}
 	private Effects collisionEffect = Effects.STOP;
@@ -375,8 +377,8 @@ public abstract class CollisionBox extends Observable
 						case GOOD_SHEEP_BOUNCE:
 							if (gameElement instanceof Player) {
 								if (topOrBottomHit) {
-									newYSpeed = Math.abs(ySpeed) * 1.5;
-									newXSpeed = xSpeed * 1.5;
+									newYSpeed = BOUNCE_FORCE;
+									//newXSpeed = xSpeed * 1.5;
 									newY = collider.y() + collider.collisionBoxHeight();
 									double dice = Math.random();
 									Stereophone.playSound(dice > 0.5?"100":"101", "good_sheep_bounce", 1000);
@@ -385,7 +387,7 @@ public abstract class CollisionBox extends Observable
 							break;
 						case BAD_SHEEP_BOUNCE:
 							if (gameElement instanceof Player) {
-								newYSpeed = 3;
+								newYSpeed = BOUNCE_FORCE;
 								newXSpeed = -6;
 								double dice = Math.random();
 								Stereophone.playSound(dice > 0.5?"102":"103", "bad_sheep_bounce", 250);

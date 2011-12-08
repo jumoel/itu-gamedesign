@@ -226,16 +226,17 @@ public class Player extends GameElement
 		if (cannotMoveLeft)
 		{
 			xSpeed = 0;
+			xAcceleration = 0;
 			return;
 		}
 		
 		if (isInAir)
 		{
-			xSpeed -= MOVEACCEL_AIR;
+			xAcceleration = -MOVEACCEL_AIR;
 		}
 		else
 		{
-			xSpeed -= MOVEACCEL_GROUND;
+			xAcceleration = -MOVEACCEL_GROUND;
 		}
 	}
 	
@@ -249,16 +250,17 @@ public class Player extends GameElement
 		if (cannotMoveRight)
 		{
 			xSpeed = 0;
+			xAcceleration = 0;
 			return;
 		}
 		
 		if (isInAir)
 		{
-			xSpeed += MOVEACCEL_AIR;
+			xAcceleration = MOVEACCEL_AIR;
 		}
 		else
 		{
-			xSpeed += MOVEACCEL_GROUND;
+			xAcceleration = MOVEACCEL_GROUND;
 		}
 	}
 	
@@ -484,6 +486,10 @@ public class Player extends GameElement
 		{
 			moveRight();
 			
+		}
+		
+		if (!rightbutton && !leftbutton) {
+			xAcceleration = 0;
 		}
 		
 		if (downbutton)

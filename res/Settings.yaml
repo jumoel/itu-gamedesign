@@ -3,12 +3,12 @@ game:
 gameplay:
   deltatdivident: 100
   clamptozero: 0.001
-  gravity: -0.981
-  jumpforce: 4.2
-  bounceforce: 8.4
+  gravity: -1.0
+  jumpforce: 4.0
+  bounceforce: 6.0
   moveacceleration:
-    ground: 0.6
-    air: 0.15
+    ground: 3.0
+    air: 1.0
   breakacceleration:
     ground: 1.4
     air: 0.5
@@ -18,7 +18,7 @@ gameplay:
   gumspeed: 3.0
   gumstucktime: 7000
   pushspeedmax: 0.5
-  pushaccelerationfactor: 0.5  
+  pushaccelerationfactor: 0.5
 debug:
   fps: false
 gamerules:

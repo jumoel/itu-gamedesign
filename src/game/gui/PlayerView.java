@@ -429,7 +429,7 @@ public class PlayerView extends Updateable implements Observer
 		} else if (this.doorEnabled) {
 			this.cameraOffsetX = (int)(((ownDoor.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((ownDoor.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
-			if (Math.abs(cameraOffsetX) > (width-ownPlayer.collisionBoxWidth()*2)/2) {
+			if (Math.abs(cameraOffsetX) > (width-ownPlayer.collisionBoxWidth()*3)/2) {
 				if (cameraOffsetX > 0) {
 					ownPlayer.cannotMoveLeft = true;
 				} else {
@@ -439,11 +439,28 @@ public class PlayerView extends Updateable implements Observer
 			}
 		}
 		
-		// Place the player in the middle
+		//if (cameraOffsetFactor != 0) {
 		xCoordCameraMiddle = pxpos;
-		xCoordCamera = xCoordCameraMiddle - halfwidth + (int)(cameraOffsetX * cameraOffsetFactor);
-		//yCoordCameraMiddle = pypos;
-		//yCoordCamera = yCoordCameraMiddle - halfheight + (int)(cameraOffsetY * cameraOffsetFactor);
+		int xCoordCameraProposed = xCoordCameraMiddle - halfwidth + (int)(cameraOffsetX * cameraOffsetFactor);
+		//} else {
+		int minDistRight = width / 3;
+		int minDistLeft = width / 3;
+		if (pxpos > xCoordCamera + (width - minDistRight)) {
+			xCoordCamera = pxpos - (width - minDistRight);
+		} else if (pxpos < xCoordCamera + minDistLeft) {
+			xCoordCamera = pxpos - minDistLeft;
+		}
+		//smooth transition for camera pans
+		if (cameraOffsetFactor != 0) {
+			int xCoordCameraProposedDiff = xCoordCameraProposed - xCoordCamera;
+			xCoordCamera += xCoordCameraProposedDiff * cameraOffsetFactor;
+		}
+		
+		//}
+		
+			
+		yCoordCameraMiddle = pypos;
+		int yCoordCameraProposed = yCoordCameraMiddle - halfheight + (int)(cameraOffsetY * cameraOffsetFactor);
 		int minDistBottom = height/3;
 		int minDistTop = (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION);
 		if (pypos > yCoordCamera + (height-minDistTop)) {
@@ -451,11 +468,19 @@ public class PlayerView extends Updateable implements Observer
 		} else if (pypos < yCoordCamera + minDistBottom) {
 			yCoordCamera = pypos - minDistBottom;
 		}
+		//smooth transition for camera pans
+		if (cameraOffsetFactor != 0) {
+			int yCoordCameraProposedDiff = yCoordCameraProposed - yCoordCamera;
+			yCoordCamera += yCoordCameraProposedDiff * cameraOffsetFactor;
+		}
 		
 		drawpxpos = halfwidth - (int)(cameraOffsetX * cameraOffsetFactor)
 				- (int)(ownPlayer.collisionBoxWidth() * BunnyHat.TILEDIMENSION / 2);
 		drawpypos = halfheight - (int)(cameraOffsetY * cameraOffsetFactor)
 				- (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);
+		
+		
+		
 		
 		// nicer(? maybe.. well I hope so) camera y positioning
 		/*if (this.cameraCurrentY == 0) this.cameraCurrentY = this.yCoordCamera;

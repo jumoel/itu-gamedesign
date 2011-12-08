@@ -50,7 +50,7 @@ public abstract class GameElement extends CollisionBox
 	protected double xSpeed, ySpeed; 
 	public double getYSpeed() {return ySpeed;} public void setYSpeed(double speed) {ySpeed = speed;}
 	protected double xpos, ypos, previous_xpos, previous_ypos;
-	protected double yAcceleration;
+	protected double yAcceleration, xAcceleration;
 	protected boolean isInAir;
 	protected boolean hasMovedX = false;
 	public boolean cannotMoveLeft;
@@ -104,18 +104,20 @@ public abstract class GameElement extends CollisionBox
 			
 			double absXSpeed = Math.abs(xSpeed);
 			double breakAmount = 0;
-			if (isInAir)
-			{
-				breakAmount = BREAKACCEL_AIR * deltaFactor * breakAccelAirFactor;
-			}
-			else
-			{
-				breakAmount = BREAKACCEL_GROUND * deltaFactor * breakAccelGroundFactor;
-			}
-			if (absXSpeed > breakAmount) {
-				xSpeed = (absXSpeed - breakAmount) * xSignum;
-			} else {
-				xSpeed = 0.0;
+			if (xAcceleration == 0) {
+				if (isInAir)
+				{
+					breakAmount = BREAKACCEL_AIR * deltaFactor * breakAccelAirFactor;
+				}
+				else
+				{
+					breakAmount = BREAKACCEL_GROUND * deltaFactor * breakAccelGroundFactor;
+				}
+				if (absXSpeed > breakAmount) {
+					xSpeed = (absXSpeed - breakAmount) * xSignum;
+				} else {
+					xSpeed = 0.0;
+				}
 			}
 			
 			if (this.ourPushable == null) {
@@ -129,18 +131,22 @@ public abstract class GameElement extends CollisionBox
 			xSpeed = 0;
 		}
 		
-		xpos = xpos + xSpeed * deltaFactor * (this.ourPushable == null ? 1 : this.PUSH_ACCEL_FACTOR);
 		
+		xpos += xSpeed * deltaFactor * (this.ourPushable == null ? 1 : this.PUSH_ACCEL_FACTOR)
+				+ 0.5 * xAcceleration*Math.pow(deltaFactor, 2);
+		xSpeed += xAcceleration * deltaFactor;
 		
 		
 		
 		yAcceleration = GRAVITY * gravityFactor;
 		
+		ypos += ySpeed * deltaFactor + 0.5*yAcceleration*Math.pow(deltaFactor, 2);// + yAcceleration;
 		ySpeed += yAcceleration * deltaFactor;
+		
 		double ySignum = Math.signum(ySpeed);
 		ySpeed = BMath.clamp(ySpeed, 0, ySignum * MAX_Y_SPEED);
 		
-		ypos += ySpeed * deltaFactor;// + yAcceleration;
+		
 		
 		
 		
