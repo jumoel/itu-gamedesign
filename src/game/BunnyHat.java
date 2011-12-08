@@ -453,6 +453,8 @@ public class BunnyHat extends PApplet implements Observer
 		switcher.addObserver(view2);
 		view1.addObserver(switcher);
 		view2.addObserver(switcher);
+		view1.addObserver(gameMaster);
+		view2.addObserver(gameMaster);
 		
 		//switcher.addObserver(view1);
 		//switcher.addObserver(view2);

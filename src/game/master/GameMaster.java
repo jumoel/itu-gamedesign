@@ -256,7 +256,12 @@ public class GameMaster extends Observable implements Observer, Runnable
 					this.msTillNextSwitch = 0;  // would we?
 				}
 			}
-		} 
+		} else if (arg1 instanceof String) {
+			String msg = (String)arg1;
+			if (msg == "MAKEDOORSDISAPPEAR") {
+				this.msTillDoorsEnd = 0;
+			}
+		}
 		
 	}
 	

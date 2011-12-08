@@ -14,7 +14,7 @@ public class PushBox extends GameElement
 	
 	public PushBox(double x, double y, PApplet p)
 	{
-		super(x, y, 3, 3);
+		super(x, y, 3, 2.8);
 		this.setCollisionEffect(Effects.PUSH);
 		
 		processing = p;

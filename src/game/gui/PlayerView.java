@@ -64,6 +64,7 @@ public class PlayerView extends Updateable implements Observer
 	protected int cameraOffsetX = 0;
 	protected int cameraOffsetY = 0;
 	protected double cameraOffsetFactor = 0.0;
+	protected int cameraCurrentY = 0;
 	
 	private int levelLength;
 	
@@ -428,7 +429,7 @@ public class PlayerView extends Updateable implements Observer
 		} else if (this.doorEnabled) {
 			this.cameraOffsetX = (int)(((ownDoor.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((ownDoor.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
-			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth()*2)/2) {
+			if (Math.abs(cameraOffsetX) > (width-ownPlayer.collisionBoxWidth()*2)/2) {
 				if (cameraOffsetX > 0) {
 					ownPlayer.cannotMoveLeft = true;
 				} else {
@@ -448,6 +449,9 @@ public class PlayerView extends Updateable implements Observer
 				- (int)(ownPlayer.collisionBoxWidth() * BunnyHat.TILEDIMENSION / 2);
 		drawpypos = halfheight - (int)(cameraOffsetY * cameraOffsetFactor)
 				- (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);
+		
+		// if high up in the level, the character should be closer to the
+		
 		
 		if (xCoordCamera < 0)
 		{

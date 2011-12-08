@@ -379,11 +379,6 @@ public class AmazingSwitchWitch extends Observable implements Observer, Runnable
 						break;
 				}
 			} 
-		} else if (arg instanceof String) {
-			String msg = (String)arg; 
-			if (msg == "MAKEDOORSDISAPPEAR") {
-				shouldSwitchPlayerBack = true;
-			}
 		}
 	}
 

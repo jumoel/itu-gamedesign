@@ -5,6 +5,7 @@ gameplay:
   clamptozero: 0.001
   gravity: -0.981
   jumpforce: 4.2
+  bounceforce: 8.4
   moveacceleration:
     ground: 0.6
     air: 0.15
