@@ -13,10 +13,11 @@ public class BadSheep extends CrossingGameElement
 	private PApplet processing;
 	private GoodSheep goodTwin;
 	
+	
 	public BadSheep(double x, double y, double width, double height, 
 			PApplet processing, GoodSheep twinElement)
 	{
-		super(x, y, width, height, twinElement);
+		super(x, y, width, height, processing, twinElement);
 		super.setCollisionEffect(Effects.BAD_SHEEP_BOUNCE);
 		this.processing = processing;
 		this.badSheepAnimation = new Animation(processing, "graphics/animations/badSheep");

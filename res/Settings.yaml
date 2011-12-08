@@ -19,6 +19,7 @@ gameplay:
   gumstucktime: 7000
   pushspeedmax: 0.5
   pushaccelerationfactor: 0.5
+  dreamswitchbuttoncooldown: 5000
 debug:
   fps: false
 gamerules:
@@ -220,24 +221,24 @@ graphics:
       frameheight: 72
       fps: 27
     dreamSwitch:
-      path: objects/dreamswitch.png
-      framewidth: 72
+      path: objects/buttonon.png
+      framewidth: 48
       frameheight: 24
       fps: 27
-    dreamSwitchPushed:
-      path: objects/dreamswitchpushed.png
-      framewidth: 72
-      frameheight: 72
+    dreamSwitchPress:
+      path: objects/buttonpress.png
+      framewidth: 48
+      frameheight: 24
       fps: 27
     dreamSwitchAlarm:
-      path: objects/dreamswitchalarm.png
-      framewidth: 72
-      frameheight: 72
+      path: objects/buttonalarm.png
+      framewidth: 48
+      frameheight: 24
       fps: 27
-    dreamSwitchInactive:
-      path: objects/dreamswitchinactive.png
-      framewidth: 72
-      frameheight: 72
+    dreamSwitchOff:
+      path: objects/buttonoff.png
+      framewidth: 48
+      frameheight: 24
       fps: 27
     pushBox:
       path: objects/rock.png

@@ -21,7 +21,7 @@ public class BubbleGunGum extends GameElement
 	public BubbleGunGum(double x, double y, double xSpeed, double ySpeed, 
 			PApplet processing, BallColor ballColor)
 	{
-		super(x, y, 7/24.0, 7/24.0);
+		super(x, y, 7/24.0, 7/24.0, processing);
 		super.setCollisionEffect(Effects.BALL_BOUNCE);
 		super.setGameElement(this);
 		

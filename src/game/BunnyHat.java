@@ -62,7 +62,7 @@ public class BunnyHat extends PApplet implements Observer
 	private RaceIndicator indicator;
 	private SoundControl sndCtrl;
 	private Stereophone sndOut;
-	private GameMaster gameMaster;
+	private static GameMaster gameMaster; public static GameMaster getGameMaster() {return gameMaster;} 
 	private AmazingSwitchWitch switcher;
 
 	private State inputState;
@@ -181,6 +181,9 @@ public class BunnyHat extends PApplet implements Observer
 		
 		deltaT = currentTimestamp - lastTimestamp;
 		if (deltaT==0) deltaT=10;
+		if(deltaT > 84) {
+			System.out.println("high deltaT: "+ deltaT);
+		}
 		
 		switch (currentView) {
 		case INTRO:
@@ -265,23 +268,9 @@ public class BunnyHat extends PApplet implements Observer
 	}
 	
 	private void handleKeyGame() {
-		if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i'))
-		{
-			//nothing for the moment
-		}
-		else if (TWIN_JUMP_SPACEBAR && key == ' ')
-		{
-			inputState.put('w', true);
-			inputState.put('i', true);
-		}
-		else
-		{
-			inputState.put(key, true);
-		}
 		
 		if (key == 'd')
 		{
-			System.out.println("lol");
 			inputState.put('a', false);
 		}
 		
@@ -315,6 +304,19 @@ public class BunnyHat extends PApplet implements Observer
 			inputState.put('.', true);
 		}
 		
+		if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i'))
+		{
+			//nothing for the moment
+		}
+		else if (TWIN_JUMP_SPACEBAR && key == ' ')
+		{
+			inputState.put('w', true);
+			inputState.put('i', true);
+		}
+		else
+		{
+			inputState.put(key, true);
+		}
 	}
 	
 	public void deleteAllTheStuff()

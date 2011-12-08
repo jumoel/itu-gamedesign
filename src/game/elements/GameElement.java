@@ -40,6 +40,7 @@ public abstract class GameElement extends CollisionBox
 	private static double PUSH_ACCEL_FACTOR = BunnyHat.SETTINGS.getValue("gameplay/pushaccelerationfactor");
 
 	protected Facing facing;
+	protected PApplet processing;
 	
 	// information for Level and ColisionLevel
 	public boolean destroyed = false; 
@@ -66,8 +67,9 @@ public abstract class GameElement extends CollisionBox
 		this.updatePosition(x, y);
 	}
 	
-	public GameElement(double x, double y, double width, double height){
+	public GameElement(double x, double y, double width, double height, PApplet processing){
 		super(x, y, width, height);
+		this.processing = processing;
 		this.xpos = x;
 		this.ypos = y;
 		this.xSpeed = 0.0;
@@ -132,6 +134,7 @@ public abstract class GameElement extends CollisionBox
 		}
 		
 		
+		// new xpos, xSpeed
 		xpos += xSpeed * deltaFactor * (this.ourPushable == null ? 1 : this.PUSH_ACCEL_FACTOR)
 				+ 0.5 * xAcceleration*Math.pow(deltaFactor, 2);
 		xSpeed += xAcceleration * deltaFactor;
@@ -140,6 +143,7 @@ public abstract class GameElement extends CollisionBox
 		
 		yAcceleration = GRAVITY * gravityFactor;
 		
+		// new ypos, ySpeed
 		ypos += ySpeed * deltaFactor + 0.5*yAcceleration*Math.pow(deltaFactor, 2);// + yAcceleration;
 		ySpeed += yAcceleration * deltaFactor;
 		
@@ -148,45 +152,42 @@ public abstract class GameElement extends CollisionBox
 		
 		
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		if(deltaT > 84) {
-			//System.out.println("high deltaT: "+ deltaT);
-		}
-		
 		//make sure, ypos and xpos did not travel to far for one frame 
 		// once they travel too far, they can cross a collision box  - and we surely do not want that!
+		// but we have a better idea: how about scanning stepwise the whole way & stop once we encounter
+		// any collision?
+		int numCollisionScanSteps = 1;
 		double yDiff = ypos - previous_ypos;
 		double xDiff = xpos - previous_xpos;
-		double maxDistance = 0.9;
+		double collisionScanStepDistanceX = xDiff;
+		double collisionScanStepDistanceY = yDiff;
+		double maxDistance = 0.8;
 		if (Math.abs(yDiff)>=maxDistance || Math.abs(xDiff)>=maxDistance) {
-			if (Math.abs(yDiff)>=maxDistance) {
-				ypos = previous_ypos + maxDistance * Math.signum(yDiff);
+			if (Math.abs(yDiff) > Math.abs(xDiff)) {
+				numCollisionScanSteps = (int)Math.ceil(Math.abs(yDiff) / maxDistance);  
+			} else {
+				numCollisionScanSteps = (int)Math.ceil(Math.abs(xDiff) / maxDistance);
 			}
-			if (Math.abs(xDiff)>=maxDistance) {
-				xpos = previous_xpos + maxDistance * Math.signum(xDiff);
-			}
+			
+			
+			collisionScanStepDistanceX = xDiff / numCollisionScanSteps;
+			collisionScanStepDistanceY = yDiff / numCollisionScanSteps;
+			
 		}
 		
-
 		
-		if (this.isColliding(xpos, ypos, xSpeed, ySpeed)) {
-			xpos = this.getNewX(); ypos = this.getNewY();
-			xSpeed = this.getNewXSpeed(); ySpeed = this.getNewYSpeed();
-			if (ySpeed == 0) {
-				isInAir = false;
-			}
-			
-			
-			
-
-		} 
+		// stepwise scan for collision
+		for (int i = 1; i <= numCollisionScanSteps; i++) {
+			if (this.isColliding(previous_xpos + collisionScanStepDistanceX*i, 
+					previous_ypos + collisionScanStepDistanceY*i, xSpeed, ySpeed)) {
+				xpos = this.getNewX(); ypos = this.getNewY();
+				xSpeed = this.getNewXSpeed(); ySpeed = this.getNewYSpeed();
+				if (ySpeed == 0) {
+					isInAir = false;
+				}
+				break;
+			} 
+		}
 		
 		if (ySpeed != 0) isInAir = true;
 		

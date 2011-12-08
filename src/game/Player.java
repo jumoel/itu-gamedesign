@@ -108,7 +108,7 @@ public class Player extends GameElement
 	
 	public Player(PApplet applet, int playerNumber, Level level)
 	{
-		super(level.spawnX + 0.5, level.spawnY + 0.5, 2, 3);
+		super(level.spawnX + 0.5, level.spawnY + 0.5, 2, 3, applet);
 		super.setLevel(level);
 		super.setGameElement(this);
 		this.isAbleToPush = true; // hardcore pusher!
@@ -423,7 +423,8 @@ public class Player extends GameElement
 			HashMap map = new HashMap();
 			map.put("IGOTGUMMED", myID);
 			this.notifyObservers(map);
-		} else if (unarmed && gameElement instanceof DreamSwitch && ySpeed < 0) {
+		} else if (unarmed && gameElement instanceof DreamSwitch 
+				&& ySpeed < 0 && ((DreamSwitch)gameElement).usable) {
 			this.resetBouncePartner();
 			this.setChanged();
 			HashMap map = new HashMap();

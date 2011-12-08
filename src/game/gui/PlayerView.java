@@ -426,6 +426,10 @@ public class PlayerView extends Updateable implements Observer
 					ownPlayer.cannotMoveRight = true;
 				}
 			}
+			if (Math.abs(cameraOffsetY) > (height-ownPlayer.collisionBoxHeight()*3)/2) {
+				this.setChanged();
+				this.notifyObservers("MAKEDOORSDISAPPEAR");
+			}
 		} else if (this.doorEnabled) {
 			this.cameraOffsetX = (int)(((ownDoor.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((ownDoor.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);

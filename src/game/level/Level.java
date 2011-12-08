@@ -142,6 +142,7 @@ public class Level extends CollisionLevel
 					}
 				} else if (currentMetaTile == MetaTiles.DREAMSWITCH.index()) {
 					DreamSwitch dreamSwitch = new DreamSwitch(x, y-1, processing);
+					BunnyHat.getGameMaster().addObserver(dreamSwitch);
 					this.addElement(dreamSwitch);
 				} else if (currentMetaTile == MetaTiles.PUSHBOX.index()) {
 					PushBox pushBox = new PushBox(x, y-1, processing);

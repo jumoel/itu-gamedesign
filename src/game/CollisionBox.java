@@ -59,8 +59,8 @@ public abstract class CollisionBox extends Observable
 	// if we have crossing elements, we are interested in their collision too
 	protected GameElement collisionPartnerX, collisionPartnerY;
 	
-	protected boolean isBeingPushedRight = false;
-	protected boolean isBeingPushedLeft = false;
+	public boolean isBeingPushedRight = false;
+	public boolean isBeingPushedLeft = false;
 	public void removePushConstraints() {isBeingPushedRight = isBeingPushedLeft = false;}
 	protected GameElement ourPushable; // something we can push
 	public void removePushable() {ourPushable = null;}
@@ -69,6 +69,13 @@ public abstract class CollisionBox extends Observable
 	 */
 	private Line2D.Double collisionGroundPath;
 	private CollisionBox collisionGroundPathSource;
+	
+	protected void setCollisionBox(double x, double y, double width, double height) {
+		cBox = new Rectangle2D.Double(x, y, width, height);
+	}
+	protected void changeCollisionBoxHeight(double newHeight) {
+		cBox = new Rectangle2D.Double(cBox.x, cBox.y, cBox.width, newHeight);
+	}
 	
 	/**
 	 * collision box for this object
@@ -359,12 +366,14 @@ public abstract class CollisionBox extends Observable
 							- (collider.y() + this.collisionBoxHeight()/2);
 					boolean topOrBottomHit = (Math.abs(yDiff) >=Math.abs(xDiff));
 					boolean rightHit = xDiff < 0;
-					boolean topHit = yDiff > 0;
+					boolean topHit = yDiff < 0;
 					switch (collider.getCollisionEffect()) {
 						case BOUNCE:
 							if (topOrBottomHit) {
-								newYSpeed = -ySpeed;
-								newY = collider.y() + collider.collisionBoxHeight();
+								
+									newYSpeed = this.BOUNCE_FORCE;
+									newY = collider.y() + collider.collisionBoxHeight();
+								
 							} else {
 								/*newXSpeed = -xSpeed;
 								if (rightHit) {
@@ -411,7 +420,7 @@ public abstract class CollisionBox extends Observable
 							}
 						case STOP:
 							if (topOrBottomHit) {
-								if (!topHit) {
+								if (topHit) {
 									newYSpeed = 0.0;
 									newY = collider.y() - cBox.height;
 								} else {

@@ -33,7 +33,7 @@ public class StandardCreature extends GameElement
 
 	public StandardCreature(PApplet applet, int creatureNumber, int effect, Level level)
 	{
-		super(10, 10, 2, 3);
+		super(10, 10, 2, 3, applet);
 		super.setLevel(level);
 		super.setGameElement(this);
 		
