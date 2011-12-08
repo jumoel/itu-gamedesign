@@ -417,7 +417,7 @@ public class PlayerView extends Updateable implements Observer
 			//System.out.println("derandere!");
 			this.cameraOffsetX = (int)(((otherPlayer.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((otherPlayer.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
-			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth()*2)/2) {
+			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth()*3)/2) {
 				if (otherPlayer.x() > ownPlayer.x()) {
 					otherPlayer.cannotMoveRight = true;
 					ownPlayer.cannotMoveLeft = true;
@@ -442,15 +442,30 @@ public class PlayerView extends Updateable implements Observer
 		// Place the player in the middle
 		xCoordCameraMiddle = pxpos;
 		xCoordCamera = xCoordCameraMiddle - halfwidth + (int)(cameraOffsetX * cameraOffsetFactor);
-		yCoordCameraMiddle = pypos;
-		yCoordCamera = yCoordCameraMiddle - halfheight + (int)(cameraOffsetY * cameraOffsetFactor);
+		//yCoordCameraMiddle = pypos;
+		//yCoordCamera = yCoordCameraMiddle - halfheight + (int)(cameraOffsetY * cameraOffsetFactor);
+		int minDistBottom = height/3;
+		int minDistTop = (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION);
+		if (pypos > yCoordCamera + (height-minDistTop)) {
+			yCoordCamera = pypos - (height-minDistTop);
+		} else if (pypos < yCoordCamera + minDistBottom) {
+			yCoordCamera = pypos - minDistBottom;
+		}
 		
 		drawpxpos = halfwidth - (int)(cameraOffsetX * cameraOffsetFactor)
 				- (int)(ownPlayer.collisionBoxWidth() * BunnyHat.TILEDIMENSION / 2);
 		drawpypos = halfheight - (int)(cameraOffsetY * cameraOffsetFactor)
 				- (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);
 		
-		// if high up in the level, the character should be closer to the
+		// nicer(? maybe.. well I hope so) camera y positioning
+		/*if (this.cameraCurrentY == 0) this.cameraCurrentY = this.yCoordCamera;
+		if (this.yCoordCamera > this.cameraCurrentY + height/4) {
+			this.cameraCurrentY = this.yCoordCamera + height/4;
+		} else if (this.yCoordCamera < this.cameraCurrentY - height/4) {
+			this.cameraCurrentY = this.yCoordCamera - height/4;
+		} else {
+			this.yCoordCamera = this.cameraCurrentY;
+		}*/
 		
 		
 		if (xCoordCamera < 0)
@@ -561,10 +576,10 @@ public class PlayerView extends Updateable implements Observer
 	{
 		ArrayList backgrounds = level.dream == DreamStyle.GOOD ? this.goodBackgroundImages : this.badBackgroundImages;
 		for (int i = 0; i < backgrounds.size(); i++) {
-			PImage image = (PImage)backgrounds.get(i);
+			PImage image = ((PImage)backgrounds.get(i));
 			int x = 0;
 			int y = 0;
-			graphics.image(image, x, y);
+			graphics.copy(image, x, y, width, height, 0, 0, width, height);
 		}
 	}
 
