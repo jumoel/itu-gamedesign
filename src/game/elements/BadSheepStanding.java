@@ -8,23 +8,24 @@ import processing.core.PApplet;
 import processing.core.PGraphics;
 import processing.core.PImage;
 
-public class GoodSheepStanding extends GameElement
+public class BadSheepStanding extends GameElement
 {
 	private Animation sheepAnimation;
 	private int timeTillNextSound = 0;
-	private String[] sounds = {"131", "132", "133", "134", "135", 
-			                   "136", "137", "138", "139", "140",
-			                   "141", "142", "143"};
+	private String[] sounds = {"145", "146", "147", "148", "149", 
+			                   "150", "151", "152", "153", "154",
+			                   "155", "156", "157", "158", "159",
+			                   "160", "161", "162", "163", "164"};
 	
 	
-	public GoodSheepStanding(double x, double y, PApplet processing)
+	public BadSheepStanding(double x, double y, PApplet processing)
 	{
 		super(x, y, 3, 3, processing);
 		this.processing = processing;
-		this.setCollisionEffect(Effects.GOOD_SHEEP_BOUNCE);
+		this.setCollisionEffect(Effects.BAD_SHEEP_BOUNCE);
 		
-		sheepAnimation = new Animation(processing, "graphics/animations/goodSheepStanding");
-		sheepAnimation.start();
+		sheepAnimation = new Animation(processing, "graphics/animations/badSheepStanding");
+		sheepAnimation.start(false, true);
 		timeTillNextSound = GameMaster.getNewTimeTillNextAction(5000, 0.7);
 	}
 
@@ -49,7 +50,9 @@ public class GoodSheepStanding extends GameElement
 		if (this.timeTillNextSound < 0) {
 			double dice = Math.random();
 			String soundToPlay = sounds[(int)(dice * sounds.length)];
-			Stereophone.playSound(soundToPlay, "good sheep standing", 300);
+			if (true) {
+				Stereophone.playSound(soundToPlay, "bad sheep standing", 300);
+			}
 			this.timeTillNextSound = GameMaster.getNewTimeTillNextAction(5000, 0.7);
 		} else {
 			this.timeTillNextSound -= deltaT;

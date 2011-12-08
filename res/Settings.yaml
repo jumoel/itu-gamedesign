@@ -5,13 +5,13 @@ gameplay:
   clamptozero: 0.001
   gravity: -1.0
   jumpforce: 4.0
-  bounceforce: 6.0
+  bounceforce: 5.0
   moveacceleration:
     ground: 3.0
-    air: 1.0
+    air: 1.5
   breakacceleration:
     ground: 1.4
-    air: 0.5
+    air: 0.1
   maxspeed: 2.0
   maxYspeed: 5.0
   maxXspeed: 5.0
@@ -140,6 +140,11 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+    player1push:
+      path: dreampush.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     player2run:
       path: dreamrungirlevensmaller48x72.png
       framewidth: 48
@@ -190,6 +195,11 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+    player2push:
+      path: dreamgirlpush.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     goodSheep:
       path: creatures/sheep.png
       framewidth: 72
@@ -217,6 +227,16 @@ graphics:
       fps: 27
     badSheepMoveMouth:
       path: creatures/sheepmovemouth.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    goodSheepStanding:
+      path: creatures/sheepstand.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    badSheepStanding:
+      path: creatures/badsheepstand.png
       framewidth: 72
       frameheight: 72
       fps: 27

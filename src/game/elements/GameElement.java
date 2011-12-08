@@ -60,8 +60,13 @@ public abstract class GameElement extends CollisionBox
 	protected double breakAccelAirFactor = 1.0;
 	protected double breakAccelGroundFactor = 1.0;
 	
-	public void setPos(double x, double y) {
+	public void movePos(double x, double y) {
 		this.hasMovedX = (this.xpos != x);
+		setPos(x, y);
+	}
+	
+	public void setPos(double x, double y) {
+		
 		this.xpos = x;
 		this.ypos = y;
 		this.updatePosition(x, y);
@@ -136,7 +141,7 @@ public abstract class GameElement extends CollisionBox
 		
 		// new xpos, xSpeed
 		xpos += xSpeed * deltaFactor * (this.ourPushable == null ? 1 : this.PUSH_ACCEL_FACTOR)
-				+ 0.5 * xAcceleration*Math.pow(deltaFactor, 2);
+				+ 0.5 * xAcceleration*(this.ourPushable == null ? 1 : this.PUSH_ACCEL_FACTOR)*Math.pow(deltaFactor, 2);
 		xSpeed += xAcceleration * deltaFactor;
 		
 		
@@ -201,16 +206,21 @@ public abstract class GameElement extends CollisionBox
 		// update the position of the characters collision box
 		this.updatePosition(xpos, ypos);
 		// update pushable position
-		this.hasMovedX = (previous_xpos != xpos);
+		this.hasMovedX = (previous_xpos != xpos) || hasMovedX;
 		
 		if (ourPushable != null) {
-			
-			
-			this.ourPushable.hasMovedX = true;
-			this.ourPushable.setPos(pushRight?xpos + collisionBoxWidth():xpos-ourPushable.collisionBoxWidth(), 
+			this.ourPushable.movePos(pushRight?xpos + collisionBoxWidth():xpos-ourPushable.collisionBoxWidth(),
 					ourPushable.y());
-			
-		}  
+		}
+		
+		if (collisionPartnerX != null && hasMovedX) {
+			((GameElement) collisionPartnerX).setPos(xpos, collisionPartnerX.y());
+			hasMovedX = false;
+		}
+		
+		if (collisionPartnerY != null) {
+			((GameElement) collisionPartnerY).setPos(collisionPartnerY.x(), ypos);
+		}
 	}
 		
 

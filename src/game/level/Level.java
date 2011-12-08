@@ -11,10 +11,12 @@ import game.BunnyHat;
 import game.CollisionBox;
 import game.Player;
 import game.elements.BadSheep;
+import game.elements.BadSheepStanding;
 import game.elements.BubbleGunGum;
 import game.elements.DreamSwitch;
 import game.elements.GameElement;
 import game.elements.GoodSheep;
+import game.elements.GoodSheepStanding;
 import game.elements.PushBox;
 import processing.core.*;
 import util.BImage;
@@ -151,6 +153,14 @@ public class Level extends CollisionLevel
 					twinDream.addElement(pushBoxOther);
 					pushBox.setBoxTwin(pushBoxOther);
 					pushBoxOther.setBoxTwin(pushBox);
+				} else if (currentMetaTile == MetaTiles.NORMALSHEEP.index()) {
+					if (dream == DreamStyle.GOOD) {
+						GoodSheepStanding sheep = new GoodSheepStanding(x, y-1, processing);
+						this.addElement(sheep);
+					} else {
+						BadSheepStanding sheep = new BadSheepStanding(x, y-1, processing);
+						this.addElement(sheep);
+					}
 				}
 			}
 		}
@@ -232,16 +242,6 @@ public class Level extends CollisionLevel
 				currentCreature.update(deltaT);
 			}
 		}
-		
-		// sort once, get elements with high zIndex further to the front
-		// sorting once is enough, to get e.g. one player to the front
-		for (int i = 1; i < gameElements.size(); i++) {
-			if (gameElements.get(i-1).zIndex > gameElements.get(i).zIndex) {
-				GameElement element = gameElements.get(i);
-				gameElements.set(i, gameElements.get(i-1));
-				gameElements.set(i-1, element);
-			}
-		}
 	}
 	
 	public void drawCreaturesAndObjects(int x, int y, int width, int height, PGraphics graphics) {
@@ -273,6 +273,15 @@ public class Level extends CollisionLevel
 	public void addElement(GameElement e) {
 		e.setLevel(this);
 		gameElements.add(e);
+		// sort once, get elements with high zIndex further to the front
+		// sorting once is enough, to get e.g. one player to the front
+		for (int i = 1; i < gameElements.size(); i++) {
+			if (gameElements.get(i-1).zIndex > gameElements.get(i).zIndex) {
+				GameElement element = gameElements.get(i);
+				gameElements.set(i, gameElements.get(i-1));
+				gameElements.set(i-1, element);
+			}
+		}
 	}
 	
 	public void removeElement(GameElement e) {

@@ -51,6 +51,7 @@ public class Player extends GameElement
 	private Animation winAnimation;
 	private Animation loseAnimation;
 	private Animation stuckToTheGroundAnimation;
+	private Animation pushAnimation;
 	
 	private Level level;
 	private Player myTwin; public void setTwin(Player twin) {myTwin=twin;}
@@ -159,27 +160,47 @@ public class Player extends GameElement
 		this.winAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "win");
 		this.loseAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "lose");
 		this.stuckToTheGroundAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "stuck");
+		this.pushAnimation = new Animation(processing, "graphics/animations/player" + playerNumber + "push");
 		
 		this.idleAnimation.start();
 		
 		this.facing = Facing.RIGHT;
 	}
 	
+	private void startAnimation(Animation anim) {
+		anim.start();
+		if (anim != walkAnimation) this.walkAnimation.stop();
+		if (anim != idleAnimation) this.idleAnimation.stop();
+		if (anim != jumpAnimation) this.jumpAnimation.stop();
+		if (anim != walkAnimationGun) this.walkAnimationGun.stop();
+		if (anim != idleAnimationGun) this.idleAnimationGun.stop();
+		if (anim != jumpAnimationGun) this.jumpAnimationGun.stop();
+		if (anim != winAnimation) this.winAnimation.stop();
+		if (anim != loseAnimation) this.loseAnimation.stop();
+		if (anim != stuckToTheGroundAnimation) this.stuckToTheGroundAnimation.stop();
+		if (anim != pushAnimation) this.pushAnimation.stop();
+	}
+	
+	
+	
 	// Return the current texture (ie. specific animation sprite)
 	public PImage getCurrentTexture()
 	{
 		PImage ret;
 		int time = processing.millis();
+	
 		
-		if (jumpAnimation.isRunning())
+		if (pushAnimation.isRunning()) {
+			ret = pushAnimation.getCurrentImage(time);
+		}else if (jumpAnimation.isRunning() || jumpAnimationGun.isRunning())
 		{
 			ret = unarmed?jumpAnimation.getCurrentImage(time):jumpAnimationGun.getCurrentImage(time);
 		}
-		else if (walkAnimation.isRunning())
+		else if (walkAnimation.isRunning() || walkAnimationGun.isRunning())
 		{
 			ret = unarmed?walkAnimation.getCurrentImage(time):walkAnimationGun.getCurrentImage(time);
 		}
-		else if (idleAnimation.isRunning())
+		else if (idleAnimation.isRunning() || idleAnimationGun.isRunning())
 		{
 			ret = unarmed?idleAnimation.getCurrentImage(time):idleAnimationGun.getCurrentImage(time);
 		}
@@ -197,6 +218,8 @@ public class Player extends GameElement
 			idleAnimation.start();
 			ret = unarmed?idleAnimation.getCurrentImage(time):idleAnimationGun.getCurrentImage(time);
 		}
+		
+		if (ret == null) System.out.println("no anim? serious trouble!"+time);
 		
 		if (facing == Facing.LEFT)
 		{
@@ -282,76 +305,48 @@ public class Player extends GameElement
 		boolean hasXSpeed = Math.abs(xSpeed) > CLAMPTOZERO;
 		
 		
-		
-		if (isInAir)
+		if (ourPushable != null) {
+			if (pushAnimation.isStopped()) startAnimation(pushAnimation);
+		}
+		else if (isInAir)
 		{
-			idleAnimation.stop();
-			walkAnimation.stop();
-			idleAnimationGun.stop();
-			walkAnimationGun.stop();
-			
-			if (jumpAnimation.isStopped())
-			{
-				jumpAnimation.start();
-				jumpAnimationGun.start();
+			if (unarmed) {
+				if (jumpAnimation.isStopped()) startAnimation(jumpAnimation);
+			} else {
+				if (jumpAnimationGun.isStopped()) startAnimation(jumpAnimationGun);
 			}
 		}
 		else if (theWinner != -1) {
-			idleAnimation.stop();
-			walkAnimation.stop();
-			jumpAnimation.stop();
-			idleAnimationGun.stop();
-			walkAnimationGun.stop();
-			jumpAnimationGun.stop();
-			stuckToTheGroundAnimation.stop();
 			if (theWinner == myID) {
 				if (winAnimation.isStopped()) {
-					winAnimation.start();
+					startAnimation(winAnimation);
 				}
 			} else {
 				if (loseAnimation.isStopped()) {
-					loseAnimation.start();
+					startAnimation(loseAnimation);
 				}
 			}
 		}
 		else if (stuckToTheGround) {
-			idleAnimation.stop();
-			walkAnimation.stop();
-			jumpAnimation.stop();
-			idleAnimationGun.stop();
-			walkAnimationGun.stop();
-			jumpAnimationGun.stop();
 			
 			if (stuckToTheGroundAnimation.isStopped()) {
-				stuckToTheGroundAnimation.start();
+				startAnimation(stuckToTheGroundAnimation);
 			}
 		}
 		else if (hasXSpeed)
 		{
-			idleAnimation.stop();
-			jumpAnimation.stop();
-			idleAnimationGun.stop();
-			jumpAnimationGun.stop();
-			stuckToTheGroundAnimation.stop();
-			
-			if (walkAnimation.isStopped())
-			{
-				walkAnimation.start();
-				walkAnimationGun.start();
+			if (unarmed) {
+				if (walkAnimation.isStopped()) startAnimation(walkAnimation);
+			} else {	
+				if (walkAnimationGun.isStopped()) startAnimation(walkAnimationGun);
 			}
 		}
 		else
-		{
-			jumpAnimation.stop();
-			walkAnimation.stop();
-			jumpAnimationGun.stop();
-			walkAnimationGun.stop();
-			stuckToTheGroundAnimation.stop();
-			
-			if (idleAnimation.isStopped())
-			{
-				idleAnimation.start();
-				idleAnimationGun.start();
+		{	
+			if (unarmed) {
+				if (idleAnimation.isStopped()) startAnimation(idleAnimation); 
+			} else {
+				if (idleAnimationGun.isStopped()) startAnimation(idleAnimationGun);
 			}
 		}
 	}

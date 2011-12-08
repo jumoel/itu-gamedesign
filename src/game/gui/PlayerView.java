@@ -216,6 +216,7 @@ public class PlayerView extends Updateable implements Observer
 		this.ownDoor.showDoor();
 		this.drawOwnDoor = true;
 		this.doorEnabled = true;
+		Stereophone.playSound("305", "showdoors", 1000);
 	}
 	
 	//remove all doors
@@ -401,9 +402,10 @@ public class PlayerView extends Updateable implements Observer
 			pypos = 0;
 		}
 		
-		if (pypos + ownPlayer.getCurrentTexture().height > level.levelHeight * BunnyHat.TILEDIMENSION)
+		int playerHeight = ownPlayer.getCurrentTexture().height; 
+		if (pypos + playerHeight > level.levelHeight * BunnyHat.TILEDIMENSION)
 		{
-			pypos = level.levelHeight * BunnyHat.TILEDIMENSION - ownPlayer.getCurrentTexture().height;
+			pypos = level.levelHeight * BunnyHat.TILEDIMENSION - playerHeight;
 		}
 		
 		this.playerPosition = pxpos;

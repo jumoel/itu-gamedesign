@@ -81,7 +81,7 @@ public class PushBox extends GameElement
 				myTwinBox.xpos = myTwinBox.x()-0.1;
 				myTwinBox.isInAir = true;
 			}*/
-			myTwinBox.xpos = xpos;
+			//myTwinBox.xpos = xpos;
 			//System.out.println(ypos+" vs "+myTwinBox.ypos);
 		}
 		super.update(deltaT);

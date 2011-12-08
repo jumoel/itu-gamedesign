@@ -41,11 +41,11 @@ public class GameMaster extends Observable implements Observer, Runnable
 	
 	// GAME FACTS
 	// general
-	private int msTillNextSwitch = getNewTimeTillNextSwitch();
+	private static int msTillNextSwitch = getNewTimeSpan(SWITCH_TIME_TILL_NEXT, SWITCH_TIME_VARIATION);
 	private int msTillDoorsEnd = 0;
-	private boolean switchHappening = false;
+	private static boolean switchHappening = false;
 	private boolean doorsHappening = false;
-	private boolean switchAlertStarted = false;
+	private static boolean switchAlertStarted = false;
 	private boolean gameOver = false;
 	private int winner = -1; public int getWinner() {return winner;};
 	
@@ -65,10 +65,26 @@ public class GameMaster extends Observable implements Observer, Runnable
 		player2 = p2;
 	}
 	
-	private static int getNewTimeTillNextSwitch() {
-		double variationSpan = SWITCH_TIME_TILL_NEXT * SWITCH_TIME_VARIATION;
+	/**
+	 * 
+	 * @return
+	 */
+	public static int getNewTimeTillNextAction(int usualTimeSpan, double timeVariation) {
+		int correctedSpan = usualTimeSpan;
+		if (correctedSpan < msTillNextSwitch + 230 && correctedSpan > msTillNextSwitch - SWITCH_ALERT_PHASE_DURATION - 2000) {
+			correctedSpan = msTillNextSwitch + 230;
+		}
+		int timeSpan = getNewTimeSpan(correctedSpan, timeVariation);
+		while (timeSpan < msTillNextSwitch + 230 && timeSpan > msTillNextSwitch - SWITCH_ALERT_PHASE_DURATION - 2000) {
+			timeSpan = getNewTimeSpan(correctedSpan, timeVariation);
+		}
+		return timeSpan;
+	}
+	
+	private static int getNewTimeSpan(int usualTimeSpan, double timeVariation) {
+		double variationSpan = usualTimeSpan * timeVariation;
 		double variation = Math.random() * variationSpan;
-		return (int)(SWITCH_TIME_TILL_NEXT - (variationSpan / 2) + variation);
+		return (int)(usualTimeSpan - (variationSpan / 2) + variation);
 	}
 	
 	/**
@@ -106,7 +122,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 			this.setChanged();
 			this.notifyObservers(GameMaster.MSG.SWITCH_DREAMS);
 			Stereophone.playSound("302", "switchhappening", 1600);
-			msTillNextSwitch = this.getNewTimeTillNextSwitch();
+			msTillNextSwitch = this.getNewTimeSpan(SWITCH_TIME_TILL_NEXT, SWITCH_TIME_VARIATION);
 			switchAlertStarted = false;
 			//return;
 		} else if (msTillNextSwitch < SWITCH_ALERT_PHASE_DURATION
@@ -184,7 +200,7 @@ public class GameMaster extends Observable implements Observer, Runnable
 		int lastFpsTime = 0;
 		int fps = 0;
 		int timeStepSize = 100;
-		this.msTillNextSwitch = getNewTimeTillNextSwitch();
+		this.msTillNextSwitch = getNewTimeSpan(SWITCH_TIME_TILL_NEXT, SWITCH_TIME_VARIATION);
 		while (runGame) {
 			try
 			{

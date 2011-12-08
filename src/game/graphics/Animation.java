@@ -20,7 +20,8 @@ public class Animation
 	
 	private boolean holdAnimations;
 	private int timeOnStop;
-	private boolean holdOnLastFrame;
+	private boolean randomFrameOffset;
+	private int frameOffset= 0;
 	
 	private boolean loop;
 	
@@ -41,7 +42,7 @@ public class Animation
 		
 		this.isRunning = false;
 		this.holdAnimations = false;
-		this.holdOnLastFrame = false;
+		this.randomFrameOffset = false;
 	}
 	
 	public boolean isRunning()
@@ -59,11 +60,12 @@ public class Animation
 		this.start(true, false);
 	}
 	
-	public void start(boolean loop, boolean holdOnLastPicture) {
+	public void start(boolean loop, boolean randomFrameOffset) {
 		this.loop = loop;
-		this.holdOnLastFrame = holdOnLastPicture;
+		this.randomFrameOffset = randomFrameOffset;
 		this.isRunning = true;
 		this.startTime = processing.millis();
+		this.frameOffset = (int)(Math.random()*this.sprites.length);
 	}
 	
 	public void stop()
@@ -75,21 +77,23 @@ public class Animation
 	{
 		if (!isRunning)
 		{
-			return null;
+			this.start();
+			//System.out.println("I am not running!");
+			//return null;
 		}
 		
 		if (holdAnimations) time = this.timeOnStop;
 		
 		int diff = time - startTime;
 		
-		int frame = (diff / millisPerFrame) % numberOfFrames;
+		int frame = ((diff / millisPerFrame)+(this.randomFrameOffset?this.frameOffset:0)) % numberOfFrames;
 		if (!loop) {
 			
 			frame = (diff / millisPerFrame);
 			if (frame >= numberOfFrames)
 			{
 				frame = numberOfFrames -1;
-				if (!this.holdOnLastFrame) this.isRunning = false;
+				if (!this.randomFrameOffset) this.isRunning = false;
 			}
 		} 
 		

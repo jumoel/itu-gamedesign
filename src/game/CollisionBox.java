@@ -59,6 +59,7 @@ public abstract class CollisionBox extends Observable
 	// if we have crossing elements, we are interested in their collision too
 	protected GameElement collisionPartnerX, collisionPartnerY;
 	
+	
 	public boolean isBeingPushedRight = false;
 	public boolean isBeingPushedLeft = false;
 	public void removePushConstraints() {isBeingPushedRight = isBeingPushedLeft = false;}
@@ -197,7 +198,7 @@ public abstract class CollisionBox extends Observable
 			// check auf collisionPartnerRequest um endlosschleifen zu vermeiden
 			// lŠsst sich mit einer HashMap interessanter gestalten
 			//double partnerYSpeedBackup = ((GameElement)collisionPartnerX).getYSpeed();
-			
+
 			if (collisionPartnerX.isBeingPushedLeft 
 					&& ((GameElement)gameElement).isBeingPushedRight) {
 				newXSpeed = 0;
@@ -211,6 +212,7 @@ public abstract class CollisionBox extends Observable
 				collision = true;
 				System.out.println("lock right left");
 			} else if (collisionPartnerX.isCollidingPartner(x, collisionPartnerX.y(), xSpeed, 0, xDistance, 0)) {
+				System.out.println("partner is colliding");
 				newXSpeed = 0;//collisionPartnerX.getNewXSpeed();
 				newX = collisionPartnerX.getNewX();
 				collision = true;
@@ -397,7 +399,7 @@ public abstract class CollisionBox extends Observable
 						case BAD_SHEEP_BOUNCE:
 							if (gameElement instanceof Player) {
 								newYSpeed = BOUNCE_FORCE;
-								newXSpeed = -6;
+								newXSpeed = -BOUNCE_FORCE*2;
 								double dice = Math.random();
 								Stereophone.playSound(dice > 0.5?"102":"103", "bad_sheep_bounce", 250);
 							}
