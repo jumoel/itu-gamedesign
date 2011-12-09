@@ -38,6 +38,8 @@ public abstract class GameElement extends CollisionBox
 	
 	private static double PUSH_SPEED_MAX = BunnyHat.SETTINGS.getValue("gameplay/pushspeedmax");
 	private static double PUSH_ACCEL_FACTOR = BunnyHat.SETTINGS.getValue("gameplay/pushaccelerationfactor");
+	
+	private static double MAX_SOUND_DISTANCE = BunnyHat.SETTINGS.getValue("sound/maxdistance");
 
 	protected Facing facing;
 	protected PApplet processing;
@@ -80,6 +82,10 @@ public abstract class GameElement extends CollisionBox
 		this.xSpeed = 0.0;
 		this.ySpeed = 0.0;
 		this.facing = Facing.LEFT;
+	}
+	
+	public void setTwinElement(GameElement e) {
+		this.collisionPartnerX = e;
 	}
 	
 	// calculating movement
@@ -215,6 +221,7 @@ public abstract class GameElement extends CollisionBox
 		
 		if (collisionPartnerX != null && hasMovedX) {
 			((GameElement) collisionPartnerX).setPos(xpos, collisionPartnerX.y());
+			((GameElement) collisionPartnerX).facing = facing;
 			hasMovedX = false;
 		}
 		
@@ -222,7 +229,13 @@ public abstract class GameElement extends CollisionBox
 			((GameElement) collisionPartnerY).setPos(collisionPartnerY.x(), ypos);
 		}
 	}
-		
+	
+	protected void playSound(String sound, String id, int time) {
+		//System.out.println(this.collisionLevel.getDistanceClosestPlayer(this.xpos));
+		if (this.collisionLevel.getDistanceClosestPlayer(this.xpos) < MAX_SOUND_DISTANCE) {
+			Stereophone.playSound(sound, id, time);
+		}
+	}
 
 	public abstract PImage getCurrentTexture();
 		

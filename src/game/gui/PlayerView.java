@@ -443,6 +443,10 @@ public class PlayerView extends Updateable implements Observer
 					this.notifyObservers("MAKEDOORSDISAPPEAR");
 				}
 			}
+			if (Math.abs(cameraOffsetY) > (height-ownPlayer.collisionBoxHeight()*3)/2) {
+				this.setChanged();
+				this.notifyObservers("MAKEDOORSDISAPPEAR");
+			}
 		}
 		
 		//if (cameraOffsetFactor != 0) {

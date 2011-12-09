@@ -29,7 +29,7 @@ public abstract class CollisionBox extends Observable
 		GOOD_SHEEP_BOUNCE, BAD_SHEEP_BOUNCE, BALL_BOUNCE, PUSH}
 	private Effects collisionEffect = Effects.STOP;
 	
-	private Level collisionLevel;
+	protected Level collisionLevel;
 	
 	private Object gameElement;
 	public Object getGameElement() {
@@ -213,7 +213,7 @@ public abstract class CollisionBox extends Observable
 				System.out.println("lock right left");
 			} else if (collisionPartnerX.isCollidingPartner(x, collisionPartnerX.y(), xSpeed, 0, xDistance, 0)) {
 				System.out.println("partner is colliding");
-				newXSpeed = 0;//collisionPartnerX.getNewXSpeed();
+				newXSpeed = collisionPartnerX.getNewXSpeed();
 				newX = collisionPartnerX.getNewX();
 				collision = true;
 			}

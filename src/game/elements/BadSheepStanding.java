@@ -25,7 +25,7 @@ public class BadSheepStanding extends GameElement
 		this.setCollisionEffect(Effects.BAD_SHEEP_BOUNCE);
 		
 		sheepAnimation = new Animation(processing, "graphics/animations/badSheepStanding");
-		sheepAnimation.start(false, true);
+		sheepAnimation.start(true, true);
 		timeTillNextSound = GameMaster.getNewTimeTillNextAction(5000, 0.7);
 	}
 
@@ -50,9 +50,9 @@ public class BadSheepStanding extends GameElement
 		if (this.timeTillNextSound < 0) {
 			double dice = Math.random();
 			String soundToPlay = sounds[(int)(dice * sounds.length)];
-			if (true) {
-				Stereophone.playSound(soundToPlay, "bad sheep standing", 300);
-			}
+			
+			playSound(soundToPlay, "bad sheep standing", 300);
+			
 			this.timeTillNextSound = GameMaster.getNewTimeTillNextAction(5000, 0.7);
 		} else {
 			this.timeTillNextSound -= deltaT;

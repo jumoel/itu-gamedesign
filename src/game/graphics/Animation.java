@@ -66,6 +66,7 @@ public class Animation
 		this.isRunning = true;
 		this.startTime = processing.millis();
 		this.frameOffset = (int)(Math.random()*this.sprites.length);
+		//System.out.println(frameOffset);
 	}
 	
 	public void stop()

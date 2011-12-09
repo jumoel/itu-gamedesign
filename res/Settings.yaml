@@ -33,7 +33,8 @@ gamerules:
     doorDuration: 10000
   creatures:
     speed: 1
-   
+sound:
+  maxdistance: 30.0 
 gui:
   tiledimension: 24
   playerviewtileheight: 14

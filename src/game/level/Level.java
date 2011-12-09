@@ -65,6 +65,7 @@ public class Level extends CollisionLevel
 	private int levelDataForeground[];
 	private int metaData[];
 	private ArrayList<GameElement> gameElements;
+	private ArrayList<Player> players;
 	
 	public String levelName;
 	private String levelPath;
@@ -96,6 +97,7 @@ public class Level extends CollisionLevel
 		this.collisionSetup();
 		
 		gameElements = new ArrayList<GameElement>();
+		players = new ArrayList<Player>();
 		//this.setupTheBigPiture();
 	}
 	
@@ -135,6 +137,8 @@ public class Level extends CollisionLevel
 				if (currentMetaTile == Level.MetaTiles.CROSSINGSHEEP.index()) {
 					GoodSheep goodSheep = new GoodSheep(x, y-1, 3, 3, processing);
 					BadSheep badSheep = new BadSheep(x, y-1, 3, 3, processing, goodSheep);
+					goodSheep.setTwinElement(badSheep);
+					badSheep.setTwinElement(goodSheep);
 					if (dream == DreamStyle.GOOD) {
 						twinDream.addElement(badSheep);
 						this.addElement(goodSheep);
@@ -273,6 +277,7 @@ public class Level extends CollisionLevel
 	public void addElement(GameElement e) {
 		e.setLevel(this);
 		gameElements.add(e);
+		if (e instanceof Player) players.add((Player)e);
 		// sort once, get elements with high zIndex further to the front
 		// sorting once is enough, to get e.g. one player to the front
 		for (int i = 1; i < gameElements.size(); i++) {
@@ -284,8 +289,21 @@ public class Level extends CollisionLevel
 		}
 	}
 	
+	public double getDistanceClosestPlayer(double ownX) {
+		double distance = 100000;
+		// search playaz
+		for (int i = 0; i < players.size(); i++) {
+			double dist = Math.abs(players.get(i).x() - ownX);
+			if (dist < distance) {
+				distance = dist;
+			}
+		}
+		return distance;
+	}
+	
 	public void removeElement(GameElement e) {
 		gameElements.remove(e);
+		if (e instanceof Player) players.remove((Player)e);
 	}
 	
 	public void removeAllPushBoxConstraints() {
