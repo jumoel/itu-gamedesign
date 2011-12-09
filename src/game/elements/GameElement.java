@@ -3,11 +3,13 @@ import java.util.HashMap;
 
 import processing.core.*;
 import util.BMath;
+import util.BPoint;
 import game.BunnyHat;
 import game.CollisionBox;
 import game.Door;
 import game.FinishLine;
 import game.Player;
+import game.control.RingBuffer;
 import game.graphics.Animation;
 import game.level.Level;
 import game.sound.Stereophone;
@@ -49,6 +51,9 @@ public abstract class GameElement extends CollisionBox
 	public boolean drawMe = true;
 	public boolean updateMe = true;
 	public int zIndex = 0; // higher index = further in front
+	public boolean drawTrail = false;
+	public class TrailPos {public double x, y; public PImage image; public TrailPos(PImage image, double x, double y) {this.image = image; this.x = x; this.y = y;}}
+	public RingBuffer<TrailPos> drawTrailPositions;
 	
 	protected double xSpeed, ySpeed; 
 	public double getYSpeed() {return ySpeed;} public void setYSpeed(double speed) {ySpeed = speed;}

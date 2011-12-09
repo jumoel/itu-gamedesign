@@ -44,6 +44,9 @@ gui:
     tintg: 255
     tintb: 0
 graphics:
+  effects:
+    trail:
+      length: 7
   animations:
     animationpath: animations/
     buttonOn:

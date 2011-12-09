@@ -10,16 +10,19 @@ import java.util.LinkedList;
 import game.BunnyHat;
 import game.CollisionBox;
 import game.Player;
+import game.control.RingBuffer;
 import game.elements.BadSheep;
 import game.elements.BadSheepStanding;
 import game.elements.BubbleGunGum;
 import game.elements.DreamSwitch;
 import game.elements.GameElement;
+import game.elements.GameElement.TrailPos;
 import game.elements.GoodSheep;
 import game.elements.GoodSheepStanding;
 import game.elements.PushBox;
 import processing.core.*;
 import util.BImage;
+import util.BPoint;
 import util.BString;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -30,6 +33,9 @@ import org.w3c.dom.Document;
 
 public class Level extends CollisionLevel
 {
+	private static int TRAIL_LENGTH = BunnyHat.SETTINGS.getValue("graphics/effects/trail/length");
+	private static int TRAIL_VIS_REDUC = 255 / TRAIL_LENGTH;
+	
 	public enum Layer {FOREGROUND, BACKGROUND}
 	public enum DreamStyle {GOOD, BAD}
 	
@@ -265,7 +271,37 @@ public class Level extends CollisionLevel
 					
 					PImage image = currentCreature.getCurrentTexture();
 					
+					//trail?
+					if (currentCreature.drawTrail) {
+						double lastX = currentCreature.x();
+						double lastY = currentCreature.y();
+						if (currentCreature.drawTrailPositions != null) {
+							Iterator<TrailPos> prevPoses = currentCreature.drawTrailPositions.iterator();
+							int visibility = 255;
+							double cX = 0, cY = 0;
+							while (prevPoses.hasNext()) {
+								TrailPos pos = prevPoses.next();
+								graphics.tint(255, visibility);
+								graphics.image(pos.image, (int)(pos.x*BunnyHat.TILEDIMENSION - x), 
+										(int)(height - pos.y*BunnyHat.TILEDIMENSION - image.height));
+								visibility -= TRAIL_VIS_REDUC;
+								
+							}
+							graphics.noTint();
+						} else {
+							currentCreature.drawTrailPositions = new RingBuffer<TrailPos>(TRAIL_LENGTH);
+						}
+						currentCreature.drawTrailPositions.enqueue(currentCreature.new TrailPos(image, currentCreature.x(), 
+								currentCreature.y()));
+					} else {
+						if (currentCreature.drawTrailPositions != null) {
+							currentCreature.drawTrailPositions = null;
+						}
+					}
+					
 					graphics.image(image, xcoord, ycoord-image.height);
+					
+					
 				}
 			}
 		}

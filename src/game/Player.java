@@ -116,6 +116,7 @@ public class Player extends GameElement
 		
 		this.updateMe = false;
 		this.zIndex = 100;
+		this.drawTrail = true;
 		
 		this.myID = playerNumber;
 		
@@ -467,7 +468,7 @@ public class Player extends GameElement
 		{
 			jump();
 			this.didJump = true;
-			if (BunnyHat.TWIN_JUMP)
+			if (BunnyHat.TWIN_JUMP) 
 			{
 				myTwin.jump();
 			}
