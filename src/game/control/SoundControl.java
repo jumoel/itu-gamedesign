@@ -1,6 +1,12 @@
 package game.control;
 
+
+
+
+import game.graphics.Animation;
+
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Observable;
 import java.util.Observer;
@@ -141,6 +147,12 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	
 	
 	
+	int frequencyBorder; // frequency to determine high frequency
+	int frequencyBorderPos; // array pos of the border
+	int minGapLength; //  
+	int maxGapLength; //
+	float freqGraphFactor = 1f; // how much to amplify the freq graph display
+	
 	
 	Minim minim;
 	AudioInput myinput;
@@ -150,6 +162,8 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	//general settings
 	private long frameSize = 42; // 42ms = roundabout 23 fps
 
+	private int bufferSize = 84;
+	
 	//input Attention Windows: Settings
 	float initStrengthMin = 5f;
 	float initStrengthMax = 200f;
@@ -187,6 +201,16 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	int lastPeakPosLF, lastPeakPosHF;
 	PatternDetector pattyLF, pattyHF;
 
+	RingBuffer<float[]> ourFrequencyBuffer;
+	RingBuffer<int[]> ourPeakBuffer;
+	//RingBuffer<int[]> ourPeakBufferW;
+	RingBuffer<Integer> ourEventBufferLF;
+	RingBuffer<Integer> ourEventBufferHF;
+	//RingBuffer<Integer> ourEventBufferW;
+	RingBuffer<Integer> ourDetectedPatternBufferLF;
+	RingBuffer<Integer> ourDetectedPatternBufferHF;
+	//RingBuffer<Integer> ourDetectedPatternBufferW;
+	
 	float[] frequenciesOfInterest =
 		{/*16.35f, //C0
 		 17.32f, //C#0/Db0
@@ -216,7 +240,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		 69.30f, //C#2/Db2 	
 		 73.42f, //D2 	
 		 77.78f, //D#2/Eb2 	
-		 82.41f, //E2 	     - start of human voice range
+		 82.41f,*/ //E2 	     - start of human voice range
 		 87.31f, //F2 	
 		 92.50f, //F#2/Gb2 	
 		 98.00f, //G2 	
@@ -248,7 +272,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		 440.00f, //A4 
 		 466.16f, //A#4/Bb4 
 		 493.88f, //B4 	
-		 523.25f, //C5 */
+		 523.25f, //C5
 		 554.37f, //C#5/Db5 
 		 587.33f, //D5 
 		 622.25f, //D#5/Eb5
@@ -275,7 +299,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		 2093.00f, //C7          60
 		 2217.46f, //C#7/Db7 
 		 2349.32f, //D7 
-		 2489.02f/*, //D#7/Eb7 
+		 2489.02f, //D#7/Eb7 
 		 2637.02f, //E7 
 		 2793.83f, //F7 
 		 2959.96f, //F#7/Gb7 
@@ -287,25 +311,55 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		 4186.01f, //C8 
 		 4434.92f, //C#8/Db8
 		 4698.64f, //D8 
-		 4978.03f  //D#8/Eb8*/
+		 4978.03f  //D#8/Eb8
 		};
 	
+	// keyboard control
+		public boolean drawAnalysis = true;
+		private boolean showAllFrequencies = true;
+		private boolean markPeakTypes = true;
+		public boolean drawLines = true;
+		private boolean hideWeakFrequencies = false;
+		public boolean markStrongestPeaks = true;
+		
+	// graphics
+	PGraphics displayBuffer;
+	PGraphics historyBuffer;
+	Animation blueGum, redGum, blueIdle, blueShoot, redIdle, redShoot;
+	
 	PApplet ourPApplet;
+	
+	private float[] freqArray;
+	private int[] peakArray;
 	 
 	public SoundControl(PApplet papplet)
 	{
 	  ourPApplet = papplet;
+	  
+	  blueGum = new Animation(ourPApplet, "graphics/animations/bubbleGumBoy");
+	  redGum = new Animation(ourPApplet, "graphics/animations/bubbleGumGirl");
+	  blueGum.start();
+	  redGum.start();
+	  blueIdle =  new Animation(ourPApplet, "graphics/animations/player1idleGun");
+	  blueShoot = new Animation(ourPApplet, "graphics/animations/player1shot");
+	  redIdle = new Animation(ourPApplet, "graphics/animations/player2idleGun");
+	  redShoot = new Animation(ourPApplet, "graphics/animations/player2shot");
+	  blueIdle.start();
+	  redIdle.start();
 	  
 	  movingAverageCompareThreshold = 0.5f;
 	  mainPeakThreshold = 3;
 	  lonelyPeakThreshold = 20;
 	  
 	  
+	  minGapLength = 2; 
+	  maxGapLength = 7;
+	  
 	  
 	  
 	  // human voice frequency range: 60 Hz - 7000 Hz
 	  // whistling range: 1300 Hz - 4000 Hz
-	  //frequencyBorderPos = 42; //position in the array
+	  frequencyBorderPos = 42; //position in the array
 	  
 	  // setup attention windows
 	  
@@ -326,6 +380,16 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  
 	  
 	  
+	  ourFrequencyBuffer = new RingBuffer<float[]>(bufferSize);
+	  ourPeakBuffer = new RingBuffer<int[]>(bufferSize);
+	  //ourPeakBufferW = new RingBuffer<int[]>(42);
+	  ourEventBufferLF = new RingBuffer<Integer>(bufferSize + 1);
+	  ourEventBufferHF = new RingBuffer<Integer>(bufferSize + 1);
+	  //ourEventBufferW = new RingBuffer<Integer>(freqHistoryHeight/lineHeight + 1);
+	  ourDetectedPatternBufferLF = new RingBuffer<Integer>(bufferSize + 1);
+	  ourDetectedPatternBufferHF = new RingBuffer<Integer>(bufferSize + 1);
+	  //ourDetectedPatternBufferW = new RingBuffer<Integer>(freqHistoryHeight/lineHeight + 1);
+	  
 	  lastEventLF = lastEventHF = PatternDetector.SNDPT_NONE;
 	  lastPeakPosLF = lastPeakPosHF = -1;
 	  try
@@ -343,18 +407,419 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  pattyLF.addObserver(this);
 	  pattyHF.addObserver(this);
 	  
+	  freqArray = new float[frequenciesOfInterest.length];
+	  peakArray = new int[frequenciesOfInterest.length];
+	  
 	  
 	}
-	 
 	
 	
 	
-	public void analyseNextChunk()
+	public void updateFreqHistory(int x, int y, int totalWidth, int height) {
+		int width = totalWidth - blueIdle.getCurrentImage(ourPApplet.millis()).width;
+		
+		if (historyBuffer == null || historyBuffer.width != width || historyBuffer.height != height) {
+			historyBuffer = ourPApplet.createGraphics(width, height, PConstants.JAVA2D);
+		} else if (!drawAnalysis) {
+			ourPApplet.image(historyBuffer, x, y);
+			return;
+		}
+		
+		historyBuffer.beginDraw();
+		
+		
+		historyBuffer.background(0, 0);
+		//historyBuffer.rect(x, y, width, height);
+		historyBuffer.strokeWeight(1);
+		  
+		  int lineHeight = width/bufferSize;
+		  int w = new Integer(height/frequenciesOfInterest.length);
+		  
+		  //draw the freqRecord so far
+		  Iterator<float[]> ringIt = ourFrequencyBuffer.iterator();
+		  Iterator<int[]> ringItPeak = ourPeakBuffer.iterator();
+		  
+		  //and draw our events
+		  Iterator<Integer> ringItEventLF = ourEventBufferLF.iterator();
+		  Iterator<Integer> ringItEventHF = ourEventBufferHF.iterator();
+		  
+		  
+		  int currentLine = height/lineHeight + 1;
+		  int lastLowPitchX = -1;
+		  int lastLowPitchY = -1;
+		  int lastHighPitchX = -1;
+		  int lastHighPitchY = -1;
+		  int lastHFPeakDistance = 0;
+		  int lastLFPeakDistance = 0;
+		  int lastHFPeakPos = -1;
+		  int lastLFPeakPos = -1;
+		  
+		  boolean thereHasBeenAPeak = false;
+		  
+		  //boolean newEventRecorded = false;
+		  int lastFoundEventHF = PatternDetector.SNDPT_NONE;
+		  int lastFoundEventLF = PatternDetector.SNDPT_NONE;
+		  
+		  
+		while(ringIt.hasNext()) {
+			  currentLine--;
+			  float[] freqArray = ringIt.next();
+			  int[] peakArray = ringItPeak.next();
+			  
+			  lastFoundEventLF = PatternDetector.SNDPT_NONE;
+			  lastFoundEventHF = PatternDetector.SNDPT_NONE;
+			  
+			  
+			  
+			  int currentX = 0;
+	 		  for (int i = 0; i < freqArray.length; i++)
+			  {
+	 			 thereHasBeenAPeak = false;
+	 			 
+	 			 int currentY = height-i*w;
+	 			 currentX = height-currentLine*lineHeight;
+	 			  
+	 			historyBuffer.noStroke();
+	 			//historyBuffer.fill((int)Math.log(freqArray[i])*42);
+	 			historyBuffer.noFill();
+
+			    if (peakArray[i] == GENERAL_PEAK && markPeakTypes)
+			    {
+			    	historyBuffer.stroke(0, 200, 0);
+			    	historyBuffer.fill(0, (int)Math.log(freqArray[i])*42, 0);   
+			    }
+			    else if (peakArray[i] == LONELY_PEAK && markPeakTypes)
+			    {
+			    	historyBuffer.stroke(200, 0, 0);
+			    	historyBuffer.fill((int)Math.log(freqArray[i])*42, 0, 0);
+			    }
+			    
+			    if (peakArray[i] == STRONGEST_PEAK && markStrongestPeaks)
+	 			  {
+				    	historyBuffer.stroke(0, 0, 200);
+				    	historyBuffer.fill(0, 0, (int)Math.log(freqArray[i]+1)*42);
+				    	thereHasBeenAPeak = true;
+	 			  }
+			    
+			    
+			    //historyBuffer.rect(currentX, currentY, w, -lineHeight + 1);
+			    
+			    
+			    // process transition to high frequency:
+			    // has there been any peak in the lowFQ range?
+			    if (i == frequencyBorderPos-1) {
+			    	if (!thereHasBeenAPeak) {
+			    		lastLFPeakDistance++;
+			    		
+			    	}
+			    }
+			    
+			    
+			    // draw peak line
+			    if (peakArray[i] == STRONGEST_PEAK)
+			    {
+			    	
+			    	if (i < frequencyBorderPos) {
+			    		
+			    		
+			    		historyBuffer.stroke(0, 0, 255);
+			    		if (lastLowPitchX > -1 
+			    				&& lastLowPitchY > -1
+			    				&& lastLFPeakPos > - 1)
+			    		{
+			    			int oldXmed = (lastLowPitchX + w/2) ;
+				    		int oldYmed = (lastLowPitchY - lineHeight/2 + 1);
+				    		int newYmed = (currentY + w/2);
+				    		int newXmed = (currentX - lineHeight/2 + 1);
+				    		
+				    		int posDifference = i - lastLFPeakPos;
+				    		
+				    		boolean gap = (lastLFPeakDistance > minGapLength
+		    				         && lastLFPeakDistance < maxGapLength);
+				    		boolean bigGap = (lastLFPeakDistance >= maxGapLength);
+				    		if (bigGap) posDifference = 0;
+				    		
+				    		
+				    		
+				    		
+				    		
+				    		if (posDifference > 0) {
+				    			historyBuffer.stroke(255, 0, (gap?255:0));
+				    		} else if (posDifference < 0) {
+				    			historyBuffer.stroke(0, 255, (gap?255:0));
+				    		} else {
+				    			historyBuffer.stroke(255, 255, (gap?255:0));
+				    		}
+				    	
+				    		if (bigGap) { historyBuffer.stroke(0, 0, 0); historyBuffer.noStroke();}
+			    			if (drawLines) historyBuffer.line(oldXmed, oldYmed, newXmed, newYmed);
+			    			
+			    			lastLFPeakDistance = 0;
+			    		} 
+			    		
+			    		lastLFPeakPos = i;
+			    		lastLowPitchY = currentY;
+			    		lastLowPitchX = currentX;
+			    		
+			    	} else {
+			    		
+			    		historyBuffer.stroke(0, 0, 255);
+			    		if (lastHighPitchX > -1 
+			    				&& lastHighPitchY > -1
+			    				&& lastHFPeakPos > - 1)
+			    		{
+			    			int oldXmed = (lastHighPitchX + w/2) ;
+				    		int oldYmed = (lastHighPitchY - lineHeight/2 + 1);
+				    		int newYmed = (currentY + w/2);
+				    		int newXmed = (currentX - lineHeight/2 + 1);
+				    		
+				    		int posDifference = i - lastHFPeakPos;
+				    		
+				    		boolean gap = (lastHFPeakDistance > minGapLength
+				    				         && lastHFPeakDistance < maxGapLength);
+				    		boolean bigGap = (lastHFPeakDistance >= maxGapLength);
+				    		
+				    		if (posDifference > 0) {
+				    			historyBuffer.stroke(255, 0, (gap?255:0));
+				    		} else if (posDifference < 0) {
+				    			historyBuffer.stroke(0, 255, (gap?255:0));
+				    		} else {
+				    			historyBuffer.stroke(255, 255, (gap?255:0));
+				    		}
+				    	
+				    		if (bigGap) { historyBuffer.stroke(0, 0, 0); historyBuffer.noStroke();}
+				    		if (drawLines) historyBuffer.line(oldXmed, oldYmed, newXmed, newYmed);
+			    			
+			    			lastHFPeakDistance = 0;
+			    		} 
+			    		
+			    		lastHFPeakPos = i;
+			    		lastHighPitchY = currentY;
+			    		lastHighPitchX = currentX;
+			    	}
+			    } 
+			    
+			    
+			    
+			    
+			    
+			  }
+	 		  
+	 		  for (int i = 0; i < peakArray.length; i++)
+			  {
+	 			 int currentY = height-i*w;
+	 			  if (peakArray[i] == STRONGEST_PEAK && markStrongestPeaks)
+	 			  {
+				    	
+				    	// nicer
+				    	int ballY = (int)(currentY);
+				    	int ballX = (int)(currentX-lineHeight);
+				    	if (i < frequencyBorderPos) {
+				    		historyBuffer.image(blueGum.getCurrentImage(ourPApplet.millis()), ballX, ballY);
+				    	} else {
+				    		historyBuffer.image(redGum.getCurrentImage(ourPApplet.millis()), ballX, ballY);
+				    	}
+	 			  }
+			  }
+	 		 historyBuffer.noStroke();
+	 		  
+	 		  
+	 		  
+	 		 if (!thereHasBeenAPeak) {
+		    	lastHFPeakDistance++;
+		    	
+		     }
+	 		 
+	 		 //mark events
+	 		currentX = height-(currentLine)*lineHeight;
+			switch (ringItEventLF.next()) {
+		    case PatternDetector.SNDPT_SAME:
+		    	historyBuffer.fill(255, 255, 0);
+		    	break;
+		    case PatternDetector.SNDPT_LOWER:
+		    	historyBuffer.fill(0, 255, 0);
+		    	break;
+		    case PatternDetector.SNDPT_HIGHER:
+		    	historyBuffer.fill(255, 0, 0);
+		    	break;
+		    case PatternDetector.SNDPT_GAP_SAME:
+		    	historyBuffer.fill(255, 255, 255);
+		    	break;
+		    case PatternDetector.SNDPT_GAP_LOWER:
+		    	historyBuffer.fill(0, 255, 255);
+		    	break;
+		    case PatternDetector.SNDPT_GAP_HIGHER:
+		    	historyBuffer.fill(255, 0, 255);
+		    	break;
+		    case PatternDetector.PATTERN_NONE:
+		    default:
+		    	historyBuffer.noFill();
+		    	break;
+		    }
+			historyBuffer.rect(currentX, 0, - lineHeight + 1, 12);
+			
+			currentX = height-(currentLine)*lineHeight;
+			switch (ringItEventHF.next()) {
+		    case PatternDetector.SNDPT_SAME:
+		    	historyBuffer.fill(255, 255, 0);
+		    	break;
+		    case PatternDetector.SNDPT_LOWER:
+		    	historyBuffer.fill(0, 255, 0);
+		    	break;
+		    case PatternDetector.SNDPT_HIGHER:
+		    	historyBuffer.fill(255, 0, 0);
+		    	break;
+		    case PatternDetector.SNDPT_GAP_SAME:
+		    	historyBuffer.fill(255, 255, 255);
+		    	break;
+		    case PatternDetector.SNDPT_GAP_LOWER:
+		    	historyBuffer.fill(0, 255, 255);
+		    	break;
+		    case PatternDetector.SNDPT_GAP_HIGHER:
+		    	historyBuffer.fill(255, 0, 255);
+		    	break;
+		    default:
+		    	historyBuffer.noFill();
+		    	break;
+		    }
+			historyBuffer.rect(currentX, height-12, - lineHeight + 1, 12);
+	 		
+		    
+		    /*y = freqHistoryHeight-(currentLine+1)*lineHeight;
+			switch (ringItEventW.next()) {
+		    case SoundInputTest.SNDPT_SAME:
+		    	fill(255, 255, 0);
+		    	break;
+		    case SoundInputTest.SNDPT_LOWER:
+		    	fill(0, 255, 0);
+		    	break;
+		    case SoundInputTest.SNDPT_HIGHER:
+		    	fill(255, 0, 0);
+		    	break;
+		    case SoundInputTest.SNDPT_GAP_SAME:
+		    	fill(255, 255, 255);
+		    	break;
+		    case SoundInputTest.SNDPT_GAP_LOWER:
+		    	fill(0, 255, 255);
+		    	break;
+		    case SoundInputTest.SNDPT_GAP_HIGHER:
+		    	fill(255, 0, 255);
+		    	break;
+		    default:
+		    	noFill();
+		    	break;
+		    }
+		    rect(width-12, y, width, y - lineHeight + 1);*/
+	 		 
+	 		 
+			}
+		  if (lastFoundEventHF == PatternDetector.SNDPT_NONE) {
+			  if (lastHFPeakDistance > maxGapLength ) {
+				 
+				  lastHFPeakPos = -1;
+			  } 
+		  }
+		  
+		  historyBuffer.endDraw();
+		  
+		  PImage girl = redIdle.getCurrentImage(ourPApplet.millis());
+		  PImage boy = blueIdle.getCurrentImage(ourPApplet.millis());
+		  
+		  ourPApplet.image(historyBuffer, blueIdle.getCurrentImage(ourPApplet.millis()).width, y);
+		  ourPApplet.image(girl, 0, height-lastPeakPosHF*w-girl.height/3*2);
+		  ourPApplet.image(boy, 0, height-lastPeakPosLF*w-boy.height/3*2);
+	}
+	
+	
+	
+	public void updateFreqDisplay(int x, int y, int width, int height) {
+		if (displayBuffer == null || displayBuffer.width != width || displayBuffer.height != height) {
+			displayBuffer = ourPApplet.createGraphics(width, height, PConstants.JAVA2D);
+		}
+		displayBuffer.beginDraw();
+		
+		displayBuffer.background(0);
+		
+		this.displayBuffer.noStroke();
+		
+		
+		int w = width / freqArray.length;
+		for (int i = 0; i < freqArray.length; i++) {
+			float freqStrength = freqArray[i];
+			
+			
+			
+			if (peakArray[i] == GENERAL_PEAK) {
+				displayBuffer.fill(0,255,0);
+				displayBuffer.rect(i*w, height, w,  - freqStrength*freqGraphFactor);
+			} else if (peakArray[i] == LONELY_PEAK) {
+				displayBuffer.fill(255,0,0);
+				displayBuffer.rect(i*w, height, w,  - freqStrength*freqGraphFactor);
+			} else {
+				displayBuffer.fill(255);
+				displayBuffer.rect(i*w, height, w, -freqStrength*freqGraphFactor);
+			}
+		}
+		
+		
+		// draw moving average lines
+		  if (true) {
+			  // STRENGTH
+			  //LF
+			  float currentY = height - iAWLF.getSA()*freqGraphFactor;
+			  displayBuffer.stroke(100, 0, 0);
+			  displayBuffer.line(0, currentY , frequencyBorderPos*w, currentY);
+			  
+			  //HF
+			  currentY = height - iAWHF.getSA()*freqGraphFactor;
+			  displayBuffer.stroke(0, 100, 0);
+			  displayBuffer.line(frequencyBorderPos*w, currentY ,width , currentY);
+			  
+			  
+			 
+			  
+			  
+			  // FREQ
+			  // LF
+			  float currentX = w*iAWLF.getFA();
+			  displayBuffer.stroke(100, 0, 0);
+			  displayBuffer.line(currentX, height, currentX, 0);
+			  
+			  // HF
+			  currentX = w*iAWHF.getFA();
+			  displayBuffer.stroke(0, 100, 0);
+			  displayBuffer.line(currentX, height, currentX, 0);
+			  
+			  
+			  //BOXES
+			  displayBuffer.noFill();
+			  // Freq / Strength LF min / max 
+			  float xFMaxLF = w * iAWLF.getFMax();
+			  float xFMinLF = w * iAWLF.getFMin();
+			  float ySMaxLF = height - iAWLF.getSMax()*freqGraphFactor;
+			  float ySMinLF = height - iAWLF.getSMin()*freqGraphFactor;
+			  displayBuffer.stroke(255, 0, 0);
+			  displayBuffer.rect(xFMinLF, ySMinLF, xFMaxLF - xFMinLF, ySMaxLF - ySMinLF);
+			  // Freq HF min / max
+			  float xFMaxHF = w * iAWHF.getFMax();
+			  float xFMinHF = w * iAWHF.getFMin();
+			  float ySMaxHF = height - iAWHF.getSMax()*freqGraphFactor;
+			  float ySMinHF = height - iAWHF.getSMin()*freqGraphFactor;
+			  displayBuffer.stroke(0, 255, 0);
+			  displayBuffer.rect(xFMinHF, ySMinHF, xFMaxHF-xFMinHF, ySMaxHF-ySMinHF);
+			  
+		  }
+		  
+		//draw separation line
+		  displayBuffer.stroke(255);
+		  displayBuffer.line(frequencyBorderPos*w, height, frequencyBorderPos*w, 0);
+		  displayBuffer.endDraw();
+		  ourPApplet.image(displayBuffer, x, y);
+	}
+	
+	private void analyseNextChunk()
 	{
 		
-	  
-	  
-	  
 	  
 	  
 	 
@@ -363,13 +828,10 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  
 	  
 	 
-	  
-	  
-	  
-	 
 	  fft.forward(myinput.mix);
 	  
-	  float[] freqArray = new float[frequenciesOfInterest.length];
+	  freqArray = new float[frequenciesOfInterest.length];
+	  peakArray = new int[frequenciesOfInterest.length];
 	  
 	  int strongestPitchPositionLF = -1;
 	  int strongestPitchPositionHF = -1;
@@ -404,29 +866,20 @@ public class SoundControl extends Observable implements Observer, Runnable {
 						strongestPitchStrengthLF = freqStrength;
 						strongestPitchPositionLF = i;
 					}
-			    	//peakArray[i] = GENERAL_PEAK;
+			    	peakArray[i] = GENERAL_PEAK;
 				} else if (freqStrength > iAWHF.getSMin() && freqStrength < iAWHF.getSMax()
 						&& i > iAWHF.getFMin() && i < iAWHF.getFMax()) { //MAYBE HF?
 					if (freqStrength > strongestPitchStrengthHF) {
 						strongestPitchStrengthHF = freqStrength;
 						strongestPitchPositionHF = i;
 					}
-					//peakArray[i] = GENERAL_PEAK;
+					peakArray[i] = GENERAL_PEAK;
 				} 
 				
 				
 		    }
 	    }
 		
-		
-	    
-	     
-	   
-	      
-	      
-	    
-	  		
-
 	  	  
 	  		
 	  		
@@ -441,7 +894,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
     	  
     	  
     	 
-    			//peakArray[strongestPitchPositionLF] = STRONGEST_PEAK;
+    			peakArray[strongestPitchPositionLF] = STRONGEST_PEAK;
     			if (lastPeakPosLF != -1) {
     				if (lastPeakPosLF < strongestPitchPositionLF) {
     					lastFoundEventLF = PatternDetector.SNDPT_HIGHER;
@@ -483,7 +936,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		  
     	 
     	  
-    			//peakArray[strongestPitchPositionHF] = STRONGEST_PEAK;
+    			peakArray[strongestPitchPositionHF] = STRONGEST_PEAK;
     			if (lastPeakPosHF != -1) {
     				if (lastPeakPosHF < strongestPitchPositionHF) {
     					lastFoundEventHF = PatternDetector.SNDPT_HIGHER;
@@ -510,9 +963,34 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	 
 	  
 	 
-	  pattyLF.pushEvent(lastFoundEventLF);
-	  pattyHF.pushEvent(lastFoundEventHF);
+	  //pattyLF.pushEvent(lastFoundEventLF);
+	  //pattyHF.pushEvent(lastFoundEventHF);
+	  
+	  if (drawAnalysis) {
+		  ourFrequencyBuffer.enqueue(freqArray);
+		  ourPeakBuffer.enqueue(peakArray);
+		  //ourPeakBufferW.enqueue(peakArrayW);
+		  
+		  pushEvent(lastFoundEventLF, pattyLF, 
+				  ourEventBufferLF, ourDetectedPatternBufferLF);
+		  pushEvent(lastFoundEventHF, pattyHF,
+				  ourEventBufferHF, ourDetectedPatternBufferHF);
+		  /*pushEvent(lastFoundEventW, ourPatternW, pattyW,
+				  ourEventBufferW, ourDetectedPatternBufferW);*/
+		  
+	  }
 	     
+	}
+	
+	public void pushEvent(int type, PatternDetector patty,
+			RingBuffer<Integer> eventBuffer, RingBuffer<Integer> patternBuffer) {
+		
+		
+		patty.pushEvent(type);
+		eventBuffer.enqueue(type);
+		patternBuffer.enqueue(0);//patty.getPatternNumber());
+		
+		
 	}
 	
 	

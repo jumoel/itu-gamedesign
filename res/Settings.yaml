@@ -7,8 +7,8 @@ gameplay:
   jumpforce: 4.0
   bounceforce: 5.0
   moveacceleration:
-    ground: 3.0
-    air: 1.5
+    ground: 1.0
+    air: 0.5
   breakacceleration:
     ground: 1.4
     air: 0.1

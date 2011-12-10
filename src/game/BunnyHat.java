@@ -80,11 +80,13 @@ public class BunnyHat extends PApplet implements Observer
 	private FullScreen fs;
 	
 	// which screen we are on right now?
-	public static enum Screens {GAME, MENU_MAIN, MENU_GAME, MENU_STORY, MENU_CREDITS, MENU_SETUP, INTRO}
+	public static enum Screens {GAME, MENU_MAIN, MENU_GAME, MENU_STORY, MENU_CREDITS, MENU_SETUP, MENU_SNDCTRL, INTRO}
 	private static Screens currentView;
 	private static int currentButton = 0;
 	private static int buttonCount = 0;
 	private static int currentLevel = 0;
+	private static int currentScreenSize = 0;
+	private static int currentSelectedScreenSize = 0;
 	private boolean pressedLeft = false;
 	private boolean pressedRight = false;
 	
@@ -211,6 +213,9 @@ public class BunnyHat extends PApplet implements Observer
 		case MENU_SETUP:
 			drawMenuSetupScreen();
 			break;
+		case MENU_SNDCTRL:
+			drawSoundControlScreen();
+			break;
 		case MENU_STORY:
 			drawMenuStoryScreen();
 			break;
@@ -314,7 +319,7 @@ public class BunnyHat extends PApplet implements Observer
 		LevelSource curLvl = levelSources.get(currentLevel);
 		if (curLvl.previewImage != null) {
 			PImage image = loadImage(curLvl.previewImage);
-			image(image, width/2-image.width/2, currentY+150);
+			image(image, width/2-image.width/2, currentY);
 		} else {
 			text(levelSources.get(currentLevel).goodLevelFile, width/2, currentY);
 		}
@@ -375,6 +380,16 @@ public class BunnyHat extends PApplet implements Observer
 		int buttonNumber = 0;
 		int buttonSpacing = 100;
 		
+		// button sound control
+		text("Screen Resolution (" + this.screenResolutionWidth[currentSelectedScreenSize] + 
+				"x" +this.screenResolutionHeight[currentSelectedScreenSize] + ")" +  
+				(buttonNumber == currentButton?" <-" : ""), width/2, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button sound control
+		text("Sound Control "+(buttonNumber == currentButton?" <-" : ""), width/2, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
 		// button back
 		drawButton("menu/game/", "Back", buttonNumber, currentY);
 		buttonNumber++; currentY += buttonSpacing;
@@ -387,6 +402,29 @@ public class BunnyHat extends PApplet implements Observer
 		PImage b = loadImage("menu/TitleScreen1024x768.png");
 		image(b, 0, 0);
 		//text("d(^_^)b amaaazing intro screen - press space to go on!", width/2, height/2);
+	}
+	
+	private void drawSoundControlScreen() {
+		image(loadImage("menu/background.png"), 0, 0);
+		
+		this.sndCtrl.updateFreqHistory(0, 0, width, 400);
+		this.sndCtrl.updateFreqDisplay(width-420, height-200, 420, 200);
+		
+		
+		int currentY = height - 100;
+		int buttonNumber = 0;
+		int buttonSpacing = 100;
+		
+		
+		
+		
+		
+		// button back
+		drawButton("menu/game/", "Back", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		buttonCount = buttonNumber;
+		
 	}
 
 	public static void main(String args[])
@@ -409,6 +447,9 @@ public class BunnyHat extends PApplet implements Observer
 			break;
 		case MENU_SETUP:
 			handleKeySetup();
+			break;
+		case MENU_SNDCTRL:
+			handleKeySndCtrl();
 			break;
 		case MENU_STORY:
 			handleKeyStory();
@@ -518,6 +559,7 @@ public class BunnyHat extends PApplet implements Observer
 					break;
 				case 1:
 					currentView = Screens.MENU_SETUP;
+					currentSelectedScreenSize = currentScreenSize;
 					currentButton = 0;
 					break;
 				case 2:
@@ -593,7 +635,57 @@ public class BunnyHat extends PApplet implements Observer
 	
 	private void handleKeySetup() {
 		handleKeyMenu();
-		currentView = Screens.MENU_MAIN;
+		switch (currentButton) {
+			case 0: // screen
+				if (pressedRight) { // choose screen size
+					currentSelectedScreenSize = (currentSelectedScreenSize + 1) % this.screenResolutionWidth.length;
+				} else if (pressedLeft) {
+					currentSelectedScreenSize = (currentSelectedScreenSize + screenResolutionWidth.length - 1) % this.screenResolutionWidth.length;
+				}
+				
+				if (key == ' ' || keyCode == ENTER) { // apply screen size
+					this.size(screenResolutionWidth[currentSelectedScreenSize], screenResolutionHeight[currentSelectedScreenSize]);
+					currentScreenSize = currentSelectedScreenSize;
+				}
+				
+				break;
+			case 1: // snd ctrl
+				if (key == ' ' || keyCode == ENTER) {
+					this.sndCtrl.startListening();
+					currentView = Screens.MENU_SNDCTRL;
+					currentButton = 0;
+				}
+				break;
+			case 2: // back
+				if (key == ' ' || keyCode == ENTER) {
+					currentView = Screens.MENU_MAIN;
+					currentButton = 0;
+				}
+				break;
+		}
+		
+		pressedLeft = pressedRight = false;
+	}
+	
+	private void handleKeySndCtrl() {
+		handleKeyMenu();
+		
+		switch (key) {
+			case 'p':
+				sndCtrl.drawAnalysis = !sndCtrl.drawAnalysis;
+				break;
+		}
+		
+		switch (currentButton) {
+			case 0: // back
+				if (key == ' ' || keyCode == ENTER) {
+					currentView = Screens.MENU_SETUP;
+					currentButton = 0;
+					this.sndCtrl.stopListening();
+				}
+				break;
+		}
+		
 	}
 	
 	private void handleKeyCredits() {
