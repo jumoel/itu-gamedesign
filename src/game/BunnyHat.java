@@ -411,12 +411,14 @@ public class BunnyHat extends PApplet implements Observer
 		this.sndCtrl.updateFreqDisplay(width-420, height-200, 420, 200);
 		
 		
-		int currentY = height - 100;
+		int currentY = height - 200;
 		int buttonNumber = 0;
-		int buttonSpacing = 100;
+		int buttonSpacing = 90;
 		
 		
-		
+		// informative text
+		text("press 'p' to pause the visualisation", width/2 , currentY);
+		currentY += buttonSpacing;
 		
 		
 		// button back

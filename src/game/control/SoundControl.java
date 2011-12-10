@@ -644,19 +644,19 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		    case PatternDetector.SNDPT_SAME:
 		    	historyBuffer.fill(255, 255, 0);
 		    	break;
-		    case PatternDetector.SNDPT_LOWER:
+		    case PatternDetector.SNDPT_HIGHER:
 		    	historyBuffer.fill(0, 255, 0);
 		    	break;
-		    case PatternDetector.SNDPT_HIGHER:
+		    case PatternDetector.SNDPT_LOWER:
 		    	historyBuffer.fill(255, 0, 0);
 		    	break;
 		    case PatternDetector.SNDPT_GAP_SAME:
 		    	historyBuffer.fill(255, 255, 255);
 		    	break;
-		    case PatternDetector.SNDPT_GAP_LOWER:
+		    case PatternDetector.SNDPT_GAP_HIGHER:
 		    	historyBuffer.fill(0, 255, 255);
 		    	break;
-		    case PatternDetector.SNDPT_GAP_HIGHER:
+		    case PatternDetector.SNDPT_GAP_LOWER:
 		    	historyBuffer.fill(255, 0, 255);
 		    	break;
 		    case PatternDetector.PATTERN_NONE:
@@ -664,33 +664,33 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		    	historyBuffer.noFill();
 		    	break;
 		    }
-			historyBuffer.rect(currentX, 0, - lineHeight + 1, 12);
+			historyBuffer.rect(currentX, height-12, - lineHeight + 1, 12);
 			
 			currentX = height-(currentLine)*lineHeight;
 			switch (ringItEventHF.next()) {
 		    case PatternDetector.SNDPT_SAME:
 		    	historyBuffer.fill(255, 255, 0);
 		    	break;
-		    case PatternDetector.SNDPT_LOWER:
+		    case PatternDetector.SNDPT_HIGHER:
 		    	historyBuffer.fill(0, 255, 0);
 		    	break;
-		    case PatternDetector.SNDPT_HIGHER:
+		    case PatternDetector.SNDPT_LOWER:
 		    	historyBuffer.fill(255, 0, 0);
 		    	break;
 		    case PatternDetector.SNDPT_GAP_SAME:
 		    	historyBuffer.fill(255, 255, 255);
 		    	break;
-		    case PatternDetector.SNDPT_GAP_LOWER:
+		    case PatternDetector.SNDPT_GAP_HIGHER:
 		    	historyBuffer.fill(0, 255, 255);
 		    	break;
-		    case PatternDetector.SNDPT_GAP_HIGHER:
+		    case PatternDetector.SNDPT_GAP_LOWER:
 		    	historyBuffer.fill(255, 0, 255);
 		    	break;
 		    default:
 		    	historyBuffer.noFill();
 		    	break;
 		    }
-			historyBuffer.rect(currentX, height-12, - lineHeight + 1, 12);
+			historyBuffer.rect(currentX, 0, - lineHeight + 1, 12);
 	 		
 		    
 		    /*y = freqHistoryHeight-(currentLine+1)*lineHeight;
