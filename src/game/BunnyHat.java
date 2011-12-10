@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import game.graphics.Animation;
 import game.graphics.AnimationImages;
 import game.gui.AmazingSwitchWitch;
 import game.gui.PlayerView;
@@ -15,6 +16,7 @@ import game.master.GameMaster;
 import game.sound.Stereophone;
 import game.control.SoundControl;
 import processing.core.*;
+import util.BImage;
 import fullscreen.*;
 
 @SuppressWarnings("serial")
@@ -93,6 +95,7 @@ public class BunnyHat extends PApplet implements Observer
 	private static boolean SOUND_CONTROL = false;
 	private int[] screenResolutionHeight = {768, 768, 900, 900, 1200};
 	private int[] screenResolutionWidth = {1024, 1366, 1440, 1600, 1600};
+	private Animation niah, noah;
 	
 	
 	//buffer stuff
@@ -174,6 +177,9 @@ public class BunnyHat extends PApplet implements Observer
 		if (fs.available()) {
 			fs.enter();
 		}*/
+		
+		niah = new Animation(this, "graphics/animations/player2idle");
+		noah = new Animation(this, "graphics/animations/player1idle");
 				
 	}
 
@@ -201,6 +207,9 @@ public class BunnyHat extends PApplet implements Observer
 			break;
 		case MENU_GAME:
 			drawMenuGameScreen();
+			break;
+		case MENU_SETUP:
+			drawMenuSetupScreen();
 			break;
 		case MENU_STORY:
 			drawMenuStoryScreen();
@@ -243,15 +252,22 @@ public class BunnyHat extends PApplet implements Observer
 		}
 	}
 
-	
+	private void drawMenuBackground() {
+		image(loadImage("menu/background.png"), 0, 0);
+		PImage badTree = loadImage("menu/badTreem.png");
+		PImage goodTree = loadImage("menu/goodTreem.png");
+		image(badTree, -badTree.width/3, height-badTree.height+20);
+		image(goodTree, width-goodTree.width/2, height-goodTree.height);
+		image(niah.getCurrentImage(this.millis()), 100, height-100);
+		image(BImage.mirrorAroundY(this, noah.getCurrentImage(this.millis())), width-100, height-100);
+	}
 	
 	private void drawMenuMainScreen()
 	{
-		background(255);
-		fill(0);
-		int currentY = height/3;
+		drawMenuBackground();
+		int currentY = height/4;
 		int buttonNumber = 0;
-		int buttonSpacing = 100;
+		int buttonSpacing = 90;
 		
 		
 		// button new game
@@ -289,15 +305,21 @@ public class BunnyHat extends PApplet implements Observer
 
 	private void drawMenuGameScreen()
 	{
-		background(255);
-		fill(0);
-		int currentY = 100;
+		drawMenuBackground();
+		int currentY = 33;
 		int buttonNumber = 0;
-		int buttonSpacing = 100;
+		int buttonSpacing = 90;
 		
 		// button select level
-		text(levelSources.get(currentLevel).goodLevelFile, width/2, currentY);
-		buttonNumber++; currentY += buttonSpacing;
+		LevelSource curLvl = levelSources.get(currentLevel);
+		if (curLvl.previewImage != null) {
+			PImage image = loadImage(curLvl.previewImage);
+			image(image, width/2-image.width/2, currentY+150);
+		} else {
+			text(levelSources.get(currentLevel).goodLevelFile, width/2, currentY);
+		}
+		drawButton("menu/game/", "Level", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing + 150;
 		
 		// button twin jump
 		drawOptionButton("menu/game/", "TwinJump", buttonNumber, currentY, this.TWIN_JUMP_SPACEBAR);
@@ -311,22 +333,53 @@ public class BunnyHat extends PApplet implements Observer
 		drawOptionButton("menu/game/", "Sound", buttonNumber, currentY, this.SOUND_CONTROL);
 		buttonNumber++; currentY += buttonSpacing;
 		
-		// button exit
-		//drawButton("menu/game/", "Back", buttonNumber, currentY);
+		// button back
+		drawButton("menu/game/", "Back", buttonNumber, currentY);
 		buttonNumber++; currentY += buttonSpacing;
 		
-		
-		
+		buttonCount = buttonNumber;
 	}
 	
 	private void drawMenuStoryScreen()
 	{
+		image(loadImage("menu/background.png"), 0, 0);
+		int currentY = 100;
+		int buttonNumber = 0;
+		int buttonSpacing = 100;
 		
+		// button back
+		drawButton("menu/game/", "Back", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		buttonCount = buttonNumber;
 	}
 	
 	private void drawMenuCreditsScreen()
 	{
+		image(loadImage("menu/background.png"), 0, 0);
+		int currentY = 100;
+		int buttonNumber = 0;
+		int buttonSpacing = 100;
 		
+		// button back
+		drawButton("menu/game/", "Back", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		buttonCount = buttonNumber;
+	}
+	
+	private void drawMenuSetupScreen()
+	{
+		image(loadImage("menu/background.png"), 0, 0);
+		int currentY = 100;
+		int buttonNumber = 0;
+		int buttonSpacing = 100;
+		
+		// button back
+		drawButton("menu/game/", "Back", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		buttonCount = buttonNumber;
 	}
 	
 	private void drawIntroScreen()
@@ -353,6 +406,15 @@ public class BunnyHat extends PApplet implements Observer
 			break;
 		case MENU_GAME:
 			handleKeyMenuGame();
+			break;
+		case MENU_SETUP:
+			handleKeySetup();
+			break;
+		case MENU_STORY:
+			handleKeyStory();
+			break;
+		case MENU_CREDITS:
+			handleKeyCredits();
 			break;
 		case INTRO:
 			handleKeyIntro();
@@ -452,19 +514,27 @@ public class BunnyHat extends PApplet implements Observer
 			switch (currentButton) {
 				case 0:
 					currentView = Screens.MENU_GAME;
+					currentButton = 0;
 					break;
 				case 1:
 					currentView = Screens.MENU_SETUP;
+					currentButton = 0;
 					break;
 				case 2:
-					
+					currentView = Screens.MENU_STORY;
+					currentButton = 0;
 					break;
 				case 3:
+					currentView = Screens.MENU_CREDITS;
+					currentButton = 0;
 					break;
 				case 4:
+					exit();
 					break;
 			}
 		}
+		
+		
 		
 	}
 	
@@ -521,10 +591,21 @@ public class BunnyHat extends PApplet implements Observer
 		pressedLeft = pressedRight = false;
 	}
 	
+	private void handleKeySetup() {
+		handleKeyMenu();
+		currentView = Screens.MENU_MAIN;
+	}
+	
+	private void handleKeyCredits() {
+		currentView = Screens.MENU_MAIN;
+	}
+	
+	private void handleKeyStory() {
+		currentView = Screens.MENU_MAIN;
+	}
+	
 	private void handleKeyIntro() {
-		//if (key == ' ') {
-			currentView = Screens.MENU_MAIN;
-		//}
+		currentView = Screens.MENU_MAIN;
 	}
 
 	public void keyReleased()
@@ -617,6 +698,7 @@ public class BunnyHat extends PApplet implements Observer
 		
 		//setup and run game master
 		gameMaster.startGame();
+		Stereophone.playSong("music/JPRixdorfer___Amen_Gypsy.wav");
 		
 	}
 

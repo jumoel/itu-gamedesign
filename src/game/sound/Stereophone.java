@@ -2,13 +2,18 @@ package game.sound;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.HashMap;
 
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 import processing.core.PApplet;
+
+
 
 public class Stereophone
 {
@@ -16,6 +21,9 @@ public class Stereophone
 	static HashMap snds;
 	static HashMap soundCooldowns; // contains timestamps for played sounds
 	static PApplet processing;
+	static Song ourSong;
+	
+	
 	
 	public Stereophone(String soundDirName, PApplet processing) {
 		File soundDir = new File(soundDirName);
@@ -35,6 +43,15 @@ public class Stereophone
 		}
 		soundCooldowns = new HashMap();
 		this.processing = processing;
+	}
+	
+	public static void playSong(String filename) {
+		ourSong = new Song(filename); 
+		ourSong.startPlaying();
+	}
+	
+	public static void stopSong() {
+		ourSong.stopPlaying();
 	}
 	
 	public static void playSound(final String number, String identifier, int msCooldown) {
