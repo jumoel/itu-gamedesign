@@ -2,6 +2,7 @@ package game.master;
 
 import game.BunnyHat;
 import game.Player;
+import game.control.SoundControl;
 import game.sound.Stereophone;
 
 import java.util.HashMap;
@@ -251,7 +252,12 @@ public class GameMaster extends Observable implements Observer, Runnable
 	@Override
 	public void update(Observable arg0, Object arg1)
 	{
-		if (arg1 instanceof HashMap) {
+		if (arg0 instanceof SoundControl) {
+			HashMap map = (HashMap)arg1;
+			String detector = (String)map.get("detector");
+			String pattern = (String)map.get("pattern");
+			
+		} else if (arg1 instanceof HashMap) {
 			HashMap map = (HashMap)arg1;
 			if (map.containsKey("IFUCKINGWON") && !gameOver) {
 				this.gameOver = true;

@@ -1,5 +1,6 @@
 package game.elements;
 import java.util.HashMap;
+import java.util.Observer;
 
 import processing.core.*;
 import util.BMath;

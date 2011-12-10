@@ -269,10 +269,13 @@ graphics:
       framewidth: 72
       frameheight: 72
       fps: 27
-levels:
-  level1: 
-    good: levels/test_24.tmx
-    bad: levels/test_24.tmx
-  level2:
-    good: levels/Level design lucid twins_V5_good.tmx
-    bad: levels/Level design lucid twins_V5_bad.tmx
+soundControl:
+  frequencyBorder: 640 # in Hz
+  attentionWindowHF:
+    frequencyMin: 880 # in Hz
+    frequencyMax: 3000 # in Hz
+  attentionWindowLF:
+    frequencyMin: 200 # in Hz
+    frequencyMax: 800 # in Hz
+    
+  

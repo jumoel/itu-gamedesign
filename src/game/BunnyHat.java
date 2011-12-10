@@ -409,6 +409,8 @@ public class BunnyHat extends PApplet implements Observer
 		
 		this.sndCtrl.updateFreqHistory(0, 0, width, 400);
 		this.sndCtrl.updateFreqDisplay(width-420, height-200, 420, 200);
+		PImage imgPatternStates = sndCtrl.drawPatternDetectorStates();
+		image(imgPatternStates, 0, height - imgPatternStates.height);
 		
 		
 		int currentY = height - 200;
@@ -786,6 +788,8 @@ public class BunnyHat extends PApplet implements Observer
 		view2.addObserver(switcher);
 		view1.addObserver(gameMaster);
 		view2.addObserver(gameMaster);
+		sndCtrl.addObserver(player1);
+		sndCtrl.addObserver(player2);
 		
 		//switcher.addObserver(view1);
 		//switcher.addObserver(view2);

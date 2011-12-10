@@ -1,7 +1,10 @@
 package game;
 import java.util.HashMap;
+import java.util.Observable;
+import java.util.Observer;
 
 
+import game.control.SoundControl;
 import game.elements.BubbleGunGum;
 import game.elements.BubbleGunGum.BallColor;
 import game.elements.DreamSwitch;
@@ -10,13 +13,14 @@ import game.elements.StandardCreature;
 import game.graphics.Animation;
 import game.gui.AmazingSwitchWitch;
 import game.level.Level;
+import game.level.Level.DreamStyle;
 import game.sound.Stereophone;
 import processing.core.*;
 import util.BImage;
 import util.BMath;
 import util.BPoint;
 
-public class Player extends GameElement
+public class Player extends GameElement implements Observer
 {
 	//private enum Facing { LEFT, RIGHT };
 	private int myID;
@@ -73,6 +77,8 @@ public class Player extends GameElement
 	private boolean stuckToTheGround = false;
 	private int stuckToTheGroundStartTime;
 	
+	private double moveAccelModifier = 1.0;
+	
 	//sound stuff
 	private boolean soundHitBottomPlayed = false;
 
@@ -116,7 +122,7 @@ public class Player extends GameElement
 		
 		this.updateMe = false;
 		this.zIndex = 100;
-		this.drawTrail = true;
+		this.drawTrail = false;
 		
 		this.myID = playerNumber;
 		
@@ -256,11 +262,11 @@ public class Player extends GameElement
 		
 		if (isInAir)
 		{
-			xAcceleration = -MOVEACCEL_AIR;
+			xAcceleration = -MOVEACCEL_AIR * this.moveAccelModifier;
 		}
 		else
 		{
-			xAcceleration = -MOVEACCEL_GROUND;
+			xAcceleration = -MOVEACCEL_GROUND * this.moveAccelModifier;
 		}
 	}
 	
@@ -280,11 +286,11 @@ public class Player extends GameElement
 		
 		if (isInAir)
 		{
-			xAcceleration = MOVEACCEL_AIR;
+			xAcceleration = MOVEACCEL_AIR * this.moveAccelModifier;
 		}
 		else
 		{
-			xAcceleration = MOVEACCEL_GROUND;
+			xAcceleration = MOVEACCEL_GROUND * this.moveAccelModifier;
 		}
 	}
 	
@@ -572,6 +578,30 @@ public class Player extends GameElement
 		myTwin = null;
 		
 		processing = null;
+	}
+	@Override
+	public void update(Observable arg0, Object arg1)
+	{
+		if (arg0 instanceof SoundControl) {
+			HashMap map = (HashMap)arg1;
+			String detector = (String)map.get("detector");
+			String pattern = (String)map.get("pattern");
+			System.out.println("fand:"+pattern);
+			if (detector == "HF" && level.dream == DreamStyle.GOOD) {
+				System.out.println("HF detector sagt");
+				if (pattern.contentEquals("SpeedUp")) {
+					System.out.println("let's speed up");
+					this.moveAccelModifier = 1.5;
+					this.drawTrail = true;
+				} else {
+					this.moveAccelModifier = 1.0;
+					this.drawTrail = false;
+				}
+			} else if (detector == "LF" && level.dream == DreamStyle.BAD) {
+				
+			}
+		}
+		
 	}
 
 }

@@ -3,6 +3,8 @@ package game.control;
 
 
 
+
+import game.BunnyHat;
 import game.graphics.Animation;
 
 import java.util.HashMap;
@@ -18,6 +20,8 @@ import ddf.minim.*;
 
 public class SoundControl extends Observable implements Observer, Runnable {
 	private final boolean showFPS = false;
+	
+	private final boolean DYNAMIC_ATTENTION_WINDOW_WIDTH = false;
 	
 	// Thread Control
 	private Thread ourThread;
@@ -62,8 +66,8 @@ public class SoundControl extends Observable implements Observer, Runnable {
 				float minHeight, float minWidth) {
 			this.iSMin = strMin;
 			this.iSMax = strMax;
-			this.iFMin = freqMin;
-			this.iFMax = freqMax;
+			this.cFMin = this.iFMin = freqMin;
+			this.cFMax = this.iFMax = freqMax;
 			this.minW = minWidth;
 			this.minH = minHeight;
 			this.maxW = iFMax - iFMin;
@@ -98,8 +102,10 @@ public class SoundControl extends Observable implements Observer, Runnable {
 				theoFMin -= theoFMax - iFMax;
 				theoFMax = iFMax;
 			}
-			cFMin = theoFMin;
-			cFMax = theoFMax;
+			if (DYNAMIC_ATTENTION_WINDOW_WIDTH) {
+				cFMin = theoFMin;
+				cFMax = theoFMax;
+			}
 
 		}
 		
@@ -147,7 +153,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	
 	
 	
-	int frequencyBorder; // frequency to determine high frequency
+	int frequencyBorder = BunnyHat.SETTINGS.getValue("soundControl/frequencyBorder"); // frequency to determine high frequency
 	int frequencyBorderPos; // array pos of the border
 	int minGapLength; //  
 	int maxGapLength; //
@@ -318,13 +324,14 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		public boolean drawAnalysis = true;
 		private boolean showAllFrequencies = true;
 		private boolean markPeakTypes = true;
-		public boolean drawLines = true;
+		public boolean drawLines = false;
 		private boolean hideWeakFrequencies = false;
 		public boolean markStrongestPeaks = true;
 		
 	// graphics
 	PGraphics displayBuffer;
 	PGraphics historyBuffer;
+	PGraphics statesBuffer;
 	Animation blueGum, redGum, blueIdle, blueShoot, redIdle, redShoot;
 	
 	PApplet ourPApplet;
@@ -360,13 +367,22 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  // human voice frequency range: 60 Hz - 7000 Hz
 	  // whistling range: 1300 Hz - 4000 Hz
 	  frequencyBorderPos = 42; //position in the array
+	  for (int i = 0; i < frequenciesOfInterest.length; i++) {
+		  if (frequencyBorder <= frequenciesOfInterest[i]) {
+			  frequencyBorderPos = i;
+			  break;
+		  }
+	  }
 	  
 	  // setup attention windows
 	  
 	  
-	  
-	  iAWLF = new AW(initStrengthMin, initStrengthMax, 12f, 40f, minHeight, minWidth);
-	  iAWHF = new AW(initStrengthMin, initStrengthMax, 52f, 71f, minHeight, minWidth);
+	  int minPosLF =getFreqMinPos((Integer)BunnyHat.SETTINGS.getValue("soundControl/attentionWindowLF/frequencyMin")); 
+	  int maxPosLF =getFreqMaxPos((Integer)BunnyHat.SETTINGS.getValue("soundControl/attentionWindowLF/frequencyMax"));
+	  int minPosHF =getFreqMinPos((Integer)BunnyHat.SETTINGS.getValue("soundControl/attentionWindowHF/frequencyMin")); 
+	  int maxPosHF =getFreqMaxPos((Integer)BunnyHat.SETTINGS.getValue("soundControl/attentionWindowHF/frequencyMax"));
+	  iAWLF = new AW(initStrengthMin, initStrengthMax, minPosLF, maxPosLF, minHeight, minWidth);
+	  iAWHF = new AW(initStrengthMin, initStrengthMax, minPosHF, maxPosHF, minHeight, minWidth);
 	  
 	  iAWLF.setFA((iAWLF.getFMax()-iAWLF.getFMin())/2); 
 	  iAWHF.setFA((iAWHF.getFMax() - iAWHF.getFMin()) / 2);
@@ -394,8 +410,8 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  lastPeakPosLF = lastPeakPosHF = -1;
 	  try
 	  {
-			pattyLF = new PatternDetector("LF", "patternDetectors/lowFreq");
-			pattyHF = new PatternDetector("HF", "patternDetectors/lowFreq");
+			pattyLF = new PatternDetector("LF", "patternDetectors/lowFreq", papplet);
+			pattyHF = new PatternDetector("HF", "patternDetectors/highFreq", papplet);
 	  }
 	  catch (Exception e)
 	  {
@@ -413,7 +429,40 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  
 	}
 	
+	private int getFreqMinPos(int frequency) {
+		int pos = 0;
+		for (int i = 0; i < frequenciesOfInterest.length; i++) {
+			if (frequency < frequenciesOfInterest[i]) break;
+			pos = i;
+		}
+		return pos;
+	}
 	
+	private int getFreqMaxPos(int frequency) {
+		for (int i = 0; i < frequenciesOfInterest.length; i++) {
+			if (frequency < frequenciesOfInterest[i]) return i;
+		}
+		return frequenciesOfInterest.length-1;
+	}
+	
+	
+	public PImage drawPatternDetectorStates() {
+		PImage imgPattyHF = pattyHF.drawPatternDetectorStates();
+		PImage imgPattyLF = pattyLF.drawPatternDetectorStates();
+		
+		if (statesBuffer == null || statesBuffer.width != imgPattyLF.width + imgPattyHF.width 
+				|| statesBuffer.height < imgPattyLF.height || statesBuffer.height < imgPattyHF.height) {
+			statesBuffer = ourPApplet.createGraphics(imgPattyLF.width + imgPattyHF.width, 
+					imgPattyLF.height > imgPattyHF.height ? imgPattyLF.height : imgPattyHF.height, PConstants.JAVA2D);
+		}
+		statesBuffer.beginDraw();
+		
+		statesBuffer.image(imgPattyLF, 0, statesBuffer.height - imgPattyLF.height);
+		statesBuffer.image(imgPattyHF, imgPattyLF.width, statesBuffer.height - imgPattyHF.height);
+		
+		statesBuffer.endDraw();
+		return statesBuffer;
+	}
 	
 	public void updateFreqHistory(int x, int y, int totalWidth, int height) {
 		int width = totalWidth - blueIdle.getCurrentImage(ourPApplet.millis()).width;
@@ -693,31 +742,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 			historyBuffer.rect(currentX, 0, - lineHeight + 1, 12);
 	 		
 		    
-		    /*y = freqHistoryHeight-(currentLine+1)*lineHeight;
-			switch (ringItEventW.next()) {
-		    case SoundInputTest.SNDPT_SAME:
-		    	fill(255, 255, 0);
-		    	break;
-		    case SoundInputTest.SNDPT_LOWER:
-		    	fill(0, 255, 0);
-		    	break;
-		    case SoundInputTest.SNDPT_HIGHER:
-		    	fill(255, 0, 0);
-		    	break;
-		    case SoundInputTest.SNDPT_GAP_SAME:
-		    	fill(255, 255, 255);
-		    	break;
-		    case SoundInputTest.SNDPT_GAP_LOWER:
-		    	fill(0, 255, 255);
-		    	break;
-		    case SoundInputTest.SNDPT_GAP_HIGHER:
-		    	fill(255, 0, 255);
-		    	break;
-		    default:
-		    	noFill();
-		    	break;
-		    }
-		    rect(width-12, y, width, y - lineHeight + 1);*/
+		    
 	 		 
 	 		 
 			}
@@ -728,6 +753,94 @@ public class SoundControl extends Observable implements Observer, Runnable {
 			  } 
 		  }
 		  
+		//mark patterns
+			Iterator<Integer> ringItPatternLF = ourDetectedPatternBufferLF.iterator();
+			markPattern(historyBuffer, width, lineHeight, height-13, height-frequencyBorderPos*w, ringItPatternLF);
+			/*currentLine = width/lineHeight + 1;
+			historyBuffer.noStroke();
+			int lastPattern = PatternDetector.PATTERN_NONE;
+			while (ringItPatternLF.hasNext()) {
+				currentLine--;
+				int currentX = width-(currentLine+1)*lineHeight;
+				int pattern = ringItPatternLF.next();
+				switch (pattern) {
+			    case PatternDetector.PATTERN_NONE:
+			    	historyBuffer.noStroke();
+			    	historyBuffer.noFill();
+			    	break;
+			    case PatternDetector.PATTERN_STRAIGHT_GAPISH:
+			    	historyBuffer.fill(0, 255, 255);
+			    	historyBuffer.stroke(0, 255, 255);
+			    	break;
+			    case PatternDetector.PATTERN_STRAIGHT_SOLID:
+			    	historyBuffer.fill(0 , 0, 255);
+			    	historyBuffer.stroke(0 , 0, 255);
+			    	break;
+			    case PatternDetector.PATTERN_UP_DOWN_GAPISH:
+			    	historyBuffer.fill(255, 255, 0);
+			    	historyBuffer.stroke(255, 255, 0);
+			    	break;
+			    case PatternDetector.PATTERN_UP_DOWN_SOLID:
+			    	historyBuffer.fill(255, 0, 0);
+			    	historyBuffer.stroke(255, 0, 0);
+			    	break;
+			    default:
+			    	historyBuffer.noStroke();
+			    	historyBuffer.noFill();
+			    	break;
+			    }
+				
+				historyBuffer.rect(currentX, height-32, - lineHeight + 1, 20);
+			    if (lastPattern != pattern) historyBuffer.line(currentX - lineHeight + 1, frequencyBorderPos*w, currentX - lineHeight + 1, width-32);
+			    
+			    lastPattern = pattern;
+				
+			}*/
+			
+			Iterator<Integer> ringItPatternHF = ourDetectedPatternBufferHF.iterator();
+			markPattern(historyBuffer, width, lineHeight, 13, frequencyBorderPos*w, ringItPatternHF);
+			/*currentLine = width/lineHeight + 1;
+			int lastPattern = PatternDetector.PATTERN_NONE;
+			historyBuffer.noStroke();
+			while (ringItPatternHF.hasNext()) {
+				currentLine--;
+				int currentX = width-(currentLine+1)*lineHeight;
+				int pattern = ringItPatternHF.next();
+				switch (pattern) {
+			    case PatternDetector.PATTERN_NONE:
+			    	historyBuffer.noStroke();
+			    	historyBuffer.noFill();
+			    	break;
+			    case PatternDetector.PATTERN_STRAIGHT_GAPISH:
+			    	historyBuffer.fill(0, 255, 255);
+			    	historyBuffer.stroke(0, 255, 255);
+			    	break;
+			    case PatternDetector.PATTERN_STRAIGHT_SOLID:
+			    	historyBuffer.fill(0 , 0, 255);
+			    	historyBuffer.stroke(0 , 0, 255);
+			    	break;
+			    case PatternDetector.PATTERN_UP_DOWN_GAPISH:
+			    	historyBuffer.fill(255, 255, 0);
+			    	historyBuffer.stroke(255, 255, 0);
+			    	break;
+			    case PatternDetector.PATTERN_UP_DOWN_SOLID:
+			    	historyBuffer.fill(255, 0, 0);
+			    	historyBuffer.stroke(255, 0, 0);
+			    	break;
+			    default:
+			    	historyBuffer.noStroke();
+			    	historyBuffer.noFill();
+			    	break;
+			    }
+				
+			    
+			    historyBuffer.rect(currentX, 13, - lineHeight + 1, 33);
+			    if (lastPattern != pattern) historyBuffer.line(currentX - lineHeight + 1, 33, currentX - lineHeight + 1, frequencyBorderPos*w);
+			    
+			    lastPattern = pattern;
+				
+			}*/
+		  
 		  historyBuffer.endDraw();
 		  
 		  PImage girl = redIdle.getCurrentImage(ourPApplet.millis());
@@ -736,6 +849,53 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		  ourPApplet.image(historyBuffer, blueIdle.getCurrentImage(ourPApplet.millis()).width, y);
 		  ourPApplet.image(girl, 0, height-lastPeakPosHF*w-girl.height/3*2);
 		  ourPApplet.image(boy, 0, height-lastPeakPosLF*w-boy.height/3*2);
+	}
+	
+	private void markPattern(PGraphics buffer, int width, int lineHeight, int y0, int y1, Iterator<Integer> ringItPattern) { 
+		int currentLine = width/lineHeight + 1;
+		int lastPattern = PatternDetector.PATTERN_NONE;
+		historyBuffer.noStroke();
+		while (ringItPattern.hasNext()) {
+			currentLine--;
+			int currentX = width-(currentLine+1)*lineHeight;
+			int pattern = ringItPattern.next();
+			switch (pattern) {
+		    case PatternDetector.PATTERN_NONE:
+		    	historyBuffer.noStroke();
+		    	historyBuffer.noFill();
+		    	break;
+		    case PatternDetector.PATTERN_STRAIGHT_GAPISH:
+		    	historyBuffer.fill(0, 255, 255);
+		    	historyBuffer.stroke(0, 255, 255);
+		    	break;
+		    case PatternDetector.PATTERN_STRAIGHT_SOLID:
+		    	historyBuffer.fill(0 , 0, 255);
+		    	historyBuffer.stroke(0 , 0, 255);
+		    	break;
+		    case PatternDetector.PATTERN_UP_DOWN_GAPISH:
+		    	historyBuffer.fill(255, 255, 0);
+		    	historyBuffer.stroke(255, 255, 0);
+		    	break;
+		    case PatternDetector.PATTERN_UP_DOWN_SOLID:
+		    	historyBuffer.fill(255, 0, 0);
+		    	historyBuffer.stroke(255, 0, 0);
+		    	break;
+		    default:
+		    	historyBuffer.noStroke();
+		    	historyBuffer.noFill();
+		    	break;
+		    }
+			
+		    
+		    historyBuffer.rect(currentX+lineHeight/2+2, y0, - lineHeight , -(y0 < y1?-4:4));
+		    if (lastPattern != pattern) {
+		    	historyBuffer.line(currentX - lineHeight/2 +2 , y0, currentX - lineHeight/2 + 2, y1);
+		    	historyBuffer.ellipse(currentX - 2, y1, 4, 4);
+		    }
+		    
+		    lastPattern = pattern;
+			
+		}
 	}
 	
 	
@@ -920,7 +1080,8 @@ public class SoundControl extends Observable implements Observer, Runnable {
     	  strongestPitchStrengthLF = 0;
 	  } else {
 		  
-		 
+		  //iAWLF.setSA(calcMovAverage(0f, windowExpansionSpeed, iAWLF.getSA(), numberOfPeaksForMovingAverage));
+		  iAWLF.setFA(calcMovAverage(0f, windowExpansionSpeed, iAWLF.getFA(), numberOfPeaksForMovingFreqAverage));
 		  iAWPeakPercentageLF = calcMovAverage(0f, windowExpansionSpeed, iAWPeakPercentageLF, peakPercentageSampleSize);
 		  
 		  
@@ -964,7 +1125,8 @@ public class SoundControl extends Observable implements Observer, Runnable {
     	    
     	  strongestPitchStrengthHF = 0;
 	  } else {
-	
+		  iAWHF.setSA(calcMovAverage(0f, windowExpansionSpeed, iAWHF.getSA(), numberOfPeaksForMovingAverage));
+		  //iAWHF.setFA(calcMovAverage(0f, windowExpansionSpeed, iAWHF.getFA(), numberOfPeaksForMovingFreqAverage));
 		  iAWPeakPercentageHF = calcMovAverage(0f, windowExpansionSpeed, iAWPeakPercentageHF, peakPercentageSampleSize);
 	  }
 	  iAWHF.recalc(iAWPeakPercentageHF);
@@ -995,8 +1157,8 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		
 		
 		patty.pushEvent(type);
-		eventBuffer.enqueue(type);
-		patternBuffer.enqueue(0);//patty.getPatternNumber());
+		eventBuffer.enqueue(type); 
+		patternBuffer.enqueue(patty.getPatternNumber());
 		
 		
 	}
