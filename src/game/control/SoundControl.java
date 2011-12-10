@@ -418,10 +418,18 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	public void updateFreqHistory(int x, int y, int totalWidth, int height) {
 		int width = totalWidth - blueIdle.getCurrentImage(ourPApplet.millis()).width;
 		
+		int w = new Integer(height/frequenciesOfInterest.length);
+		
 		if (historyBuffer == null || historyBuffer.width != width || historyBuffer.height != height) {
 			historyBuffer = ourPApplet.createGraphics(width, height, PConstants.JAVA2D);
 		} else if (!drawAnalysis) {
-			ourPApplet.image(historyBuffer, x, y);
+			PImage girl = redIdle.getCurrentImage(ourPApplet.millis());
+			  PImage boy = blueIdle.getCurrentImage(ourPApplet.millis());
+			  
+			  ourPApplet.image(historyBuffer, blueIdle.getCurrentImage(ourPApplet.millis()).width, y);
+			  ourPApplet.image(girl, 0, height-lastPeakPosHF*w-girl.height/3*2);
+			  ourPApplet.image(boy, 0, height-lastPeakPosLF*w-boy.height/3*2);
+			
 			return;
 		}
 		
@@ -433,7 +441,7 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		historyBuffer.strokeWeight(1);
 		  
 		  int lineHeight = width/bufferSize;
-		  int w = new Integer(height/frequenciesOfInterest.length);
+		  
 		  
 		  //draw the freqRecord so far
 		  Iterator<float[]> ringIt = ourFrequencyBuffer.iterator();
