@@ -37,6 +37,8 @@ public class BunnyHat extends PApplet implements Observer
 	
 	boolean SHOW_FPS = SETTINGS.getValue("debug/fps");
 	int FPS_AVERAGE_SAMPLE_SIZE = 10; // number of last measurements to take into account 
+	int FRAMERATE_GAME = SETTINGS.getValue("game/frameRateGame");
+	int FRAMERATE_MENU = SETTINGS.getValue("game/frameRateMenu");
 	
 	public static int TILEDIMENSION = SETTINGS.getValue("gui/tiledimension");
 	
@@ -114,9 +116,9 @@ public class BunnyHat extends PApplet implements Observer
 		
 		sndCtrl = new SoundControl(this);
 		
-		size(1024, 768);
+		size(1024, 768, JAVA2D);
 		
-		frameRate(23);
+		frameRate(FRAMERATE_MENU);
 		
 		//setup buffers 
 		//buffer = createGraphics(this.width, this.height, PConstants.JAVA2D);
@@ -191,6 +193,7 @@ public class BunnyHat extends PApplet implements Observer
 		cb.beginDraw();
 		cb.background(255);*/
 		
+		
 		lastTimestamp = currentTimestamp;
 		currentTimestamp = millis();
 		
@@ -199,6 +202,7 @@ public class BunnyHat extends PApplet implements Observer
 		if(deltaT > 84) {
 			System.out.println("high deltaT: "+ deltaT);
 		}
+		
 		
 		switch (currentView) {
 		case INTRO:
@@ -495,7 +499,7 @@ public class BunnyHat extends PApplet implements Observer
 		}
 		
 		if (key == 'g') {
-			frameRate(23);
+			frameRate(FRAMERATE_MENU);
 			currentView = Screens.MENU_GAME;
 			gameMaster.stopGame();
 			this.deleteAllTheStuff();
@@ -611,7 +615,7 @@ public class BunnyHat extends PApplet implements Observer
 				}
 				if (keyCode == ENTER || keyCode == ' ') {
 					setupGame(currentLevel);
-					frameRate(60);
+					frameRate(FRAMERATE_GAME);
 					currentView = Screens.GAME;
 				}
 				break;
@@ -685,6 +689,7 @@ public class BunnyHat extends PApplet implements Observer
 				if (key == ' ' || keyCode == ENTER) {
 					currentView = Screens.MENU_SETUP;
 					currentButton = 0;
+					
 					this.sndCtrl.stopListening();
 				}
 				break;

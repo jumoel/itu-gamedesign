@@ -754,101 +754,22 @@ public class SoundControl extends Observable implements Observer, Runnable {
 		  }
 		  
 		//mark patterns
-			Iterator<Integer> ringItPatternLF = ourDetectedPatternBufferLF.iterator();
-			markPattern(historyBuffer, width, lineHeight, height-13, height-frequencyBorderPos*w, ringItPatternLF);
-			/*currentLine = width/lineHeight + 1;
-			historyBuffer.noStroke();
-			int lastPattern = PatternDetector.PATTERN_NONE;
-			while (ringItPatternLF.hasNext()) {
-				currentLine--;
-				int currentX = width-(currentLine+1)*lineHeight;
-				int pattern = ringItPatternLF.next();
-				switch (pattern) {
-			    case PatternDetector.PATTERN_NONE:
-			    	historyBuffer.noStroke();
-			    	historyBuffer.noFill();
-			    	break;
-			    case PatternDetector.PATTERN_STRAIGHT_GAPISH:
-			    	historyBuffer.fill(0, 255, 255);
-			    	historyBuffer.stroke(0, 255, 255);
-			    	break;
-			    case PatternDetector.PATTERN_STRAIGHT_SOLID:
-			    	historyBuffer.fill(0 , 0, 255);
-			    	historyBuffer.stroke(0 , 0, 255);
-			    	break;
-			    case PatternDetector.PATTERN_UP_DOWN_GAPISH:
-			    	historyBuffer.fill(255, 255, 0);
-			    	historyBuffer.stroke(255, 255, 0);
-			    	break;
-			    case PatternDetector.PATTERN_UP_DOWN_SOLID:
-			    	historyBuffer.fill(255, 0, 0);
-			    	historyBuffer.stroke(255, 0, 0);
-			    	break;
-			    default:
-			    	historyBuffer.noStroke();
-			    	historyBuffer.noFill();
-			    	break;
-			    }
-				
-				historyBuffer.rect(currentX, height-32, - lineHeight + 1, 20);
-			    if (lastPattern != pattern) historyBuffer.line(currentX - lineHeight + 1, frequencyBorderPos*w, currentX - lineHeight + 1, width-32);
-			    
-			    lastPattern = pattern;
-				
-			}*/
+		Iterator<Integer> ringItPatternLF = ourDetectedPatternBufferLF.iterator();
+		markPattern(historyBuffer, width, lineHeight, height-13, height-frequencyBorderPos*w, ringItPatternLF);
+		
+		
+		Iterator<Integer> ringItPatternHF = ourDetectedPatternBufferHF.iterator();
+		markPattern(historyBuffer, width, lineHeight, 13, frequencyBorderPos*w, ringItPatternHF);
 			
-			Iterator<Integer> ringItPatternHF = ourDetectedPatternBufferHF.iterator();
-			markPattern(historyBuffer, width, lineHeight, 13, frequencyBorderPos*w, ringItPatternHF);
-			/*currentLine = width/lineHeight + 1;
-			int lastPattern = PatternDetector.PATTERN_NONE;
-			historyBuffer.noStroke();
-			while (ringItPatternHF.hasNext()) {
-				currentLine--;
-				int currentX = width-(currentLine+1)*lineHeight;
-				int pattern = ringItPatternHF.next();
-				switch (pattern) {
-			    case PatternDetector.PATTERN_NONE:
-			    	historyBuffer.noStroke();
-			    	historyBuffer.noFill();
-			    	break;
-			    case PatternDetector.PATTERN_STRAIGHT_GAPISH:
-			    	historyBuffer.fill(0, 255, 255);
-			    	historyBuffer.stroke(0, 255, 255);
-			    	break;
-			    case PatternDetector.PATTERN_STRAIGHT_SOLID:
-			    	historyBuffer.fill(0 , 0, 255);
-			    	historyBuffer.stroke(0 , 0, 255);
-			    	break;
-			    case PatternDetector.PATTERN_UP_DOWN_GAPISH:
-			    	historyBuffer.fill(255, 255, 0);
-			    	historyBuffer.stroke(255, 255, 0);
-			    	break;
-			    case PatternDetector.PATTERN_UP_DOWN_SOLID:
-			    	historyBuffer.fill(255, 0, 0);
-			    	historyBuffer.stroke(255, 0, 0);
-			    	break;
-			    default:
-			    	historyBuffer.noStroke();
-			    	historyBuffer.noFill();
-			    	break;
-			    }
-				
-			    
-			    historyBuffer.rect(currentX, 13, - lineHeight + 1, 33);
-			    if (lastPattern != pattern) historyBuffer.line(currentX - lineHeight + 1, 33, currentX - lineHeight + 1, frequencyBorderPos*w);
-			    
-			    lastPattern = pattern;
-				
-			}*/
 		  
-		  historyBuffer.endDraw();
-		  
-		  PImage girl = redIdle.getCurrentImage(ourPApplet.millis());
-		  PImage boy = blueIdle.getCurrentImage(ourPApplet.millis());
-		  
-		  ourPApplet.image(historyBuffer, blueIdle.getCurrentImage(ourPApplet.millis()).width, y);
-		  ourPApplet.image(girl, 0, height-lastPeakPosHF*w-girl.height/3*2);
-		  ourPApplet.image(boy, 0, height-lastPeakPosLF*w-boy.height/3*2);
+		historyBuffer.endDraw();
+	  
+	  	PImage girl = redIdle.getCurrentImage(ourPApplet.millis());
+	  	PImage boy = blueIdle.getCurrentImage(ourPApplet.millis());
+	  
+	  	ourPApplet.image(historyBuffer, blueIdle.getCurrentImage(ourPApplet.millis()).width, y);
+	  	ourPApplet.image(girl, 0, height-lastPeakPosHF*w-girl.height/3*2);
+	  	ourPApplet.image(boy, 0, height-lastPeakPosLF*w-boy.height/3*2);
 	}
 	
 	private void markPattern(PGraphics buffer, int width, int lineHeight, int y0, int y1, Iterator<Integer> ringItPattern) { 

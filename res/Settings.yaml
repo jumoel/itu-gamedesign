@@ -1,5 +1,7 @@
 game:
   title: Lucid Twins
+  frameRateMenu: 17 # while not playing a low framerate is nice for the cpu
+  frameRateGame: 60 # the framerate the game will _try_ to reach
 gameplay:
   deltatdivident: 100
   clamptozero: 0.001
