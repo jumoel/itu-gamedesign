@@ -29,6 +29,7 @@ public class BunnyHat extends PApplet implements Observer
 		String goodLevelFile, badLevelFile;
 		ArrayList goodBackgroundImages, badBackgroundImages;
 		String previewImage; 
+		String music;
 	}
 	private ArrayList<LevelSource> levelSources;
 	
@@ -135,13 +136,13 @@ public class BunnyHat extends PApplet implements Observer
 		
 		
 		//setup sound output
-		sndOut = new Stereophone(this.getClass().getClassLoader().getResource("sounds/").getPath(), this);
+		sndOut = new Stereophone("sounds/", this);
 		sndOut.printSounds();
 		
 		
 		// get levels
 		levelSources = new ArrayList<LevelSource>();
-		File levelDirRoot = new File(this.getClass().getClassLoader().getResource("levels/").getPath());
+		File levelDirRoot = new File("levels/");
 		File[] levelDirs = levelDirRoot.listFiles();
 		PImage dummy;
 		for (int i = 0; i < levelDirs.length; i++) {
@@ -157,6 +158,8 @@ public class BunnyHat extends PApplet implements Observer
 						lvlSrc.badLevelFile = files[e].getAbsolutePath();
 					} else if (name.endsWith("od.tmx")) {
 						lvlSrc.goodLevelFile = files[e].getAbsolutePath();
+					} else if (name.endsWith(".wav")) {
+						lvlSrc.music = files[e].getAbsolutePath();
 					} else if (name.endsWith(".png")) {
 						String path = files[e].getAbsolutePath();
 						if (name.startsWith("good")) {
@@ -174,7 +177,7 @@ public class BunnyHat extends PApplet implements Observer
 		}
 		
 		
-		//attempt to get a full screen mode - not working - null pointer exception 		
+		//attempt to get a full screen mode - only working as an application 		
 		/*fs = new FullScreen(this);
 		if (fs.available()) {
 			fs.enter();
@@ -502,6 +505,7 @@ public class BunnyHat extends PApplet implements Observer
 			currentView = Screens.MENU_GAME;
 			gameMaster.stopGame();
 			this.deleteAllTheStuff();
+			Stereophone.stopSong();
 		}
 		
 		if (key == 's' || key == 'k') {
@@ -800,14 +804,16 @@ public class BunnyHat extends PApplet implements Observer
 		
 		//setup and run game master
 		gameMaster.startGame();
-		Stereophone.playSong("music/JPRixdorfer___Amen_Gypsy.wav");
+		if (lvlSrc.music != null) {
+			Stereophone.playSong(lvlSrc.music);
+		}
 		
 	}
 
 	@Override
 	public void update(Observable o, Object arg)
 	{
-		if (arg instanceof HashMap) {
+		/*if (arg instanceof HashMap) {
 			HashMap map = (HashMap)arg;
 			String detector = (String)map.get("detector");
 			String pattern = (String)map.get("pattern");
@@ -816,7 +822,7 @@ public class BunnyHat extends PApplet implements Observer
 			} else {
 				inputState.put('l', (pattern.contentEquals("Straight Solid")));
 			}
-		}
+		}*/
 		
 	}
 	

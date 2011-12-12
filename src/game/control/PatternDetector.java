@@ -1,6 +1,7 @@
 package game.control;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -110,7 +111,7 @@ public class PatternDetector extends Observable {
 		patternNames = new ArrayList<String>();
 		
 		// reading configurations from our configuration directory
-		File confDir = new File(this.getClass().getClassLoader().getResource(confDirName).getPath());
+		File confDir = new File(confDirName);
 		File[] confFiles = confDir.listFiles();
 		if (confFiles == null) {System.out.println("no config for pattern detector "+name); return;}
 		Yaml yaml = new Yaml();
@@ -120,7 +121,7 @@ public class PatternDetector extends Observable {
 			if (confFiles[i].isFile() && confFiles[i].getName().endsWith(".yaml")) {
 				// setup defined pattern
 				ArrayList<PDS> newStates = new ArrayList<PDS>();
-				InputStream is = this.getClass().getClassLoader().getResourceAsStream(confDirName + confFiles[i].getName());
+				InputStream is = new FileInputStream(confFiles[i].getPath());
 				Object possibleLinkedHashMap = yaml.load(is);
 				LinkedHashMap<String, Object> values = null;
 				if (possibleLinkedHashMap instanceof LinkedHashMap<?, ?>) {

@@ -72,7 +72,7 @@ public class Song implements Runnable
 					e.printStackTrace();
 				}
 	        }
-	        AudioPlayer.player.stop(as); 
+	        AudioPlayer.player.stop(as);
 	    }
 		public void stopPlaying() {
 			playSong = false;
