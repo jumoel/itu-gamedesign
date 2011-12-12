@@ -183,7 +183,7 @@ public class BunnyHat extends PApplet implements Observer
 		fs = new FullScreen(this);
 		if (fs.available()) {
 			this.screenResolutions = fs.getResolutions();
-			size(screen.width, screen.height);
+			//size(screen.width, screen.height);
 			fs.setResolution(screenResolutions[0].width, screenResolutions[0].height);
 			fs.enter();
 		}
