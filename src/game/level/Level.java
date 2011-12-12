@@ -10,14 +10,19 @@ import java.util.LinkedList;
 import game.BunnyHat;
 import game.CollisionBox;
 import game.Player;
+import game.control.RingBuffer;
 import game.elements.BadSheep;
+import game.elements.BadSheepStanding;
 import game.elements.BubbleGunGum;
 import game.elements.DreamSwitch;
 import game.elements.GameElement;
+import game.elements.GameElement.TrailPos;
 import game.elements.GoodSheep;
+import game.elements.GoodSheepStanding;
 import game.elements.PushBox;
 import processing.core.*;
 import util.BImage;
+import util.BPoint;
 import util.BString;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -28,6 +33,9 @@ import org.w3c.dom.Document;
 
 public class Level extends CollisionLevel
 {
+	private static int TRAIL_LENGTH = BunnyHat.SETTINGS.getValue("graphics/effects/trail/length");
+	private static int TRAIL_VIS_REDUC = 255 / TRAIL_LENGTH;
+	
 	public enum Layer {FOREGROUND, BACKGROUND}
 	public enum DreamStyle {GOOD, BAD}
 	
@@ -63,6 +71,7 @@ public class Level extends CollisionLevel
 	private int levelDataForeground[];
 	private int metaData[];
 	private ArrayList<GameElement> gameElements;
+	private ArrayList<Player> players;
 	
 	public String levelName;
 	private String levelPath;
@@ -94,6 +103,7 @@ public class Level extends CollisionLevel
 		this.collisionSetup();
 		
 		gameElements = new ArrayList<GameElement>();
+		players = new ArrayList<Player>();
 		//this.setupTheBigPiture();
 	}
 	
@@ -133,6 +143,8 @@ public class Level extends CollisionLevel
 				if (currentMetaTile == Level.MetaTiles.CROSSINGSHEEP.index()) {
 					GoodSheep goodSheep = new GoodSheep(x, y-1, 3, 3, processing);
 					BadSheep badSheep = new BadSheep(x, y-1, 3, 3, processing, goodSheep);
+					goodSheep.setTwinElement(badSheep);
+					badSheep.setTwinElement(goodSheep);
 					if (dream == DreamStyle.GOOD) {
 						twinDream.addElement(badSheep);
 						this.addElement(goodSheep);
@@ -142,6 +154,7 @@ public class Level extends CollisionLevel
 					}
 				} else if (currentMetaTile == MetaTiles.DREAMSWITCH.index()) {
 					DreamSwitch dreamSwitch = new DreamSwitch(x, y-1, processing);
+					BunnyHat.getGameMaster().addObserver(dreamSwitch);
 					this.addElement(dreamSwitch);
 				} else if (currentMetaTile == MetaTiles.PUSHBOX.index()) {
 					PushBox pushBox = new PushBox(x, y-1, processing);
@@ -150,6 +163,14 @@ public class Level extends CollisionLevel
 					twinDream.addElement(pushBoxOther);
 					pushBox.setBoxTwin(pushBoxOther);
 					pushBoxOther.setBoxTwin(pushBox);
+				} else if (currentMetaTile == MetaTiles.NORMALSHEEP.index()) {
+					if (dream == DreamStyle.GOOD) {
+						GoodSheepStanding sheep = new GoodSheepStanding(x, y-1, processing);
+						this.addElement(sheep);
+					} else {
+						BadSheepStanding sheep = new BadSheepStanding(x, y-1, processing);
+						this.addElement(sheep);
+					}
 				}
 			}
 		}
@@ -231,16 +252,6 @@ public class Level extends CollisionLevel
 				currentCreature.update(deltaT);
 			}
 		}
-		
-		// sort once, get elements with high zIndex further to the front
-		// sorting once is enough, to get e.g. one player to the front
-		for (int i = 1; i < gameElements.size(); i++) {
-			if (gameElements.get(i-1).zIndex > gameElements.get(i).zIndex) {
-				GameElement element = gameElements.get(i);
-				gameElements.set(i, gameElements.get(i-1));
-				gameElements.set(i-1, element);
-			}
-		}
 	}
 	
 	public void drawCreaturesAndObjects(int x, int y, int width, int height, PGraphics graphics) {
@@ -256,11 +267,41 @@ public class Level extends CollisionLevel
 				int ycoord = (int)((height - currentCreature.y() * BunnyHat.TILEDIMENSION));
 				
 				if (xcoord+currentCreature.collisionBoxWidth()+200 > 0 && xcoord <  width 
-						&& ycoord - currentCreature.collisionBoxHeight() > 0 && ycoord <  height) {
+						&& ycoord + currentCreature.collisionBoxHeight() > 0 && ycoord <  height) {
 					
 					PImage image = currentCreature.getCurrentTexture();
 					
+					//trail?
+					if (currentCreature.drawTrail) {
+						double lastX = currentCreature.x();
+						double lastY = currentCreature.y();
+						if (currentCreature.drawTrailPositions != null) {
+							Iterator<TrailPos> prevPoses = currentCreature.drawTrailPositions.iterator();
+							int visibility = 255;
+							double cX = 0, cY = 0;
+							while (prevPoses.hasNext()) {
+								TrailPos pos = prevPoses.next();
+								graphics.tint(255, visibility);
+								graphics.image(pos.image, (int)(pos.x*BunnyHat.TILEDIMENSION - x), 
+										(int)(height - pos.y*BunnyHat.TILEDIMENSION - image.height));
+								visibility -= TRAIL_VIS_REDUC;
+								
+							}
+							graphics.noTint();
+						} else {
+							currentCreature.drawTrailPositions = new RingBuffer<TrailPos>(TRAIL_LENGTH);
+						}
+						currentCreature.drawTrailPositions.enqueue(currentCreature.new TrailPos(image, currentCreature.x(), 
+								currentCreature.y()));
+					} else {
+						if (currentCreature.drawTrailPositions != null) {
+							currentCreature.drawTrailPositions = null;
+						}
+					}
+					
 					graphics.image(image, xcoord, ycoord-image.height);
+					
+					
 				}
 			}
 		}
@@ -272,10 +313,33 @@ public class Level extends CollisionLevel
 	public void addElement(GameElement e) {
 		e.setLevel(this);
 		gameElements.add(e);
+		if (e instanceof Player) players.add((Player)e);
+		// sort once, get elements with high zIndex further to the front
+		// sorting once is enough, to get e.g. one player to the front
+		for (int i = 1; i < gameElements.size(); i++) {
+			if (gameElements.get(i-1).zIndex > gameElements.get(i).zIndex) {
+				GameElement element = gameElements.get(i);
+				gameElements.set(i, gameElements.get(i-1));
+				gameElements.set(i-1, element);
+			}
+		}
+	}
+	
+	public double getDistanceClosestPlayer(double ownX) {
+		double distance = 100000;
+		// search playaz
+		for (int i = 0; i < players.size(); i++) {
+			double dist = Math.abs(players.get(i).x() - ownX);
+			if (dist < distance) {
+				distance = dist;
+			}
+		}
+		return distance;
 	}
 	
 	public void removeElement(GameElement e) {
 		gameElements.remove(e);
+		if (e instanceof Player) players.remove((Player)e);
 	}
 	
 	public void removeAllPushBoxConstraints() {

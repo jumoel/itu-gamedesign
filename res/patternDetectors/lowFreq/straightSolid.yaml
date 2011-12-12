@@ -7,6 +7,7 @@ states:
   - # 1
     name: confirmed straigth solid!
     confirmed: true
+    pattern: 3
     onSame: 1
     weightSame: 1
       

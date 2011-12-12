@@ -1,0 +1,35 @@
+name: straightGapish
+states:
+  - # 0
+    name: initSG
+    onSame: 1
+    weightSame: 3
+  - # 1
+    name: pre0SG
+    weightNone : 3
+    weightSame : 4
+    onNone : 2
+  - # 2
+    name: pre1SG
+    weightNone : 4
+    weightSame : 3
+    onSame : 3
+  - # 3
+    name: pre2SG
+    weightNone : 3
+    weightSame : 4
+    onNone : 4
+  - # 4
+    name: conf0SG
+    weightNone : 4
+    weightSame : 3
+    onSame : 5
+    confirmed: true
+    pattern: 4
+  - # 5
+    name: conf1SG
+    weightNone : 3
+    weightSame : 4
+    onNone : 4
+    confirmed: true
+    pattern: 4

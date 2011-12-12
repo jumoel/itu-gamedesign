@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 
+import game.graphics.Animation;
 import game.graphics.AnimationImages;
 import game.gui.AmazingSwitchWitch;
 import game.gui.PlayerView;
@@ -15,6 +16,7 @@ import game.master.GameMaster;
 import game.sound.Stereophone;
 import game.control.SoundControl;
 import processing.core.*;
+import util.BImage;
 import fullscreen.*;
 
 @SuppressWarnings("serial")
@@ -28,17 +30,15 @@ public class BunnyHat extends PApplet implements Observer
 		ArrayList goodBackgroundImages, badBackgroundImages;
 		String previewImage; 
 	}
-	private ArrayList levelSources;
+	private ArrayList<LevelSource> levelSources;
 	
 	
 	public static Settings SETTINGS = new Settings();
 	
 	boolean SHOW_FPS = SETTINGS.getValue("debug/fps");
-	int FPS_AVERAGE_SAMPLE_SIZE = 10; // number of last measurements to take into account
-	
-	// game modes
-	public static boolean TWIN_JUMP_SPACEBAR = false;
-	public static boolean TWIN_JUMP = false; 
+	int FPS_AVERAGE_SAMPLE_SIZE = 10; // number of last measurements to take into account 
+	int FRAMERATE_GAME = SETTINGS.getValue("game/frameRateGame");
+	int FRAMERATE_MENU = SETTINGS.getValue("game/frameRateMenu");
 	
 	public static int TILEDIMENSION = SETTINGS.getValue("gui/tiledimension");
 	
@@ -62,7 +62,7 @@ public class BunnyHat extends PApplet implements Observer
 	private RaceIndicator indicator;
 	private SoundControl sndCtrl;
 	private Stereophone sndOut;
-	private GameMaster gameMaster;
+	private static GameMaster gameMaster; public static GameMaster getGameMaster() {return gameMaster;} 
 	private AmazingSwitchWitch switcher;
 
 	private State inputState;
@@ -70,7 +70,7 @@ public class BunnyHat extends PApplet implements Observer
 	private int lastTimestamp;
 	private int currentTimestamp;
 	private int deltaT;
-	public double physicsTimeFactor = 1.0;
+	public static double physicsTimeFactor = 1.0;
 	
 	// statistics
 	private int lastFpsTime;
@@ -82,8 +82,25 @@ public class BunnyHat extends PApplet implements Observer
 	private FullScreen fs;
 	
 	// which screen we are on right now?
-	public static enum Screens {GAME, MENU_MAIN, MENU_SETUP, MENU_STORY, MENU_CREDITS, INTRO}
+	public static enum Screens {GAME, MENU_MAIN, MENU_GAME, MENU_STORY, MENU_CREDITS, MENU_SETUP, MENU_SNDCTRL, INTRO}
 	private static Screens currentView;
+	private static int currentButton = 0;
+	private static int buttonCount = 0;
+	private static int currentLevel = 0;
+	private static int currentScreenSize = 0;
+	private static int currentSelectedScreenSize = 0;
+	private boolean pressedLeft = false;
+	private boolean pressedRight = false;
+	
+	// game modes
+	private static boolean TWIN_JUMP_SPACEBAR = false;
+	public static boolean TWIN_JUMP = false;
+	private static boolean SAME_DREAM = false;
+	private static boolean SOUND_CONTROL = false;
+	private int[] screenResolutionHeight = {768, 768, 900, 900, 1200};
+	private int[] screenResolutionWidth = {1024, 1366, 1440, 1600, 1600};
+	private Animation niah, noah;
+	
 	
 	//buffer stuff
 	private PGraphics buffer;
@@ -99,12 +116,9 @@ public class BunnyHat extends PApplet implements Observer
 		
 		sndCtrl = new SoundControl(this);
 		
+		size(1024, 768, JAVA2D);
 		
-		//size(WINDOWWIDTH, WINDOWHEIGHT);
-		size(1024, 768);
-		//background(0);
-		
-		frameRate(2000);
+		frameRate(FRAMERATE_MENU);
 		
 		//setup buffers 
 		//buffer = createGraphics(this.width, this.height, PConstants.JAVA2D);
@@ -128,7 +142,7 @@ public class BunnyHat extends PApplet implements Observer
 		
 		
 		// get levels
-		levelSources = new ArrayList();
+		levelSources = new ArrayList<LevelSource>();
 		File levelDirRoot = new File("levels/");
 		File[] levelDirs = levelDirRoot.listFiles();
 		PImage dummy;
@@ -167,6 +181,9 @@ public class BunnyHat extends PApplet implements Observer
 		if (fs.available()) {
 			fs.enter();
 		}*/
+		
+		niah = new Animation(this, "graphics/animations/player2idle");
+		noah = new Animation(this, "graphics/animations/player1idle");
 				
 	}
 
@@ -176,11 +193,16 @@ public class BunnyHat extends PApplet implements Observer
 		cb.beginDraw();
 		cb.background(255);*/
 		
+		
 		lastTimestamp = currentTimestamp;
 		currentTimestamp = millis();
 		
 		deltaT = currentTimestamp - lastTimestamp;
 		if (deltaT==0) deltaT=10;
+		if(deltaT > 84) {
+			System.out.println("high deltaT: "+ deltaT);
+		}
+		
 		
 		switch (currentView) {
 		case INTRO:
@@ -188,6 +210,21 @@ public class BunnyHat extends PApplet implements Observer
 			break;
 		case MENU_MAIN:
 			drawMenuMainScreen();
+			break;
+		case MENU_GAME:
+			drawMenuGameScreen();
+			break;
+		case MENU_SETUP:
+			drawMenuSetupScreen();
+			break;
+		case MENU_SNDCTRL:
+			drawSoundControlScreen();
+			break;
+		case MENU_STORY:
+			drawMenuStoryScreen();
+			break;
+		case MENU_CREDITS:
+			drawMenuCreditsScreen();
 			break;
 		case GAME:
 			deltaT = (int)(deltaT * physicsTimeFactor);
@@ -224,23 +261,178 @@ public class BunnyHat extends PApplet implements Observer
 		}
 	}
 
+	private void drawMenuBackground() {
+		image(loadImage("menu/background.png"), 0, 0);
+		PImage badTree = loadImage("menu/badTreem.png");
+		PImage goodTree = loadImage("menu/goodTreem.png");
+		image(badTree, -badTree.width/3, height-badTree.height+20);
+		image(goodTree, width-goodTree.width/2, height-goodTree.height);
+		image(niah.getCurrentImage(this.millis()), 100, height-100);
+		image(BImage.mirrorAroundY(this, noah.getCurrentImage(this.millis())), width-100, height-100);
+	}
+	
 	private void drawMenuMainScreen()
 	{
-		background(255);
-		fill(0);
-		int currentY = height/2;
-		for (int i = 0; i < levelSources.size(); i++) {
-			text("press "+i+" for level "+i, width/2, currentY);
-			currentY += 15;
-		}
-		text("and g to quit this game..", width/2, currentY);
+		drawMenuBackground();
+		int currentY = height/4;
+		int buttonNumber = 0;
+		int buttonSpacing = 90;
+		
+		
+		// button new game
+		drawButton("menu/main/", "Play", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button setup
+		drawButton("menu/main/", "Setup", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button story
+		drawButton("menu/main/", "Story", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button credits
+		drawButton("menu/main/", "Credits", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button exit
+		drawButton("menu/main/", "Exit", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		buttonCount = buttonNumber;
+	}
+	
+	private void drawButton(String path, String name, int number, int y) {
+		PImage image = loadImage(path+"button"+name+(currentButton==number?"Selected":"")+".png"); 
+		image(image, width/2-image.width/2, y);
+	}
+	
+	private void drawOptionButton(String path, String name, int number, int y, boolean option) {
+		PImage image = loadImage(path+"button"+name+(option?"On":"Off")+(currentButton==number?"Selected":"")+".png"); 
+		image(image, width/2-image.width/2, y);
 	}
 
+	private void drawMenuGameScreen()
+	{
+		drawMenuBackground();
+		int currentY = 33;
+		int buttonNumber = 0;
+		int buttonSpacing = 90;
+		
+		// button select level
+		LevelSource curLvl = levelSources.get(currentLevel);
+		if (curLvl.previewImage != null) {
+			PImage image = loadImage(curLvl.previewImage);
+			image(image, width/2-image.width/2, currentY);
+		} else {
+			text(levelSources.get(currentLevel).goodLevelFile, width/2, currentY);
+		}
+		drawButton("menu/game/", "Level", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing + 150;
+		
+		// button twin jump
+		drawOptionButton("menu/game/", "TwinJump", buttonNumber, currentY, this.TWIN_JUMP_SPACEBAR);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button run together / alone
+		drawOptionButton("menu/game/", "DreamOpposite", buttonNumber, currentY, !this.SAME_DREAM);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button sound control
+		drawOptionButton("menu/game/", "Sound", buttonNumber, currentY, this.SOUND_CONTROL);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button back
+		drawButton("menu/game/", "Back", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		buttonCount = buttonNumber;
+	}
+	
+	private void drawMenuStoryScreen()
+	{
+		image(loadImage("menu/background.png"), 0, 0);
+		int currentY = 100;
+		int buttonNumber = 0;
+		int buttonSpacing = 100;
+		
+		// button back
+		drawButton("menu/game/", "Back", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		buttonCount = buttonNumber;
+	}
+	
+	private void drawMenuCreditsScreen()
+	{
+		image(loadImage("menu/background.png"), 0, 0);
+		int currentY = 100;
+		int buttonNumber = 0;
+		int buttonSpacing = 100;
+		
+		// button back
+		drawButton("menu/game/", "Back", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		buttonCount = buttonNumber;
+	}
+	
+	private void drawMenuSetupScreen()
+	{
+		image(loadImage("menu/background.png"), 0, 0);
+		int currentY = 100;
+		int buttonNumber = 0;
+		int buttonSpacing = 100;
+		
+		// button sound control
+		text("Screen Resolution (" + this.screenResolutionWidth[currentSelectedScreenSize] + 
+				"x" +this.screenResolutionHeight[currentSelectedScreenSize] + ")" +  
+				(buttonNumber == currentButton?" <-" : ""), width/2, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button sound control
+		text("Sound Control "+(buttonNumber == currentButton?" <-" : ""), width/2, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button back
+		drawButton("menu/game/", "Back", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		buttonCount = buttonNumber;
+	}
+	
 	private void drawIntroScreen()
 	{
 		PImage b = loadImage("menu/TitleScreen1024x768.png");
 		image(b, 0, 0);
 		//text("d(^_^)b amaaazing intro screen - press space to go on!", width/2, height/2);
+	}
+	
+	private void drawSoundControlScreen() {
+		image(loadImage("menu/background.png"), 0, 0);
+		
+		this.sndCtrl.updateFreqHistory(0, 0, width, 400);
+		this.sndCtrl.updateFreqDisplay(width-420, height-200, 420, 200);
+		PImage imgPatternStates = sndCtrl.drawPatternDetectorStates();
+		image(imgPatternStates, 0, height - imgPatternStates.height);
+		
+		
+		int currentY = height - 200;
+		int buttonNumber = 0;
+		int buttonSpacing = 90;
+		
+		
+		// informative text
+		text("press 'p' to pause the visualisation", width/2 , currentY);
+		currentY += buttonSpacing;
+		
+		
+		// button back
+		drawButton("menu/game/", "Back", buttonNumber, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		buttonCount = buttonNumber;
+		
 	}
 
 	public static void main(String args[])
@@ -258,6 +450,21 @@ public class BunnyHat extends PApplet implements Observer
 		case MENU_MAIN:
 			handleKeyMenuMain();
 			break;
+		case MENU_GAME:
+			handleKeyMenuGame();
+			break;
+		case MENU_SETUP:
+			handleKeySetup();
+			break;
+		case MENU_SNDCTRL:
+			handleKeySndCtrl();
+			break;
+		case MENU_STORY:
+			handleKeyStory();
+			break;
+		case MENU_CREDITS:
+			handleKeyCredits();
+			break;
 		case INTRO:
 			handleKeyIntro();
 			break;
@@ -265,23 +472,9 @@ public class BunnyHat extends PApplet implements Observer
 	}
 	
 	private void handleKeyGame() {
-		if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i'))
-		{
-			//nothing for the moment
-		}
-		else if (TWIN_JUMP_SPACEBAR && key == ' ')
-		{
-			inputState.put('w', true);
-			inputState.put('i', true);
-		}
-		else
-		{
-			inputState.put(key, true);
-		}
 		
 		if (key == 'd')
 		{
-			System.out.println("lol");
 			inputState.put('a', false);
 		}
 		
@@ -306,7 +499,8 @@ public class BunnyHat extends PApplet implements Observer
 		}
 		
 		if (key == 'g') {
-			currentView = Screens.MENU_MAIN;
+			frameRate(FRAMERATE_MENU);
+			currentView = Screens.MENU_GAME;
 			gameMaster.stopGame();
 			this.deleteAllTheStuff();
 		}
@@ -315,6 +509,19 @@ public class BunnyHat extends PApplet implements Observer
 			inputState.put('.', true);
 		}
 		
+		if (TWIN_JUMP_SPACEBAR && (key == 'w' || key == 'i'))
+		{
+			//nothing for the moment
+		}
+		else if (TWIN_JUMP_SPACEBAR && key == ' ')
+		{
+			inputState.put('w', true);
+			inputState.put('i', true);
+		}
+		else
+		{
+			inputState.put(key, true);
+		}
 	}
 	
 	public void deleteAllTheStuff()
@@ -350,26 +557,156 @@ public class BunnyHat extends PApplet implements Observer
 	}
 	
 	private void handleKeyMenuMain() {
-		if (keyCode >= 48 && keyCode <= 57) {
-			int levelNo = keyCode - 48;
-			if (levelNo < levelSources.size()) {
-				setupGame(levelNo);
-				currentView = Screens.GAME;
-			}
-		} else {
-			switch (key) {
-				case 'g':
+		handleKeyMenu();
+		
+		if (keyCode == ENTER || key == ' ') {
+			switch (currentButton) {
+				case 0:
+					currentView = Screens.MENU_GAME;
+					currentButton = 0;
+					break;
+				case 1:
+					currentView = Screens.MENU_SETUP;
+					currentSelectedScreenSize = currentScreenSize;
+					currentButton = 0;
+					break;
+				case 2:
+					currentView = Screens.MENU_STORY;
+					currentButton = 0;
+					break;
+				case 3:
+					currentView = Screens.MENU_CREDITS;
+					currentButton = 0;
+					break;
+				case 4:
 					exit();
 					break;
-					
 			}
+		}
+		
+		
+		
+	}
+	
+	private void handleKeyMenu() {
+		if (key == 'w' || key == 'i' || keyCode == UP) {
+			currentButton = (currentButton + buttonCount - 1) % buttonCount;
+		} else if (key == 's' || key == 'k' || keyCode == DOWN || keyCode == TAB) {
+			currentButton = (currentButton + 1) % buttonCount;
+		}
+		
+		if (key == 'a' || key == 'j' || keyCode == LEFT) {
+			pressedLeft = true;
+		}
+		
+		if (key == 'd' || key == 'l' || keyCode == RIGHT) {
+			pressedRight = true;
 		}
 	}
 	
-	private void handleKeyIntro() {
-		//if (key == ' ') {
+	private void handleKeyMenuGame() {
+		handleKeyMenu();
+		switch (currentButton) {
+			case 0: // level selection
+				if (pressedLeft) {
+					currentLevel = (currentLevel + this.levelSources.size() - 1) % this.levelSources.size();
+				} else if (pressedRight) {
+					currentLevel = (currentLevel + 1) % this.levelSources.size();
+				}
+				if (keyCode == ENTER || keyCode == ' ') {
+					setupGame(currentLevel);
+					frameRate(FRAMERATE_GAME);
+					currentView = Screens.GAME;
+				}
+				break;
+			case 1: // jump style
+				if (pressedLeft || pressedRight || keyCode == ENTER || key == ' ') 
+					this.TWIN_JUMP_SPACEBAR = !TWIN_JUMP_SPACEBAR;
+				break;
+			case 2: // together / alone
+				if (pressedLeft || pressedRight || keyCode == ENTER || key == ' ') 
+					this.SAME_DREAM = !SAME_DREAM;
+				break;
+			case 3: // snd Ctrl
+				if (pressedLeft || pressedRight || keyCode == ENTER || key == ' ') 
+					this.SOUND_CONTROL = !SOUND_CONTROL;
+				break;
+			case 4: // back to main
+				if (keyCode==ENTER || key ==' ') currentView = Screens.MENU_MAIN;
+				break;
+		}
+		if (keyCode == ESC) {
 			currentView = Screens.MENU_MAIN;
-		//}
+		}
+		pressedLeft = pressedRight = false;
+	}
+	
+	private void handleKeySetup() {
+		handleKeyMenu();
+		switch (currentButton) {
+			case 0: // screen
+				if (pressedRight) { // choose screen size
+					currentSelectedScreenSize = (currentSelectedScreenSize + 1) % this.screenResolutionWidth.length;
+				} else if (pressedLeft) {
+					currentSelectedScreenSize = (currentSelectedScreenSize + screenResolutionWidth.length - 1) % this.screenResolutionWidth.length;
+				}
+				
+				if (key == ' ' || keyCode == ENTER) { // apply screen size
+					this.size(screenResolutionWidth[currentSelectedScreenSize], screenResolutionHeight[currentSelectedScreenSize]);
+					currentScreenSize = currentSelectedScreenSize;
+				}
+				
+				break;
+			case 1: // snd ctrl
+				if (key == ' ' || keyCode == ENTER) {
+					this.sndCtrl.startListening();
+					currentView = Screens.MENU_SNDCTRL;
+					currentButton = 0;
+				}
+				break;
+			case 2: // back
+				if (key == ' ' || keyCode == ENTER) {
+					currentView = Screens.MENU_MAIN;
+					currentButton = 0;
+				}
+				break;
+		}
+		
+		pressedLeft = pressedRight = false;
+	}
+	
+	private void handleKeySndCtrl() {
+		handleKeyMenu();
+		
+		switch (key) {
+			case 'p':
+				sndCtrl.drawAnalysis = !sndCtrl.drawAnalysis;
+				break;
+		}
+		
+		switch (currentButton) {
+			case 0: // back
+				if (key == ' ' || keyCode == ENTER) {
+					currentView = Screens.MENU_SETUP;
+					currentButton = 0;
+					
+					this.sndCtrl.stopListening();
+				}
+				break;
+		}
+		
+	}
+	
+	private void handleKeyCredits() {
+		currentView = Screens.MENU_MAIN;
+	}
+	
+	private void handleKeyStory() {
+		currentView = Screens.MENU_MAIN;
+	}
+	
+	private void handleKeyIntro() {
+		currentView = Screens.MENU_MAIN;
 	}
 
 	public void keyReleased()
@@ -408,12 +745,13 @@ public class BunnyHat extends PApplet implements Observer
 		// throw die: who starts in the good dream?
 		double dice = Math.random();
 		DreamStyle stylePlayer1 = dice > 0.5 ? DreamStyle.GOOD : DreamStyle.BAD;
-		
+		DreamStyle stylePlayer2 = SAME_DREAM ? stylePlayer1 : 
+			(stylePlayer1 == DreamStyle.GOOD ? DreamStyle.BAD : DreamStyle.GOOD);
 		view1 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 1, 
 				goodDream, badDream, gameMaster, stylePlayer1,
 				lvlSrc.goodBackgroundImages, lvlSrc.badBackgroundImages);
 		view2 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 2,
-				goodDream, badDream, gameMaster, stylePlayer1 == DreamStyle.GOOD ? DreamStyle.BAD : DreamStyle.GOOD,
+				goodDream, badDream, gameMaster, stylePlayer2,
 				lvlSrc.goodBackgroundImages, lvlSrc.badBackgroundImages);
 		/*view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);*/
@@ -435,7 +773,7 @@ public class BunnyHat extends PApplet implements Observer
 		
 		indicator = new RaceIndicator(width, RACEINDICATORHEIGHT, this);
 
-		sndCtrl.startListening();
+		if (SOUND_CONTROL) sndCtrl.startListening();
 
 
 		// setup our special workers
@@ -453,12 +791,17 @@ public class BunnyHat extends PApplet implements Observer
 		switcher.addObserver(view2);
 		view1.addObserver(switcher);
 		view2.addObserver(switcher);
+		view1.addObserver(gameMaster);
+		view2.addObserver(gameMaster);
+		sndCtrl.addObserver(player1);
+		sndCtrl.addObserver(player2);
 		
 		//switcher.addObserver(view1);
 		//switcher.addObserver(view2);
 		
 		//setup and run game master
 		gameMaster.startGame();
+		Stereophone.playSong("music/JPRixdorfer___Amen_Gypsy.wav");
 		
 	}
 
@@ -489,4 +832,6 @@ public class BunnyHat extends PApplet implements Observer
 			return image;
 		}
 	}
+	
+	
 }

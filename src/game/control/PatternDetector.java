@@ -9,6 +9,11 @@ import java.util.Observable;
 
 import org.yaml.snakeyaml.Yaml;
 
+import processing.core.PApplet;
+import processing.core.PConstants;
+import processing.core.PGraphics;
+import processing.core.PImage;
+
 
 /**
  * Pattern detector for sound analysis
@@ -56,6 +61,7 @@ public class PatternDetector extends Observable {
 			if (conf.containsKey("weightHigher")) {this.weightHigher = (Integer)conf.get("weightHigher");}
 			if (conf.containsKey("onLower")) {this.onLower = states.get((Integer)conf.get("onLower"));}
 			if (conf.containsKey("weightLower")) {this.weightLower = (Integer)conf.get("weightLower");}
+			if (conf.containsKey("pattern")) {this.pattern = (Integer)conf.get("pattern");}
 		}
 		
 		
@@ -90,11 +96,13 @@ public class PatternDetector extends Observable {
 	
 	private String name; // name of this detector
 	
+	private PGraphics buffer;
+	private PApplet processing;
 	
 	
 	
-	
-	public PatternDetector(String name, String confDirName) throws Exception {
+	public PatternDetector(String name, String confDirName, PApplet processing) throws Exception {
+		this.processing = processing;
 		this.name = name;
 	
 		currentStates = new ArrayList<PDS>();
@@ -142,8 +150,19 @@ public class PatternDetector extends Observable {
 			}
 		}
 		
+		this.buffer = processing.createGraphics(150, patternNames.size()*50, PConstants.JAVA2D);
 		
-		
+	}
+	
+	public PImage drawPatternDetectorStates() {
+		buffer.beginDraw();
+		buffer.background(0);
+		for (int i = 0; i < currentStates.size(); i++) {
+			buffer.text(patternNames.get(i)+":", 2, 20*i + 10);
+			buffer.text(currentStates.get(i).name, 12, 20*i + 20);
+		}
+		buffer.endDraw();
+		return buffer;
 	}
 	
 	public String getPattern() {
@@ -157,6 +176,17 @@ public class PatternDetector extends Observable {
 			}
 		}
 		return "";
+	}
+	
+	public int getPatternNumber() {
+		Iterator<PDS> states = currentStates.iterator(); 
+		while (states.hasNext()) {
+			PDS state = states.next();
+			if (state.isConfirming()) {
+				return state.pattern;
+			}
+		}
+		return 0;
 	}
 	
 	private void addPattern(PDS initialState, String name) {

@@ -7,20 +7,21 @@ import processing.core.PGraphics;
 import processing.core.PImage;
 import util.BImage;
 
-public class BadSheep extends CrossingGameElement
+public class BadSheep extends GameElement
 {
 	private Animation badSheepAnimation;
 	private PApplet processing;
 	private GoodSheep goodTwin;
 	
+	
 	public BadSheep(double x, double y, double width, double height, 
 			PApplet processing, GoodSheep twinElement)
 	{
-		super(x, y, width, height, twinElement);
+		super(x, y, width, height, processing);
 		super.setCollisionEffect(Effects.BAD_SHEEP_BOUNCE);
 		this.processing = processing;
 		this.badSheepAnimation = new Animation(processing, "graphics/animations/badSheep");
-		this.badSheepAnimation.start();
+		this.badSheepAnimation.start(true, true);
 		this.goodTwin = twinElement;
 	}
 

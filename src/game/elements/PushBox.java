@@ -14,7 +14,7 @@ public class PushBox extends GameElement
 	
 	public PushBox(double x, double y, PApplet p)
 	{
-		super(x, y, 3, 3);
+		super(x, y, 3, 2.8, p);
 		this.setCollisionEffect(Effects.PUSH);
 		
 		processing = p;
@@ -81,7 +81,7 @@ public class PushBox extends GameElement
 				myTwinBox.xpos = myTwinBox.x()-0.1;
 				myTwinBox.isInAir = true;
 			}*/
-			myTwinBox.xpos = xpos;
+			//myTwinBox.xpos = xpos;
 			//System.out.println(ypos+" vs "+myTwinBox.ypos);
 		}
 		super.update(deltaT);

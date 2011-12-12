@@ -23,11 +23,13 @@ import processing.core.PGraphics;
  */
 public abstract class CollisionBox extends Observable
 {
+	protected final static double BOUNCE_FORCE = BunnyHat.SETTINGS.getValue("gameplay/bounceforce");
+	
 	public enum Effects {STOP, BOUNCE, SLOW_DOWN, FINISH, NONE,
 		GOOD_SHEEP_BOUNCE, BAD_SHEEP_BOUNCE, BALL_BOUNCE, PUSH}
 	private Effects collisionEffect = Effects.STOP;
 	
-	private Level collisionLevel;
+	protected Level collisionLevel;
 	
 	private Object gameElement;
 	public Object getGameElement() {
@@ -57,8 +59,9 @@ public abstract class CollisionBox extends Observable
 	// if we have crossing elements, we are interested in their collision too
 	protected GameElement collisionPartnerX, collisionPartnerY;
 	
-	protected boolean isBeingPushedRight = false;
-	protected boolean isBeingPushedLeft = false;
+	
+	public boolean isBeingPushedRight = false;
+	public boolean isBeingPushedLeft = false;
 	public void removePushConstraints() {isBeingPushedRight = isBeingPushedLeft = false;}
 	protected GameElement ourPushable; // something we can push
 	public void removePushable() {ourPushable = null;}
@@ -67,6 +70,13 @@ public abstract class CollisionBox extends Observable
 	 */
 	private Line2D.Double collisionGroundPath;
 	private CollisionBox collisionGroundPathSource;
+	
+	protected void setCollisionBox(double x, double y, double width, double height) {
+		cBox = new Rectangle2D.Double(x, y, width, height);
+	}
+	protected void changeCollisionBoxHeight(double newHeight) {
+		cBox = new Rectangle2D.Double(cBox.x, cBox.y, cBox.width, newHeight);
+	}
 	
 	/**
 	 * collision box for this object
@@ -188,7 +198,7 @@ public abstract class CollisionBox extends Observable
 			// check auf collisionPartnerRequest um endlosschleifen zu vermeiden
 			// lŠsst sich mit einer HashMap interessanter gestalten
 			//double partnerYSpeedBackup = ((GameElement)collisionPartnerX).getYSpeed();
-			
+
 			if (collisionPartnerX.isBeingPushedLeft 
 					&& ((GameElement)gameElement).isBeingPushedRight) {
 				newXSpeed = 0;
@@ -202,7 +212,8 @@ public abstract class CollisionBox extends Observable
 				collision = true;
 				System.out.println("lock right left");
 			} else if (collisionPartnerX.isCollidingPartner(x, collisionPartnerX.y(), xSpeed, 0, xDistance, 0)) {
-				newXSpeed = 0;//collisionPartnerX.getNewXSpeed();
+				//System.out.println("partner is colliding");
+				newXSpeed = collisionPartnerX.getNewXSpeed();
 				newX = collisionPartnerX.getNewX();
 				collision = true;
 			}
@@ -357,12 +368,14 @@ public abstract class CollisionBox extends Observable
 							- (collider.y() + this.collisionBoxHeight()/2);
 					boolean topOrBottomHit = (Math.abs(yDiff) >=Math.abs(xDiff));
 					boolean rightHit = xDiff < 0;
-					boolean topHit = yDiff > 0;
+					boolean topHit = yDiff < 0;
 					switch (collider.getCollisionEffect()) {
 						case BOUNCE:
 							if (topOrBottomHit) {
-								newYSpeed = -ySpeed;
-								newY = collider.y() + collider.collisionBoxHeight();
+								
+									newYSpeed = this.BOUNCE_FORCE;
+									newY = collider.y() + collider.collisionBoxHeight();
+								
 							} else {
 								/*newXSpeed = -xSpeed;
 								if (rightHit) {
@@ -375,8 +388,8 @@ public abstract class CollisionBox extends Observable
 						case GOOD_SHEEP_BOUNCE:
 							if (gameElement instanceof Player) {
 								if (topOrBottomHit) {
-									newYSpeed = Math.abs(ySpeed) * 1.5;
-									newXSpeed = xSpeed * 1.5;
+									newYSpeed = BOUNCE_FORCE;
+									//newXSpeed = xSpeed * 1.5;
 									newY = collider.y() + collider.collisionBoxHeight();
 									double dice = Math.random();
 									Stereophone.playSound(dice > 0.5?"100":"101", "good_sheep_bounce", 1000);
@@ -385,8 +398,8 @@ public abstract class CollisionBox extends Observable
 							break;
 						case BAD_SHEEP_BOUNCE:
 							if (gameElement instanceof Player) {
-								newYSpeed = 3;
-								newXSpeed = -6;
+								newYSpeed = BOUNCE_FORCE;
+								newXSpeed = -BOUNCE_FORCE*2;
 								double dice = Math.random();
 								Stereophone.playSound(dice > 0.5?"102":"103", "bad_sheep_bounce", 250);
 							}
@@ -409,7 +422,7 @@ public abstract class CollisionBox extends Observable
 							}
 						case STOP:
 							if (topOrBottomHit) {
-								if (!topHit) {
+								if (topHit) {
 									newYSpeed = 0.0;
 									newY = collider.y() - cBox.height;
 								} else {

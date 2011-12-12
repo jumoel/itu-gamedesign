@@ -14,10 +14,10 @@ public abstract class CrossingGameElement extends GameElement
 {
 	protected GameElement myTwinElement;
 
-	public CrossingGameElement(double x, double y, double width, double height,
+	public CrossingGameElement(double x, double y, double width, double height, PApplet processing,
 			GameElement twinElement)
 	{
-		super(x, y, width, height);
+		super(x, y, width, height, processing);
 		this.myTwinElement = twinElement;
 	}
 	

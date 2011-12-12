@@ -1,23 +1,27 @@
 game:
   title: Lucid Twins
+  frameRateMenu: 17 # while not playing a low framerate is nice for the cpu
+  frameRateGame: 60 # the framerate the game will _try_ to reach
 gameplay:
   deltatdivident: 100
   clamptozero: 0.001
-  gravity: -0.981
-  jumpforce: 4.2
+  gravity: -1.0
+  jumpforce: 4.0
+  bounceforce: 5.0
   moveacceleration:
-    ground: 0.6
-    air: 0.15
+    ground: 1.0
+    air: 0.5
   breakacceleration:
     ground: 1.4
-    air: 0.5
+    air: 0.1
   maxspeed: 2.0
   maxYspeed: 5.0
   maxXspeed: 5.0
   gumspeed: 3.0
   gumstucktime: 7000
   pushspeedmax: 0.5
-  pushaccelerationfactor: 0.5  
+  pushaccelerationfactor: 0.5
+  dreamswitchbuttoncooldown: 5000
 debug:
   fps: false
 gamerules:
@@ -31,7 +35,8 @@ gamerules:
     doorDuration: 10000
   creatures:
     speed: 1
-   
+sound:
+  maxdistance: 30.0 
 gui:
   tiledimension: 24
   playerviewtileheight: 14
@@ -41,8 +46,16 @@ gui:
     tintg: 255
     tintb: 0
 graphics:
+  effects:
+    trail:
+      length: 7
   animations:
     animationpath: animations/
+    buttonOn:
+      path: objects/doorappeartemp.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     doorShow:
       path: objects/doorappeartemp.png
       framewidth: 48
@@ -55,6 +68,21 @@ graphics:
       fps: 27
     doorBlow:
       path: objects/doordisappeartemp.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    noDoorShow:
+      path: objects/nodoorappear.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    noDoorStay:
+      path: objects/nodoor.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
+    noDoorBlow:
+      path: objects/nodoordisappear.png
       framewidth: 48
       frameheight: 72
       fps: 27
@@ -118,6 +146,11 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+    player1push:
+      path: dreampush.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     player2run:
       path: dreamrungirlevensmaller48x72.png
       framewidth: 48
@@ -168,6 +201,11 @@ graphics:
       framewidth: 48
       frameheight: 72
       fps: 27
+    player2push:
+      path: dreamgirlpush.png
+      framewidth: 48
+      frameheight: 72
+      fps: 27
     goodSheep:
       path: creatures/sheep.png
       framewidth: 72
@@ -198,35 +236,48 @@ graphics:
       framewidth: 72
       frameheight: 72
       fps: 27
-    dreamSwitch:
-      path: objects/dreamswitch.png
+    goodSheepStanding:
+      path: creatures/sheepstand.png
       framewidth: 72
+      frameheight: 72
+      fps: 27
+    badSheepStanding:
+      path: creatures/badsheepstand.png
+      framewidth: 72
+      frameheight: 72
+      fps: 27
+    dreamSwitch:
+      path: objects/buttonon.png
+      framewidth: 48
       frameheight: 24
       fps: 27
-    dreamSwitchPushed:
-      path: objects/dreamswitchpushed.png
-      framewidth: 72
-      frameheight: 72
+    dreamSwitchPress:
+      path: objects/buttonpress.png
+      framewidth: 48
+      frameheight: 24
       fps: 27
     dreamSwitchAlarm:
-      path: objects/dreamswitchalarm.png
-      framewidth: 72
-      frameheight: 72
+      path: objects/buttonalarm.png
+      framewidth: 48
+      frameheight: 24
       fps: 27
-    dreamSwitchInactive:
-      path: objects/dreamswitchinactive.png
-      framewidth: 72
-      frameheight: 72
+    dreamSwitchOff:
+      path: objects/buttonoff.png
+      framewidth: 48
+      frameheight: 24
       fps: 27
     pushBox:
-      path: objects/pushbox.png
+      path: objects/rock.png
       framewidth: 72
       frameheight: 72
       fps: 27
-levels:
-  level1: 
-    good: levels/test_24.tmx
-    bad: levels/test_24.tmx
-  level2:
-    good: levels/Level design lucid twins_V5_good.tmx
-    bad: levels/Level design lucid twins_V5_bad.tmx
+soundControl:
+  frequencyBorder: 640 # in Hz
+  attentionWindowHF:
+    frequencyMin: 880 # in Hz
+    frequencyMax: 3000 # in Hz
+  attentionWindowLF:
+    frequencyMin: 200 # in Hz
+    frequencyMax: 800 # in Hz
+    
+  

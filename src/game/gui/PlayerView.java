@@ -64,6 +64,7 @@ public class PlayerView extends Updateable implements Observer
 	protected int cameraOffsetX = 0;
 	protected int cameraOffsetY = 0;
 	protected double cameraOffsetFactor = 0.0;
+	protected int cameraCurrentY = 0;
 	
 	private int levelLength;
 	
@@ -148,6 +149,9 @@ public class PlayerView extends Updateable implements Observer
 	private void prepareDoor() {
 		boolean closeBy = this.shouldBeCloseBy;
 		if (this.prepareDoor(closeBy)) {
+			
+			this.ownDoor.accessible = this.ownPlayer.x() < this.otherPlayer.x();
+			
 			this.setChanged();
 			HashMap map = new HashMap();
 			map.put("foundDoor", this.viewNumber);
@@ -212,6 +216,7 @@ public class PlayerView extends Updateable implements Observer
 		this.ownDoor.showDoor();
 		this.drawOwnDoor = true;
 		this.doorEnabled = true;
+		Stereophone.playSound("305", "showdoors", 1000);
 	}
 	
 	//remove all doors
@@ -397,9 +402,10 @@ public class PlayerView extends Updateable implements Observer
 			pypos = 0;
 		}
 		
-		if (pypos + ownPlayer.getCurrentTexture().height > level.levelHeight * BunnyHat.TILEDIMENSION)
+		int playerHeight = ownPlayer.getCurrentTexture().height; 
+		if (pypos + playerHeight > level.levelHeight * BunnyHat.TILEDIMENSION)
 		{
-			pypos = level.levelHeight * BunnyHat.TILEDIMENSION - ownPlayer.getCurrentTexture().height;
+			pypos = level.levelHeight * BunnyHat.TILEDIMENSION - playerHeight;
 		}
 		
 		this.playerPosition = pxpos;
@@ -413,7 +419,7 @@ public class PlayerView extends Updateable implements Observer
 			//System.out.println("derandere!");
 			this.cameraOffsetX = (int)(((otherPlayer.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((otherPlayer.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
-			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth()*2)/2) {
+			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth()*3)/2) {
 				if (otherPlayer.x() > ownPlayer.x()) {
 					otherPlayer.cannotMoveRight = true;
 					ownPlayer.cannotMoveLeft = true;
@@ -422,10 +428,14 @@ public class PlayerView extends Updateable implements Observer
 					ownPlayer.cannotMoveRight = true;
 				}
 			}
+			if (Math.abs(cameraOffsetY) > (height-ownPlayer.collisionBoxHeight()*3)/2) {
+				this.setChanged();
+				this.notifyObservers("MAKEDOORSDISAPPEAR");
+			}
 		} else if (this.doorEnabled) {
 			this.cameraOffsetX = (int)(((ownDoor.x() - ownPlayer.x())/2) * BunnyHat.TILEDIMENSION);
 			this.cameraOffsetY = (int)(((ownDoor.y() - ownPlayer.y())/2) * BunnyHat.TILEDIMENSION);
-			if (cameraOffsetX > (width-ownPlayer.collisionBoxWidth()*2)/2) {
+			if (Math.abs(cameraOffsetX) > (width-ownPlayer.collisionBoxWidth()*3)/2) {
 				if (cameraOffsetX > 0) {
 					ownPlayer.cannotMoveLeft = true;
 				} else {
@@ -433,18 +443,65 @@ public class PlayerView extends Updateable implements Observer
 					this.notifyObservers("MAKEDOORSDISAPPEAR");
 				}
 			}
+			if (Math.abs(cameraOffsetY) > (height-ownPlayer.collisionBoxHeight()*3)/2) {
+				this.setChanged();
+				this.notifyObservers("MAKEDOORSDISAPPEAR");
+			}
 		}
 		
-		// Place the player in the middle
+		//if (cameraOffsetFactor != 0) {
 		xCoordCameraMiddle = pxpos;
-		xCoordCamera = xCoordCameraMiddle - halfwidth + (int)(cameraOffsetX * cameraOffsetFactor);
+		int xCoordCameraProposed = xCoordCameraMiddle - halfwidth + (int)(cameraOffsetX * cameraOffsetFactor);
+		//} else {
+		int minDistRight = width / 3;
+		int minDistLeft = width / 3;
+		if (pxpos > xCoordCamera + (width - minDistRight)) {
+			xCoordCamera = pxpos - (width - minDistRight);
+		} else if (pxpos < xCoordCamera + minDistLeft) {
+			xCoordCamera = pxpos - minDistLeft;
+		}
+		//smooth transition for camera pans
+		if (cameraOffsetFactor != 0) {
+			int xCoordCameraProposedDiff = xCoordCameraProposed - xCoordCamera;
+			xCoordCamera += xCoordCameraProposedDiff * cameraOffsetFactor;
+		}
+		
+		//}
+		
+			
 		yCoordCameraMiddle = pypos;
-		yCoordCamera = yCoordCameraMiddle - halfheight + (int)(cameraOffsetY * cameraOffsetFactor);
+		int yCoordCameraProposed = yCoordCameraMiddle - halfheight + (int)(cameraOffsetY * cameraOffsetFactor);
+		int minDistBottom = height/3;
+		int minDistTop = (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION);
+		if (pypos > yCoordCamera + (height-minDistTop)) {
+			yCoordCamera = pypos - (height-minDistTop);
+		} else if (pypos < yCoordCamera + minDistBottom) {
+			yCoordCamera = pypos - minDistBottom;
+		}
+		//smooth transition for camera pans
+		if (cameraOffsetFactor != 0) {
+			int yCoordCameraProposedDiff = yCoordCameraProposed - yCoordCamera;
+			yCoordCamera += yCoordCameraProposedDiff * cameraOffsetFactor;
+		}
 		
 		drawpxpos = halfwidth - (int)(cameraOffsetX * cameraOffsetFactor)
 				- (int)(ownPlayer.collisionBoxWidth() * BunnyHat.TILEDIMENSION / 2);
 		drawpypos = halfheight - (int)(cameraOffsetY * cameraOffsetFactor)
 				- (int)(ownPlayer.collisionBoxHeight() * BunnyHat.TILEDIMENSION / 2);
+		
+		
+		
+		
+		// nicer(? maybe.. well I hope so) camera y positioning
+		/*if (this.cameraCurrentY == 0) this.cameraCurrentY = this.yCoordCamera;
+		if (this.yCoordCamera > this.cameraCurrentY + height/4) {
+			this.cameraCurrentY = this.yCoordCamera + height/4;
+		} else if (this.yCoordCamera < this.cameraCurrentY - height/4) {
+			this.cameraCurrentY = this.yCoordCamera - height/4;
+		} else {
+			this.yCoordCamera = this.cameraCurrentY;
+		}*/
+		
 		
 		if (xCoordCamera < 0)
 		{
@@ -554,10 +611,10 @@ public class PlayerView extends Updateable implements Observer
 	{
 		ArrayList backgrounds = level.dream == DreamStyle.GOOD ? this.goodBackgroundImages : this.badBackgroundImages;
 		for (int i = 0; i < backgrounds.size(); i++) {
-			PImage image = (PImage)backgrounds.get(i);
+			PImage image = ((PImage)backgrounds.get(i));
 			int x = 0;
 			int y = 0;
-			graphics.image(image, x, y);
+			graphics.copy(image, x, y, width, height, 0, 0, width, height);
 		}
 	}
 

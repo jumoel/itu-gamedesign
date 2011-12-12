@@ -1,0 +1,51 @@
+name: SpeedUp
+states:
+  - # 0
+    name: initial
+    onHigher: 1 # go on
+    weightHigher: 2
+  - # 1
+    name: detected higher No 1
+    onHigher: 1 # stay
+    onNone: 2 # go on
+  - # 2
+    name: detected gap No 1
+    weightNone: 7 # to much silence and we return 
+    onLower: 3 # one lower and we are satisfied
+  - # 3
+    name : detected lower No 1
+    onHigher: 4 # go on
+    weightHigher: 2
+  - # 4
+    name: detected higher No 2
+    weightSame: 2 # one single same can happen
+    onHigher: 4 # stay
+    onNone: 5 # go on
+  - # 5
+    name: detected gap No 2
+    weightNone: 7 # to much silence and we return 
+    onLower: 6 # one lower and we are satisfied
+  - # 6
+    name : detected lower No 2
+    onHigher: 7 # go on
+    weightHigher: 2
+  - # 7
+    name: detected higher No 3 - confirmed!
+    weightSame: 2 # one single same can happen
+    onHigher: 7 # stay
+    onNone: 8 # go on
+    confirmed: true
+    pattern: 1
+  - # 8
+    name: detected gap No 3 - confirmed!
+    weightNone: 7 # to much silence and we return 
+    onLower: 9 # one lower and we are satisfied
+    confirmed: true
+    pattern : 1
+  - # 9
+    name : detected lower No 3 - confirmed!
+    onHigher: 7 # loop the last 3 - it is confirmed now!
+    weightHigher: 2
+    confirmed: true
+    pattern: 1
+      
