@@ -96,7 +96,7 @@ public class BunnyHat extends PApplet implements Observer
 	private static boolean TWIN_JUMP_SPACEBAR = false;
 	public static boolean TWIN_JUMP = false;
 	private static boolean SAME_DREAM = false;
-	private static boolean SOUND_CONTROL = false;
+	private static boolean SOUND_CONTROL = true;
 	private int[] screenResolutionHeight = {768, 768, 900, 900, 1200};
 	private int[] screenResolutionWidth = {1024, 1366, 1440, 1600, 1600};
 	private Animation niah, noah;
@@ -113,8 +113,6 @@ public class BunnyHat extends PApplet implements Observer
 		currentView = Screens.INTRO;
 		
 		inputState = new State();
-		
-		sndCtrl = new SoundControl(this);
 		
 		size(1024, 768, JAVA2D);
 		
@@ -137,13 +135,13 @@ public class BunnyHat extends PApplet implements Observer
 		
 		
 		//setup sound output
-		sndOut = new Stereophone("sounds", this);
+		sndOut = new Stereophone(this.getClass().getClassLoader().getResource("sounds/").getPath(), this);
 		sndOut.printSounds();
 		
 		
 		// get levels
 		levelSources = new ArrayList<LevelSource>();
-		File levelDirRoot = new File("levels/");
+		File levelDirRoot = new File(this.getClass().getClassLoader().getResource("levels/").getPath());
 		File[] levelDirs = levelDirRoot.listFiles();
 		PImage dummy;
 		for (int i = 0; i < levelDirs.length; i++) {
@@ -156,11 +154,11 @@ public class BunnyHat extends PApplet implements Observer
 				for (int e = 0; e < files.length; e++) {
 					String name = files[e].getName();
 					if (name.endsWith("ad.tmx")) {
-						lvlSrc.badLevelFile = files[e].getPath();
+						lvlSrc.badLevelFile = files[e].getAbsolutePath();
 					} else if (name.endsWith("od.tmx")) {
-						lvlSrc.goodLevelFile = files[e].getPath();
+						lvlSrc.goodLevelFile = files[e].getAbsolutePath();
 					} else if (name.endsWith(".png")) {
-						String path = files[e].getPath();
+						String path = files[e].getAbsolutePath();
 						if (name.startsWith("good")) {
 							lvlSrc.goodBackgroundImages.add(loadImage(path));
 						} else if (name.startsWith("bad")) {
@@ -437,8 +435,9 @@ public class BunnyHat extends PApplet implements Observer
 
 	public static void main(String args[])
 	{
-		PApplet.main(new String[]
-		{ "--present", "BunnyHat" });
+		/*PApplet.main(new String[]
+		{ "--present", "BunnyHat" });*/
+		PApplet.main(new String[] {"game.BunnyHat" });
 	}
 
 	public void keyPressed()

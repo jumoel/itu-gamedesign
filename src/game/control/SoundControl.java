@@ -410,8 +410,8 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	  lastPeakPosLF = lastPeakPosHF = -1;
 	  try
 	  {
-			pattyLF = new PatternDetector("LF", "patternDetectors/lowFreq", papplet);
-			pattyHF = new PatternDetector("HF", "patternDetectors/highFreq", papplet);
+			pattyLF = new PatternDetector("LF", "patternDetectors/lowFreq/", papplet);
+			pattyHF = new PatternDetector("HF", "patternDetectors/highFreq/", papplet);
 	  }
 	  catch (Exception e)
 	  {

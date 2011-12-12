@@ -110,8 +110,9 @@ public class PatternDetector extends Observable {
 		patternNames = new ArrayList<String>();
 		
 		// reading configurations from our configuration directory
-		File confDir = new File(confDirName);
+		File confDir = new File(this.getClass().getClassLoader().getResource(confDirName).getPath());
 		File[] confFiles = confDir.listFiles();
+		if (confFiles == null) {System.out.println("no config for pattern detector "+name); return;}
 		Yaml yaml = new Yaml();
 		// process all configuration files
 		for (int i = 0; i < confFiles.length; i++) {
@@ -119,7 +120,7 @@ public class PatternDetector extends Observable {
 			if (confFiles[i].isFile() && confFiles[i].getName().endsWith(".yaml")) {
 				// setup defined pattern
 				ArrayList<PDS> newStates = new ArrayList<PDS>();
-				InputStream is = this.getClass().getClassLoader().getResourceAsStream(confFiles[i].getPath());
+				InputStream is = this.getClass().getClassLoader().getResourceAsStream(confDirName + confFiles[i].getName());
 				Object possibleLinkedHashMap = yaml.load(is);
 				LinkedHashMap<String, Object> values = null;
 				if (possibleLinkedHashMap instanceof LinkedHashMap<?, ?>) {
