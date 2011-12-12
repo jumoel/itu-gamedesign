@@ -1,4 +1,5 @@
 package game;
+import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,6 +101,7 @@ public class BunnyHat extends PApplet implements Observer
 	private static boolean SOUND_CONTROL = true;
 	private int[] screenResolutionHeight = {768, 768, 900, 900, 1200};
 	private int[] screenResolutionWidth = {1024, 1366, 1440, 1600, 1600};
+	private Dimension[] screenResolutions;
 	private Animation niah, noah;
 	
 	
@@ -178,10 +180,13 @@ public class BunnyHat extends PApplet implements Observer
 		
 		
 		//attempt to get a full screen mode - only working as an application 		
-		/*fs = new FullScreen(this);
+		fs = new FullScreen(this);
 		if (fs.available()) {
+			this.screenResolutions = fs.getResolutions();
+			size(screen.width, screen.height);
+			fs.setResolution(screenResolutions[0].width, screenResolutions[0].height);
 			fs.enter();
-		}*/
+		}
 		
 		niah = new Animation(this, "graphics/animations/player2idle");
 		noah = new Animation(this, "graphics/animations/player1idle");
