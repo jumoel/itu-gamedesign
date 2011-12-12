@@ -233,7 +233,7 @@ public class BunnyHat extends PApplet implements Observer
 			text("press "+i+" for level "+i, width/2, currentY);
 			currentY += 15;
 		}
-		text("and q to quit this game..", width/2, currentY);
+		text("and g to quit this game..", width/2, currentY);
 	}
 
 	private void drawIntroScreen()
