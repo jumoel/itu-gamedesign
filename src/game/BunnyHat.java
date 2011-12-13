@@ -99,6 +99,7 @@ public class BunnyHat extends PApplet implements Observer
 	public static boolean TWIN_JUMP = false;
 	private static boolean SAME_DREAM = false;
 	private static boolean SOUND_CONTROL = true;
+	public static boolean SOUND_CONTROL_SUPPORTED = true;
 	private int[] screenResolutionHeight = {768, 768, 900, 900, 1200};
 	private int[] screenResolutionWidth = {1024, 1366, 1440, 1600, 1600};
 	private Dimension[] screenResolutions;
@@ -184,7 +185,11 @@ public class BunnyHat extends PApplet implements Observer
 		if (fs.available()) {
 			this.screenResolutions = fs.getResolutions();
 			//size(screen.width, screen.height);
-			fs.setResolution(screenResolutions[0].width, screenResolutions[0].height);
+			for (int i = 0; i < screenResolutions.length; i++) {
+				if (screenResolutions[i].height >= 768) {
+					fs.setResolution(screenResolutions[i].width, screenResolutions[i].height);
+				}
+			}
 			fs.enter();
 		}
 		
@@ -781,7 +786,7 @@ public class BunnyHat extends PApplet implements Observer
 		
 		indicator = new RaceIndicator(width, RACEINDICATORHEIGHT, this);
 
-		if (SOUND_CONTROL) sndCtrl.startListening();
+		if (SOUND_CONTROL && SOUND_CONTROL_SUPPORTED) sndCtrl.startListening();
 
 
 		// setup our special workers

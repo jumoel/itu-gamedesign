@@ -390,6 +390,11 @@ public class SoundControl extends Observable implements Observer, Runnable {
 	 
 	  minim = new Minim(papplet);
 	  myinput = minim.getLineIn(Minim.MONO, 2048, 44100.0f);
+	  if (myinput == null) {
+		  System.out.println("did not find a supported sound input device - disabling sound control");
+		  BunnyHat.SOUND_CONTROL_SUPPORTED = false;
+		  return;
+	  }
 	  
 	  fft = new FFT(myinput.bufferSize(), myinput.sampleRate());
 	  fft.window(FourierTransform.HAMMING);
