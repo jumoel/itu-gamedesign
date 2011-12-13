@@ -354,6 +354,7 @@ public class PlayerView extends Updateable implements Observer
 		} else {
 			buffer.background(100);
 		}
+		
 		this.drawLevelBackground(buffer);
 		
 
@@ -538,7 +539,7 @@ public class PlayerView extends Updateable implements Observer
 		
 		drawpypos = height - drawpypos;
 		
-		drawLevelGraphics(buffer, Level.Layer.BACKGROUND);
+		//drawLevelGraphics(buffer, Level.Layer.BACKGROUND);
 		
 		level.drawCreaturesAndObjects(xCoordCamera, yCoordCamera, 
 				xCoordCamera + width, yCoordCamera + height, buffer);
@@ -585,7 +586,7 @@ public class PlayerView extends Updateable implements Observer
 			//drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.LEFT, Vertical.BOTTOM);	
 		}*/
 		
-		drawLevelGraphics(buffer, Level.Layer.FOREGROUND);
+		//drawLevelGraphics(buffer, Level.Layer.FOREGROUND);
 		
 		if (gameOver)
 		{
@@ -607,14 +608,36 @@ public class PlayerView extends Updateable implements Observer
 	
 	private void drawLevelBackground(PGraphics graphics)
 	{
-		ArrayList backgrounds = level.dream == DreamStyle.GOOD ? this.goodBackgroundImages : this.badBackgroundImages;
+		System.out.println(yCoordCamera);
+		graphics.loadPixels();
+		ArrayList<PImage> backgrounds = level.dream == DreamStyle.GOOD ? this.goodBackgroundImages : this.badBackgroundImages;
 		for (int i = 0; i < backgrounds.size(); i++) {
-			PImage image = ((PImage)backgrounds.get(i));
-			int x = 0;
-			int y = 0;
-			graphics.copy(image, x, y, width, height, 0, 0, width, height);
+			PImage image = backgrounds.get(i);
+			double xDistanceImage = image.width-width;
+			double xDistanceLevel = level.levelWidth * BunnyHat.TILEDIMENSION - width;
+			double yDistanceImage = image.height - height;
+			double yDistanceLevel = level.levelHeight * BunnyHat.TILEDIMENSION - height;
+			int x = (int)(xCoordCamera*(xDistanceImage/xDistanceLevel));
+			int y = (int)((level.levelHeight*BunnyHat.TILEDIMENSION - (yCoordCamera+height))*(yDistanceImage/yDistanceLevel));
+			System.out.println(y);
+			PImage imageArea = image.get(x, y, width, height);
+			
+			
+			// and now : copy pixel wise! yay!
+			
+			imageArea.loadPixels();
+			for (int p = 0; p < width*height; p++) {
+				
+					graphics.pixels[p] = 
+								imageArea.pixels[p];
+				
+			}
+			
+			//graphics.copy(image, x, y, width, height, 0, 0, width, height);
 		}
+		graphics.updatePixels();
 	}
+	
 
 
 	private void drawLevelEndScreen(PGraphics graphics) {

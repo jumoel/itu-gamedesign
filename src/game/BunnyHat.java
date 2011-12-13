@@ -28,7 +28,7 @@ public class BunnyHat extends PApplet implements Observer
 	
 	private class LevelSource {
 		String goodLevelFile, badLevelFile;
-		ArrayList goodBackgroundImages, badBackgroundImages;
+		ArrayList<PImage> goodBackgroundImages, badBackgroundImages;
 		String previewImage; 
 		String music;
 	}
@@ -103,6 +103,7 @@ public class BunnyHat extends PApplet implements Observer
 	private int[] screenResolutionHeight = {768, 768, 900, 900, 1200};
 	private int[] screenResolutionWidth = {1024, 1366, 1440, 1600, 1600};
 	private ArrayList<Dimension> screenResolutions;
+	private boolean fillScreen = false;
 	private Animation niah, noah;
 	
 	
@@ -153,8 +154,8 @@ public class BunnyHat extends PApplet implements Observer
 				File levelDir = new File(levelDirs[i].getPath());
 				File[] files = levelDir.listFiles();
 				LevelSource lvlSrc = new LevelSource();
-				lvlSrc.badBackgroundImages = new ArrayList();
-				lvlSrc.goodBackgroundImages = new ArrayList();
+				lvlSrc.badBackgroundImages = new ArrayList<PImage>();
+				lvlSrc.goodBackgroundImages = new ArrayList<PImage>();
 				for (int e = 0; e < files.length; e++) {
 					String name = files[e].getName();
 					if (name.endsWith("ad.tmx")) {
@@ -429,10 +430,14 @@ public class BunnyHat extends PApplet implements Observer
 		int buttonNumber = 0;
 		int buttonSpacing = 100;
 		
-		// button sound control
-		text("Screen Resolution (" + this.screenResolutionWidth[currentSelectedScreenSize] + 
-				"x" +this.screenResolutionHeight[currentSelectedScreenSize] + ")" +  
+		// button screen resolution
+		text("Screen Resolution (" + this.screenResolutions.get(currentSelectedScreenSize).width + 
+				"x" +this.screenResolutions.get(currentSelectedScreenSize).height + ")" +  
 				(buttonNumber == currentButton?" <-" : ""), width/2, currentY);
+		buttonNumber++; currentY += buttonSpacing;
+		
+		// button fill screen
+		text("Fil screen: "+(this.fillScreen?"yes":"no")+" "+(buttonNumber == currentButton?" <-" : ""), width/2, currentY);
 		buttonNumber++; currentY += buttonSpacing;
 		
 		// button sound control
@@ -693,25 +698,39 @@ public class BunnyHat extends PApplet implements Observer
 		switch (currentButton) {
 			case 0: // screen
 				if (pressedRight) { // choose screen size
-					currentSelectedScreenSize = (currentSelectedScreenSize + 1) % this.screenResolutionWidth.length;
+					currentSelectedScreenSize = (currentSelectedScreenSize + 1) % this.screenResolutions.size();
 				} else if (pressedLeft) {
-					currentSelectedScreenSize = (currentSelectedScreenSize + screenResolutionWidth.length - 1) % this.screenResolutionWidth.length;
+					currentSelectedScreenSize = (currentSelectedScreenSize + screenResolutions.size() - 1) % this.screenResolutionWidth.length;
 				}
 				
 				if (key == ' ' || keyCode == ENTER) { // apply screen size
-					this.size(screenResolutionWidth[currentSelectedScreenSize], screenResolutionHeight[currentSelectedScreenSize]);
+					fs.setResolution(screenResolutions.get(currentSelectedScreenSize).width, screenResolutions.get(currentSelectedScreenSize).height);
 					currentScreenSize = currentSelectedScreenSize;
 				}
 				
 				break;
-			case 1: // snd ctrl
+			case 1: // fill screen?
+				if (key == ' ' || keyCode == ENTER) {
+					fillScreen = !fillScreen;
+					if (fillScreen) {
+						size(screenResolutions.get(currentSelectedScreenSize).width, screenResolutions.get(currentSelectedScreenSize).height, JAVA2D);
+						fs.leave();
+						fs.enter();
+					} else {
+						size(1024, 768, JAVA2D);
+						fs.leave();
+						fs.enter();
+					}
+				}
+				break;
+			case 2: // snd ctrl
 				if (key == ' ' || keyCode == ENTER) {
 					this.sndCtrl.startListening();
 					currentView = Screens.MENU_SNDCTRL;
 					currentButton = 0;
 				}
 				break;
-			case 2: // back
+			case 3: // back
 				if (key == ' ' || keyCode == ENTER) {
 					currentView = Screens.MENU_MAIN;
 					currentButton = 0;
