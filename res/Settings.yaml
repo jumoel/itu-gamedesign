@@ -46,6 +46,9 @@ gui:
     tintg: 255
     tintb: 0
 graphics:
+  tuning:
+    drawBackground: true # shall we show the background graphics?
+    backgroundLayersMax: 5 # how many background layers?
   effects:
     trail:
       length: 7

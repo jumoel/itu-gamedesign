@@ -6,6 +6,7 @@ import java.util.Observable;
 import java.util.Observer;
 
 import game.BunnyHat;
+import game.BunnyHat.LevelSource;
 import game.CollisionBox.Effects;
 import game.Door;
 import game.Player;
@@ -85,7 +86,11 @@ public class PlayerView extends Updateable implements Observer
 	
 	private Level level;
 	private Level goodDream, badDream;
-	private ArrayList goodBackgroundImages, badBackgroundImages;
+	/*private ArrayList<PImage> goodBackgroundImages, badBackgroundImages;
+	private ArrayList<Double> goodBGIFactorX, goodBGIFactorY, badBGIFactorX, badBGIFactorY;
+	private PImage goodForeground, badForeground;
+	private double goodFGIFactorX, goodFGIFactorY, badFGIFactorX, badFGIFactorY;*/
+	private LevelSource lvlSrc;
 	
 	// dream switch data
 	private boolean switchHappening = false;
@@ -287,7 +292,7 @@ public class PlayerView extends Updateable implements Observer
 	
 	public PlayerView(int width, int height, PApplet applet, int viewNumber, 
 			Level goodDream, Level badDream, GameMaster gameMaster, DreamStyle style,
-			ArrayList goodBackgrounds, ArrayList badBackgrounds)
+			LevelSource lvlSrc)
 	{	
 		this.buffer = applet.createGraphics(width, height, PConstants.JAVA2D);
 		this.colorLayerColor = new int[3];
@@ -316,8 +321,47 @@ public class PlayerView extends Updateable implements Observer
 		this.level = (style == DreamStyle.GOOD ? goodDream : badDream);
 		this.levelLength = level.levelWidth * BunnyHat.TILEDIMENSION;
 		
-		this.goodBackgroundImages = goodBackgrounds;
-		this.badBackgroundImages = badBackgrounds;
+		this.lvlSrc = lvlSrc;
+		
+		//this.goodBackgroundImages = goodBackgrounds;
+		//this.badBackgroundImages = badBackgrounds;
+		
+		//this.goodForeground = goodForeground;
+		//this.badForeground = badForeground;
+		
+		// calculate those factors
+		for (int i = 0; i < lvlSrc.goodBackgroundImages.size(); i++) {
+			double xDistanceImage = lvlSrc.goodBackgroundImages.get(i).width-width;
+			double xDistanceLevel = level.levelWidth * BunnyHat.TILEDIMENSION - width;
+			double yDistanceImage = lvlSrc.goodBackgroundImages.get(i).height - height;
+			double yDistanceLevel = level.levelHeight * BunnyHat.TILEDIMENSION - height;
+			lvlSrc.goodBGIFactorX.add(xDistanceImage*1.0/xDistanceLevel);
+			lvlSrc.goodBGIFactorY.add(yDistanceImage*1.0/yDistanceLevel);
+		}
+		for (int i = 0; i < lvlSrc.badBackgroundImages.size(); i++) {
+			double xDistanceImage = lvlSrc.badBackgroundImages.get(i).width-width;
+			double xDistanceLevel = level.levelWidth * BunnyHat.TILEDIMENSION - width;
+			double yDistanceImage = lvlSrc.badBackgroundImages.get(i).height - height;
+			double yDistanceLevel = level.levelHeight * BunnyHat.TILEDIMENSION - height;
+			lvlSrc.badBGIFactorX.add(xDistanceImage*1.0/xDistanceLevel);
+			lvlSrc.badBGIFactorY.add(yDistanceImage*1.0/yDistanceLevel);
+		}
+		if (lvlSrc.badForeground != null) {
+			double xDistanceImage = lvlSrc.badForeground.width-width;
+			double xDistanceLevel = level.levelWidth * BunnyHat.TILEDIMENSION - width;
+			double yDistanceImage = lvlSrc.badForeground.height - height;
+			double yDistanceLevel = level.levelHeight * BunnyHat.TILEDIMENSION - height;
+			lvlSrc.badFGIFactorX=(xDistanceImage*1.0/xDistanceLevel);
+			lvlSrc.badFGIFactorY=(yDistanceImage*1.0/yDistanceLevel);
+		}
+		if (lvlSrc.goodForeground != null) {
+			double xDistanceImage = lvlSrc.goodForeground.width-width;
+			double xDistanceLevel = level.levelWidth * BunnyHat.TILEDIMENSION - width;
+			double yDistanceImage = lvlSrc.goodForeground.height - height;
+			double yDistanceLevel = level.levelHeight * BunnyHat.TILEDIMENSION - height;
+			lvlSrc.goodFGIFactorX=(xDistanceImage*1.0/xDistanceLevel);
+			lvlSrc.goodFGIFactorY=(yDistanceImage*1.0/yDistanceLevel);
+		}
 		
 		/*this.ownPlayer = new Player(processing, viewNumber, this.level);
 		this.ownPlayer.addObserver(this);
@@ -355,7 +399,7 @@ public class PlayerView extends Updateable implements Observer
 			buffer.background(100);
 		}
 		
-		this.drawLevelBackground(buffer);
+		
 		
 
 		if (ownPlayer == null)
@@ -539,7 +583,15 @@ public class PlayerView extends Updateable implements Observer
 		
 		drawpypos = height - drawpypos;
 		
-		//drawLevelGraphics(buffer, Level.Layer.BACKGROUND);
+		if (lvlSrc.badBackgroundImages.size() == 0 && level.dream == DreamStyle.BAD
+				|| lvlSrc.goodBackgroundImages.size() == 0 && level.dream == DreamStyle.GOOD) {
+			drawLevelGraphics(buffer, Level.Layer.BACKGROUND);
+		}
+		
+		if (lvlSrc.badBackgroundImages.size() > 0 && level.dream == DreamStyle.BAD
+				|| lvlSrc.goodBackgroundImages.size() > 0 && level.dream == DreamStyle.GOOD) {
+			this.drawLevelBackground(buffer);
+		}
 		
 		level.drawCreaturesAndObjects(xCoordCamera, yCoordCamera, 
 				xCoordCamera + width, yCoordCamera + height, buffer);
@@ -586,7 +638,15 @@ public class PlayerView extends Updateable implements Observer
 			//drawImage(otherPlayer.getCurrentTexture(), buffer, drawopxpos, drawopypos, Horizontal.LEFT, Vertical.BOTTOM);	
 		}*/
 		
-		//drawLevelGraphics(buffer, Level.Layer.FOREGROUND);
+		if (lvlSrc.badForeground == null && level.dream == DreamStyle.BAD
+				|| lvlSrc.goodForeground == null && level.dream == DreamStyle.GOOD) {
+			drawLevelGraphics(buffer, Level.Layer.FOREGROUND);
+		} 
+		
+		if (lvlSrc.badForeground != null && level.dream == DreamStyle.BAD
+				|| lvlSrc.goodForeground != null && level.dream == DreamStyle.GOOD) {
+			drawLevelForeground(buffer);
+		}
 		
 		if (gameOver)
 		{
@@ -608,34 +668,41 @@ public class PlayerView extends Updateable implements Observer
 	
 	private void drawLevelBackground(PGraphics graphics)
 	{
-		System.out.println(yCoordCamera);
-		graphics.loadPixels();
-		ArrayList<PImage> backgrounds = level.dream == DreamStyle.GOOD ? this.goodBackgroundImages : this.badBackgroundImages;
+		//System.out.println(yCoordCamera);
+		//graphics.loadPixels();
+		ArrayList<PImage> backgrounds = level.dream == DreamStyle.GOOD ? lvlSrc.goodBackgroundImages : lvlSrc.badBackgroundImages;
 		for (int i = 0; i < backgrounds.size(); i++) {
 			PImage image = backgrounds.get(i);
-			double xDistanceImage = image.width-width;
-			double xDistanceLevel = level.levelWidth * BunnyHat.TILEDIMENSION - width;
-			double yDistanceImage = image.height - height;
-			double yDistanceLevel = level.levelHeight * BunnyHat.TILEDIMENSION - height;
-			int x = (int)(xCoordCamera*(xDistanceImage/xDistanceLevel));
-			int y = (int)((level.levelHeight*BunnyHat.TILEDIMENSION - (yCoordCamera+height))*(yDistanceImage/yDistanceLevel));
-			System.out.println(y);
-			PImage imageArea = image.get(x, y, width, height);
-			
-			
-			// and now : copy pixel wise! yay!
-			
-			imageArea.loadPixels();
-			for (int p = 0; p < width*height; p++) {
-				
-					graphics.pixels[p] = 
-								imageArea.pixels[p];
-				
-			}
-			
+			drawLayer(graphics, image,
+					(Double)(level.dream == DreamStyle.GOOD ? lvlSrc.goodBGIFactorX.get(i) : lvlSrc.badBGIFactorX.get(i)),
+					(Double)(level.dream == DreamStyle.GOOD ? lvlSrc.goodBGIFactorY.get(i) : lvlSrc.badBGIFactorY.get(i)));
 			//graphics.copy(image, x, y, width, height, 0, 0, width, height);
 		}
-		graphics.updatePixels();
+		//graphics.updatePixels();
+	}
+	
+	private void drawLevelForeground(PGraphics graphics) {
+		PImage foreground = level.dream == DreamStyle.GOOD ? lvlSrc.goodForeground : lvlSrc.badForeground;
+		drawLayer(graphics, foreground, 
+				(Double)(level.dream == DreamStyle.GOOD ? lvlSrc.goodFGIFactorX : lvlSrc.badFGIFactorX),
+				(Double)(level.dream == DreamStyle.GOOD ? lvlSrc.goodFGIFactorY : lvlSrc.badFGIFactorY));
+	}
+	
+	
+	
+	private void drawLayer(PGraphics graphics, PImage image, double xFactor, double yFactor) {
+		graphics.loadPixels();
+		
+		int x = (int)(xCoordCamera*xFactor);
+		int y = (int)((level.levelHeight*BunnyHat.TILEDIMENSION - (yCoordCamera+height))*yFactor);
+		//System.out.println(y);
+		PImage imageArea = image.get(x, y, width, height);
+		
+		
+		
+		graphics.image(imageArea, 0, 0);
+		
+
 	}
 	
 

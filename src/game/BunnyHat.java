@@ -26,11 +26,14 @@ public class BunnyHat extends PApplet implements Observer
 	public static AnimationImages ANIMATION_IMAGES;
 	private static HashMap<String, PImage> imageBuffer = new HashMap<String, PImage>();
 	
-	private class LevelSource {
-		String goodLevelFile, badLevelFile;
-		ArrayList<PImage> goodBackgroundImages, badBackgroundImages;
-		String previewImage; 
-		String music;
+	public class LevelSource {
+		public String goodLevelFile, badLevelFile;
+		public ArrayList<PImage> goodBackgroundImages, badBackgroundImages;
+		public ArrayList<Double> goodBGIFactorX, goodBGIFactorY, badBGIFactorX, badBGIFactorY;
+		public PImage goodForeground, badForeground;
+		public double goodFGIFactorX, goodFGIFactorY, badFGIFactorX, badFGIFactorY;
+		public String previewImage; 
+		public String music;
 	}
 	private ArrayList<LevelSource> levelSources;
 	
@@ -41,6 +44,9 @@ public class BunnyHat extends PApplet implements Observer
 	int FPS_AVERAGE_SAMPLE_SIZE = 10; // number of last measurements to take into account 
 	int FRAMERATE_GAME = SETTINGS.getValue("game/frameRateGame");
 	int FRAMERATE_MENU = SETTINGS.getValue("game/frameRateMenu");
+	
+	public static boolean DRAW_BACKGROUND = SETTINGS.getValue("graphics/tuning/drawBackground");
+	public static int BACKGROUND_LAYERS_MAX = SETTINGS.getValue("graphics/tuning/backgroundLayersMax");
 	
 	public static int TILEDIMENSION = SETTINGS.getValue("gui/tiledimension");
 	
@@ -156,6 +162,10 @@ public class BunnyHat extends PApplet implements Observer
 				LevelSource lvlSrc = new LevelSource();
 				lvlSrc.badBackgroundImages = new ArrayList<PImage>();
 				lvlSrc.goodBackgroundImages = new ArrayList<PImage>();
+				lvlSrc.badBGIFactorX = new ArrayList<Double>();
+				lvlSrc.badBGIFactorY = new ArrayList<Double>();
+				lvlSrc.goodBGIFactorX = new ArrayList<Double>();
+				lvlSrc.goodBGIFactorY = new ArrayList<Double>();
 				for (int e = 0; e < files.length; e++) {
 					String name = files[e].getName();
 					if (name.endsWith("ad.tmx")) {
@@ -166,10 +176,16 @@ public class BunnyHat extends PApplet implements Observer
 						lvlSrc.music = files[e].getAbsolutePath();
 					} else if (name.endsWith(".png")) {
 						String path = files[e].getAbsolutePath();
-						if (name.startsWith("good")) {
+						if (name.startsWith("good") && DRAW_BACKGROUND 
+								&& lvlSrc.goodBackgroundImages.size() <= BACKGROUND_LAYERS_MAX) {
 							lvlSrc.goodBackgroundImages.add(loadImage(path));
-						} else if (name.startsWith("bad")) {
+						} else if (name.startsWith("bad") && DRAW_BACKGROUND
+								&& lvlSrc.badBackgroundImages.size() <= BACKGROUND_LAYERS_MAX) {
 							lvlSrc.badBackgroundImages.add(loadImage(path));
+						} else if (name.startsWith("foreground_good")) {
+							lvlSrc.goodForeground = loadImage(path);
+						} else if (name.startsWith("foreground_bad")) {
+							lvlSrc.badForeground = loadImage(path);
 						} else if (name.contentEquals("preview.png")) {
 							lvlSrc.previewImage = path;
 							dummy = loadImage(path);
@@ -814,11 +830,9 @@ public class BunnyHat extends PApplet implements Observer
 		DreamStyle stylePlayer2 = SAME_DREAM ? stylePlayer1 : 
 			(stylePlayer1 == DreamStyle.GOOD ? DreamStyle.BAD : DreamStyle.GOOD);
 		view1 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 1, 
-				goodDream, badDream, gameMaster, stylePlayer1,
-				lvlSrc.goodBackgroundImages, lvlSrc.badBackgroundImages);
+				goodDream, badDream, gameMaster, stylePlayer1, lvlSrc);
 		view2 = new PlayerView(width, (height - RACEINDICATORHEIGHT)/2, this, 2,
-				goodDream, badDream, gameMaster, stylePlayer2,
-				lvlSrc.goodBackgroundImages, lvlSrc.badBackgroundImages);
+				goodDream, badDream, gameMaster, stylePlayer2, lvlSrc);
 		/*view3 = new PlayerView(width/2, PLAYERVIEWHEIGHT, this, 2,
 				(String)SETTINGS.getValue("levels/level"+level+"/bad"), gameMaster);*/
 		player1 = new Player(this, 1, view1.getLevel());
