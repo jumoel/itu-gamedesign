@@ -98,7 +98,6 @@ public class PlayerView extends Updateable implements Observer
 	protected void initSwitchPrepare() {this.shouldPrepareSwitch = true;}
 	private void switchPrepare() { 
 		switchHappening = true;
-		ownPlayer.holdAnimation();
 		if (level.dream == DreamStyle.GOOD) {
 			colorLayerColor[0] = 100;
 			colorLayerColor[1] = 100;
@@ -122,7 +121,6 @@ public class PlayerView extends Updateable implements Observer
 	
 	protected void initSwitchFinish() {this.shouldFinishSwitch = true;}
 	private void switchFinish() {
-		ownPlayer.unholdAnimation();
 		switchHappening = false;
 		level.removeAllPushBoxConstraints();
 	}

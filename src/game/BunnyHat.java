@@ -102,7 +102,7 @@ public class BunnyHat extends PApplet implements Observer
 	public static boolean SOUND_CONTROL_SUPPORTED = true;
 	private int[] screenResolutionHeight = {768, 768, 900, 900, 1200};
 	private int[] screenResolutionWidth = {1024, 1366, 1440, 1600, 1600};
-	private Dimension[] screenResolutions;
+	private ArrayList<Dimension> screenResolutions;
 	private Animation niah, noah;
 	
 	
@@ -183,13 +183,16 @@ public class BunnyHat extends PApplet implements Observer
 		//attempt to get a full screen mode - only working as an application 		
 		fs = new FullScreen(this);
 		if (fs.available()) {
-			this.screenResolutions = fs.getResolutions();
-			//size(screen.width, screen.height);
-			for (int i = 0; i < screenResolutions.length; i++) {
-				if (screenResolutions[i].height >= 768) {
-					fs.setResolution(screenResolutions[i].width, screenResolutions[i].height);
+			Dimension[] resus = fs.getResolutions();
+			this.screenResolutions = new ArrayList<Dimension>();
+			for (int i = 0; i < resus.length; i++) {
+				if (resus[i].height >= 768) {
+					this.screenResolutions.add(resus[i]);
 				}
 			}
+			
+			fs.setResolution(screenResolutions.get(0).width, screenResolutions.get(0).height);
+				
 			fs.enter();
 		}
 		
@@ -380,6 +383,37 @@ public class BunnyHat extends PApplet implements Observer
 		int currentY = 100;
 		int buttonNumber = 0;
 		int buttonSpacing = 100;
+		int textSpacing = 20;
+		int textX = width/2 - 200;
+		
+		fill(0);
+		
+		text("Ministry of Art", textX, currentY);
+		currentY += textSpacing;
+		
+		text("  Ioana Marin", textX, currentY);
+		currentY += textSpacing;
+		
+		text("  K Ceiriog Shonibare-Lewis", textX, currentY);
+		currentY += textSpacing*2;
+		
+		text("Ministry of Code", textX, currentY);
+		currentY += textSpacing;
+		
+		text("  Julian M¿ller", textX, currentY);
+		currentY += textSpacing;
+		
+		text("  Steen Pedersen", textX, currentY);
+		currentY += textSpacing*2;
+		
+		text("Ministry of Story", textX, currentY);
+		currentY += textSpacing;
+		
+		text("  Nanna Florang Pedersen", textX, currentY);
+		currentY += textSpacing;
+		
+		text("  Samuel Walz", textX, currentY);
+		currentY += textSpacing;
 		
 		// button back
 		drawButton("menu/game/", "Back", buttonNumber, currentY);

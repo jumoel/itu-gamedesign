@@ -1,0 +1,32 @@
+name: AirJump
+states:
+  - # 0
+    name: initial
+    onHigher: 1 # go on
+    weightHigher: 2
+  - # 1
+    name: detected higher No 1
+    onHigher: 1 # stay
+    weightSame: 2
+    onNone: 2 # go on
+  - # 2
+    name: detected gap No 1
+    weightNone: 7 # to much silence and we return 
+    onLower: 3 # one higher and we are satisfied
+  - # 3
+    name : detected lower No 1
+    onHigher: 4 # go on
+    weightHigher: 2
+    weightSame: 2
+  - # 4
+    name: detected higher No 2
+    weightSame: 2 # one single same can happen
+    onHigher: 4 # stay
+    onLower: 5 # go on
+  - # 5
+    name: detected lower No 2
+    weightLower: 4
+    confirmed: true
+    pattern: 4
+  
+      

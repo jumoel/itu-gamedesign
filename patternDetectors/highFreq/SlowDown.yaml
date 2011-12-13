@@ -1,0 +1,51 @@
+name: SlowDown
+states:
+  - # 0
+    name: initial
+    onLower: 1 # go on
+    weightLower: 2
+  - # 1
+    name: detected lower No 1
+    onLower: 1 # stay
+    onNone: 2 # go on
+  - # 2
+    name: detected gap No 1
+    weightNone: 7 # to much silence and we return 
+    onHigher: 3 # one higher and we are satisfied
+  - # 3
+    name : detected higher No 1
+    onLower: 4 # go on
+    weightLower: 2
+  - # 4
+    name: detected lower No 2
+    weightSame: 2 # one single same can happen
+    onLower: 4 # stay
+    onNone: 5 # go on
+  - # 5
+    name: detected gap No 2
+    weightNone: 7 # to much silence and we return 
+    onHigher: 6 # one higher and we are satisfied
+  - # 6
+    name : detected higher No 2
+    onLower: 7 # go on
+    weightLower: 2
+  - # 7
+    name: detected lower No 3 - confirmed!
+    weightSame: 2 # one single same can happen
+    onLower: 7 # stay
+    onNone: 8 # go on
+    confirmed: true
+    pattern: 2
+  - # 8
+    name: detected gap No 3 - confirmed!
+    weightNone: 7 # to much silence and we return 
+    onHigher: 9 # one higher and we are satisfied
+    confirmed: true
+    pattern : 2
+  - # 9
+    name : detected higher No 3 - confirmed!
+    onLower: 7 # loop the last 3 - it is confirmed now!
+    weightLower: 2
+    confirmed: true
+    pattern: 2
+      

@@ -34,6 +34,8 @@ public class Player extends GameElement implements Observer
 	private boolean didJump = false;
 	private boolean didFire = false;
 	
+	
+	
 	//public boolean isMovingSideways;
 
 	
@@ -44,7 +46,12 @@ public class Player extends GameElement implements Observer
 	
 	//private Facing facing;
 
-	private boolean unarmed;
+	private boolean unarmed = true;
+	private boolean onSpeed = false;
+	private int speedLeftMs = 0;
+	private boolean onValium = false;
+	private int valiumLeftMs = 0;
+	private boolean airJump = false;
 	
 	private Animation walkAnimation;
 	private Animation jumpAnimation;
@@ -87,25 +94,6 @@ public class Player extends GameElement implements Observer
 	}
 	public void takeWeapon() {
 		this.unarmed = true;
-	}
-	
-	public void holdAnimation() {
-		
-		/*this.walkAnimation.holdAnimation();
-		this.jumpAnimation.holdAnimation();
-		this.idleAnimation.holdAnimation();
-		this.walkAnimationGun.holdAnimation();
-		this.jumpAnimationGun.holdAnimation();
-		this.idleAnimationGun.holdAnimation();*/
-	}
-	
-	public void unholdAnimation() {
-		this.walkAnimation.unholdAnimation();
-		this.jumpAnimation.unholdAnimation();
-		this.idleAnimation.unholdAnimation();
-		this.walkAnimationGun.unholdAnimation();
-		this.jumpAnimationGun.unholdAnimation();
-		this.idleAnimationGun.unholdAnimation();
 	}
 	
 	public void setLevel(Level level) {
@@ -363,7 +351,37 @@ public class Player extends GameElement implements Observer
 	public void update(State state, int deltaT)
 	{
 		if (theWinner == -1) handleInput(state);
-		//else xSpeed = 0;
+	
+		// effects counter each other
+		if (onValium && onSpeed) onValium = onSpeed = false; 
+		
+		if (onSpeed) {
+			if (this.speedLeftMs < 0) {
+				onSpeed = false;
+				this.drawTrail = false;
+				this.moveAccelModifier = 1.0;
+			} else {
+				this.speedLeftMs -= deltaT;
+				this.drawTrail = true;
+				this.moveAccelModifier = 1.5;
+			}
+		}
+		
+		if (onValium) {
+			if (this.valiumLeftMs < 0) {
+				onValium = false;
+				this.drawTrail = false;
+				this.moveAccelModifier = 1.0;
+			} else {
+				this.valiumLeftMs -= deltaT;
+				this.drawTrail = true;
+				this.moveAccelModifier = 0.5;
+			}
+		}
+		
+		if (isJumping && airJump) ySpeed = JUMPFORCE; 
+		if (airJump) airJump = false;
+		
 		
 		while ((level.getMetaDataAt((int)(xpos+0.2), (int)(ypos+1.5)) == Level.MetaTiles.OBSTACLE.index())
 				|| level.getMetaDataAt((int)(xpos+0.8), (int)(ypos+1.5)) == Level.MetaTiles.OBSTACLE.index()) {
@@ -375,7 +393,7 @@ public class Player extends GameElement implements Observer
 		super.update(deltaT);
 		
 		double xSignum = Math.signum(xSpeed);
-		xSpeed = BMath.clamp(xSpeed, 0, xSignum * MAXSPEED);
+		xSpeed = BMath.clamp(xSpeed, 0, xSignum * MAXSPEED * this.moveAccelModifier);
 		
 		controlAnimations();
 		
@@ -586,19 +604,28 @@ public class Player extends GameElement implements Observer
 			HashMap map = (HashMap)arg1;
 			String detector = (String)map.get("detector");
 			String pattern = (String)map.get("pattern");
-			System.out.println("fand:"+pattern);
+			//System.out.println("fand:"+pattern);
 			if (detector == "HF" && level.dream == DreamStyle.GOOD) {
-				System.out.println("HF detector sagt");
+				//System.out.println("HF detector sagt");
 				if (pattern.contentEquals("SpeedUp")) {
 					System.out.println("let's speed up");
-					this.moveAccelModifier = 1.5;
-					this.drawTrail = true;
-				} else {
-					this.moveAccelModifier = 1.0;
-					this.drawTrail = false;
+					this.onSpeed = true;
+					this.speedLeftMs = 10000;
+					//this.moveAccelModifier = 1.5;
+					//this.drawTrail = true;
+				} else if (pattern.contentEquals("AirJump")) {
+					this.airJump = true;
 				}
 			} else if (detector == "LF" && level.dream == DreamStyle.BAD) {
 				
+			} else if (detector == "HF" && level.dream == DreamStyle.BAD) {
+				if (pattern.contentEquals("SlowDown")) {
+					System.out.println("let's slow down");
+					this.onValium = true;
+					this.valiumLeftMs = 10000;
+					//this.moveAccelModifier = 1.5;
+					//this.drawTrail = true;
+				}
 			}
 		}
 		
