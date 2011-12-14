@@ -583,8 +583,8 @@ public class PlayerView extends Updateable implements Observer
 		
 		drawpypos = height - drawpypos;
 		
-		if (lvlSrc.badBackgroundImages.size() == 0 && level.dream == DreamStyle.BAD
-				|| lvlSrc.goodBackgroundImages.size() == 0 && level.dream == DreamStyle.GOOD) {
+		if (lvlSrc.badForeground == null && level.dream == DreamStyle.BAD
+				|| lvlSrc.goodForeground == null && level.dream == DreamStyle.GOOD) {
 			drawLevelGraphics(buffer, Level.Layer.BACKGROUND);
 		}
 		

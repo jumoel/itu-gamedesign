@@ -43,6 +43,7 @@ public class GoodSheep extends GameElement
 	
 	@Override
 	public void update(int deltaT) {
+		this.xSpeed = this.oldXSpeed;
 		super.update(deltaT);
 		if (this.xSpeed == 0) {
 			this.oldXSpeed = this.xSpeed = -this.oldXSpeed; 

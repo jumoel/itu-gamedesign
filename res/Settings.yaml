@@ -4,7 +4,7 @@ game:
   frameRateGame: 60 # the framerate the game will _try_ to reach
 gameplay:
   deltatdivident: 100
-  clamptozero: 0.001
+  clamptozero: 0.000001
   gravity: -1.0
   jumpforce: 4.0
   bounceforce: 5.0
@@ -47,7 +47,7 @@ gui:
     tintb: 0
 graphics:
   tuning:
-    drawBackground: true # shall we show the background graphics?
+    drawBackground: false # shall we show the background graphics?
     backgroundLayersMax: 5 # how many background layers?
   effects:
     trail:
