@@ -1,5 +1,7 @@
 package game;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.LinkedHashMap;
 
@@ -13,9 +15,20 @@ public class Settings
 	public Settings()
 	{
 		Yaml yaml = new Yaml();
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream("Settings.yaml");
+		InputStream is = null;
+		try
+		{
+			is = new FileInputStream("Settings.yaml");
+		}
+		catch (FileNotFoundException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		values = (LinkedHashMap<String, Object>) yaml.load(is);
+		if (is != null) {
+			values = (LinkedHashMap<String, Object>) yaml.load(is);
+		}
 	}
 	
 	public <T> T getValue(String name)
